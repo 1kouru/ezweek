@@ -1,43 +1,23 @@
 import { supabase } from "./supabase.js";
 
-
 /* =========================================
    ELEMENTS
 ========================================= */
 
-const dayName =
-    document.getElementById("dayName");
+const dayName = document.getElementById("dayName");
+const currentTime = document.getElementById("currentTime");
+const selectedDayLabel = document.getElementById("selectedDayLabel");
+const selectedDayName = document.getElementById("selectedDayName");
 
-const currentTime =
-    document.getElementById("currentTime");
+const schedule = document.getElementById("schedule");
+const board = document.getElementById("scheduleBoard");
 
-const selectedDayLabel =
-    document.getElementById("selectedDayLabel");
+const pointer = document.getElementById("timePointer");
+const pointerSymbol = document.getElementById("pointerSymbol");
+const emptyState = document.getElementById("emptyState");
 
-const selectedDayName =
-    document.getElementById("selectedDayName");
-
-const schedule =
-    document.getElementById("schedule");
-
-const board =
-    document.getElementById("scheduleBoard");
-
-const pointer =
-    document.getElementById("timePointer");
-
-const pointerSymbol =
-    document.getElementById("pointerSymbol");
-
-const emptyState =
-    document.getElementById("emptyState");
-
-const prevDay =
-    document.getElementById("prevDay");
-
-const nextDay =
-    document.getElementById("nextDay");
-
+const prevDay = document.getElementById("prevDay");
+const nextDay = document.getElementById("nextDay");
 const selectedDayButton =
     document.getElementById("selectedDayButton");
 
@@ -58,7 +38,6 @@ const DAYS = [
     "SATURDAY",
     "SUNDAY"
 ];
-
 
 const SHORT = {
     MONDAY: "MON",
@@ -83,39 +62,28 @@ function defaultSchedule() {
         days[day] = [];
     });
 
-
     return {
-
         days,
 
         global: {
-
             gridType: "rows",
-
             gridThickness: 1,
-
             gridColor: "#e8e8e8"
-
         },
 
         pointer: {
-
             icon: 1,
-
             color: "#111111",
-
             size: 28,
 
+            // ВАЖНО:
+            // градиент pointer принудительно выключен.
             gradient: false,
 
             gradientStart: "#ff4ecd",
-
             gradientEnd: "#7c5cff"
-
         }
-
     };
-
 }
 
 
@@ -123,11 +91,8 @@ function defaultSchedule() {
    STATE
 ========================================= */
 
-let scheduleData =
-    defaultSchedule();
-
+let scheduleData = defaultSchedule();
 let selectedDay = null;
-
 let user = null;
 
 
@@ -140,42 +105,21 @@ async function loadUser() {
     const {
         data,
         error
-    } =
-        await supabase.auth.getSession();
+    } = await supabase.auth.getSession();
 
+    if (error || !data.session) {
 
-    if (error) {
-
-        console.error(
-            "AUTH ERROR:",
-            error
-        );
-
-        window.location.href =
-            "auth.html";
+        window.location.href = "auth.html";
 
         return null;
-
     }
-
-
-    if (!data.session) {
-
-        window.location.href =
-            "auth.html";
-
-        return null;
-
-    }
-
 
     return data.session.user;
-
 }
 
 
 /* =========================================
-   LOAD SCHEDULE
+   LOAD
 ========================================= */
 
 async function loadSchedule() {
@@ -183,16 +127,11 @@ async function loadSchedule() {
     const {
         data,
         error
-    } =
-        await supabase
-            .from("schedules")
-            .select("data")
-            .eq(
-                "user_id",
-                user.id
-            )
-            .maybeSingle();
-
+    } = await supabase
+        .from("schedules")
+        .select("data")
+        .eq("user_id", user.id)
+        .maybeSingle();
 
     if (error) {
 
@@ -202,31 +141,20 @@ async function loadSchedule() {
         );
 
         return;
-
     }
 
-
-    if (
-        data &&
-        data.data
-    ) {
+    if (data?.data) {
 
         scheduleData =
-            normalizeSchedule(
-                data.data
-            );
+            normalizeSchedule(data.data);
 
-    }
-
-    else {
+    } else {
 
         scheduleData =
             defaultSchedule();
 
         await saveSchedule();
-
     }
-
 }
 
 
@@ -234,43 +162,76 @@ async function loadSchedule() {
    NORMALIZE
 ========================================= */
 
-function normalizeSchedule(data) {
+function normalizeSchedule(input) {
 
-    const base =
-        defaultSchedule();
-
+    const base = defaultSchedule();
 
     const result = {
-
         ...base,
-
-        ...data,
+        ...input,
 
         global: {
-
             ...base.global,
-
-            ...(data.global || {})
-
+            ...(input?.global || {})
         },
 
         pointer: {
-
             ...base.pointer,
-
-            ...(data.pointer || {})
-
+            ...(input?.pointer || {})
         },
 
         days: {
-
             ...base.days,
-
-            ...(data.days || {})
-
+            ...(input?.days || {})
         }
-
     };
+
+
+    /*
+     * editor.js использует gridType.
+     *
+     * Старые версии могли сохранять grid.
+     * Поддерживаем оба варианта.
+     */
+
+    if (
+        input?.global?.gridType
+    ) {
+
+        result.global.gridType =
+            input.global.gridType;
+
+    } else if (
+        input?.global?.grid
+    ) {
+
+        result.global.gridType =
+            input.global.grid;
+
+    }
+
+
+    /*
+     * Pointer.
+     *
+     * editor.js хранит icon.
+     */
+
+    if (
+        input?.pointer?.icon !== undefined
+    ) {
+
+        result.pointer.icon =
+            Number(input.pointer.icon);
+
+    }
+
+
+    /*
+     * Градиент pointer НЕ используем.
+     */
+
+    result.pointer.gradient = false;
 
 
     DAYS.forEach(day => {
@@ -282,73 +243,133 @@ function normalizeSchedule(data) {
         ) {
 
             result.days[day] = [];
-
         }
 
 
         result.days[day] =
-            result.days[day].map(item => ({
+            result.days[day].map(task => {
 
-                ...createDefaultTask(),
+                return {
 
-                ...item
+                    id:
+                        task.id ||
+                        crypto.randomUUID(),
 
-            }));
+                    time:
+                        task.time ||
+                        "08:00",
+
+                    text:
+                        task.text ||
+                        "",
+
+
+                    /*
+                     * TIME
+                     */
+
+                    timeColor:
+                        task.timeColor ||
+                        "#999999",
+
+                    timeSize:
+                        Number(
+                            task.timeSize ??
+                            11
+                        ),
+
+                    timeWeight:
+                        Number(
+                            task.timeWeight ??
+                            600
+                        ),
+
+
+                    /*
+                     * TEXT
+                     */
+
+                    color:
+                        task.color ||
+                        "#111111",
+
+                    fontSize:
+                        Number(
+                            task.fontSize ??
+                            15
+                        ),
+
+                    fontFamily:
+                        task.fontFamily ||
+                        "Arial",
+
+                    fontWeight:
+                        Number(
+                            task.fontWeight ??
+                            500
+                        ),
+
+
+                    /*
+                     * TEXT GRADIENT
+                     */
+
+                    gradient:
+                        Boolean(
+                            task.gradient
+                        ),
+
+                    gradientStart:
+                        task.gradientStart ||
+                        "#ff4ecd",
+
+                    gradientEnd:
+                        task.gradientEnd ||
+                        "#7c5cff",
+
+
+                    /*
+                     * TIME BACKGROUND
+                     */
+
+                    timeBackground:
+                        task.timeBackground ||
+                        "transparent",
+
+                    timeRadius:
+                        Number(
+                            task.timeRadius ??
+                            10
+                        ),
+
+                    timePadding:
+                        Number(
+                            task.timePadding ??
+                            7
+                        ),
+
+
+                    /*
+                     * старые поля тоже сохраняем,
+                     * чтобы ничего не ломалось
+                     */
+
+                    background:
+                        task.background,
+
+                    radius:
+                        task.radius,
+
+                    padding:
+                        task.padding
+                };
+
+            });
 
     });
 
 
     return result;
-
-}
-
-
-/* =========================================
-   DEFAULT TASK
-========================================= */
-
-function createDefaultTask() {
-
-    return {
-
-        time: "08:00",
-
-        text: "",
-
-        timeColor: "#999999",
-
-        timeSize: 11,
-
-        timeWeight: 600,
-
-        timeGradient: false,
-
-        timeGradientStart: "#ff4ecd",
-
-        timeGradientEnd: "#7c5cff",
-
-        timeBackground: "transparent",
-
-        timeRadius: 10,
-
-        timePadding: 7,
-
-        color: "#111111",
-
-        fontSize: 15,
-
-        fontFamily: "Arial",
-
-        fontWeight: 500,
-
-        gradient: false,
-
-        gradientStart: "#ff4ecd",
-
-        gradientEnd: "#7c5cff"
-
-    };
-
 }
 
 
@@ -362,30 +383,23 @@ async function saveSchedule() {
         return false;
     }
 
-
     const {
         error
-    } =
-        await supabase
-            .from("schedules")
-            .upsert(
-                {
-                    user_id:
-                        user.id,
+    } = await supabase
+        .from("schedules")
+        .upsert(
+            {
+                user_id: user.id,
 
-                    data:
-                        scheduleData,
+                data: scheduleData,
 
-                    updated_at:
-                        new Date()
-                            .toISOString()
-
-                },
-                {
-                    onConflict:
-                        "user_id"
-                }
-            );
+                updated_at:
+                    new Date().toISOString()
+            },
+            {
+                onConflict: "user_id"
+            }
+        );
 
 
     if (error) {
@@ -396,12 +410,9 @@ async function saveSchedule() {
         );
 
         return false;
-
     }
 
-
     return true;
-
 }
 
 
@@ -415,34 +426,22 @@ function getAlmatyTime() {
         new Intl.DateTimeFormat(
             "en-US",
             {
-                timeZone:
-                    "Asia/Almaty",
+                timeZone: "Asia/Almaty",
 
-                hour:
-                    "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
 
-                minute:
-                    "2-digit",
-
-                second:
-                    "2-digit",
-
-                hour12:
-                    false
+                hour12: false
             }
-        )
-        .formatToParts(
-            new Date()
-        );
+        ).formatToParts(new Date());
 
 
     let hour =
         Number(
             parts.find(
-                p =>
-                    p.type ===
-                    "hour"
-            ).value
+                p => p.type === "hour"
+            )?.value || 0
         );
 
 
@@ -458,23 +457,17 @@ function getAlmatyTime() {
         minute:
             Number(
                 parts.find(
-                    p =>
-                        p.type ===
-                        "minute"
-                ).value
+                    p => p.type === "minute"
+                )?.value || 0
             ),
 
         second:
             Number(
                 parts.find(
-                    p =>
-                        p.type ===
-                        "second"
-                ).value
+                    p => p.type === "second"
+                )?.value || 0
             )
-
     };
-
 }
 
 
@@ -483,18 +476,12 @@ function getAlmatyDay() {
     return new Intl.DateTimeFormat(
         "en-US",
         {
-            timeZone:
-                "Asia/Almaty",
-
-            weekday:
-                "long"
+            timeZone: "Asia/Almaty",
+            weekday: "long"
         }
     )
-    .format(
-        new Date()
-    )
-    .toUpperCase();
-
+        .format(new Date())
+        .toUpperCase();
 }
 
 
@@ -503,17 +490,11 @@ function seconds(time) {
     const [
         h,
         m
-    ] =
-        time
-            .split(":")
-            .map(Number);
+    ] = String(time)
+        .split(":")
+        .map(Number);
 
-
-    return (
-        h * 3600 +
-        m * 60
-    );
-
+    return h * 3600 + m * 60;
 }
 
 
@@ -528,7 +509,6 @@ function sortItems(items) {
             seconds(a.time) -
             seconds(b.time)
     );
-
 }
 
 
@@ -546,17 +526,13 @@ function render() {
     board.innerHTML = "";
 
 
-    const global =
-        scheduleData.global || {};
-
-
     /*
      * GRID VARIABLES
      */
 
     board.style.setProperty(
         "--grid-color",
-        global.gridColor ||
+        scheduleData.global.gridColor ||
         "#e8e8e8"
     );
 
@@ -564,31 +540,32 @@ function render() {
     board.style.setProperty(
         "--grid-thickness",
         `${Number(
-            global.gridThickness || 1
+            scheduleData.global.gridThickness ?? 1
         )}px`
     );
 
 
+    /*
+     * GRID TYPE
+     */
+
+    renderGridStyle();
+
+
     const items =
         sortItems(
-            scheduleData.days[
-                selectedDay
-            ] || []
+            scheduleData.days[selectedDay] || []
         );
 
 
     if (!items.length) {
 
-        board.appendChild(
-            emptyState
-        );
+        board.appendChild(emptyState);
 
         emptyState.style.display =
             "block";
 
-    }
-
-    else {
+    } else {
 
         emptyState.style.display =
             "none";
@@ -597,29 +574,23 @@ function render() {
         items.forEach(item => {
 
             const row =
-                document.createElement(
-                    "div"
-                );
-
+                document.createElement("div");
 
             row.className =
                 "schedule-row";
-
 
             row.dataset.time =
                 item.time;
 
 
-            /* =================================
-               TIME SETTINGS
-            ================================= */
+            /*
+             * TIME
+             */
 
             row.style.setProperty(
                 "--time-color",
-                item.timeColor ||
-                "#999999"
+                item.timeColor || "#999999"
             );
-
 
             row.style.setProperty(
                 "--time-size",
@@ -628,18 +599,19 @@ function render() {
                 )}px`
             );
 
-
             row.style.setProperty(
                 "--time-weight",
-                Number(
-                    item.timeWeight ?? 600
+                String(
+                    Number(
+                        item.timeWeight ?? 600
+                    )
                 )
             );
 
 
-            /* =================================
-               TASK SETTINGS
-            ================================= */
+            /*
+             * TEXT
+             */
 
             row.style.setProperty(
                 "--task-size",
@@ -648,21 +620,19 @@ function render() {
                 )}px`
             );
 
-
             row.style.setProperty(
                 "--task-color",
-                item.color ||
-                "#111111"
+                item.color || "#111111"
             );
-
 
             row.style.setProperty(
                 "--task-weight",
-                Number(
-                    item.fontWeight ?? 500
+                String(
+                    Number(
+                        item.fontWeight ?? 500
+                    )
                 )
             );
-
 
             row.style.setProperty(
                 "--task-font",
@@ -671,133 +641,70 @@ function render() {
             );
 
 
+            /*
+             * TEXT BACKGROUND
+             */
+
             row.style.setProperty(
                 "--task-background",
-                item.background ||
                 "transparent"
             );
 
 
+            /*
+             * TIME BOX
+             */
+
             row.style.setProperty(
-                "--task-radius",
+                "--time-radius",
                 `${Number(
-                    item.radius ??
-                    item.taskRadius ??
-                    12
+                    item.timeRadius ?? 10
+                )}px`
+            );
+
+            row.style.setProperty(
+                "--time-padding",
+                `${Number(
+                    item.timePadding ?? 7
                 )}px`
             );
 
 
-            row.style.setProperty(
-                "--task-padding",
-                `${Number(
-                    item.padding ??
-                    item.taskPadding ??
-                    10
-                )}px`
-            );
-
-
-            /* =================================
-               TIME
-            ================================= */
+            /*
+             * TASK
+             */
 
             const time =
-                document.createElement(
-                    "div"
-                );
-
+                document.createElement("div");
 
             time.className =
                 "schedule-time";
-
 
             time.textContent =
                 item.time;
 
 
-            /*
-             * TIME BACKGROUND
-             */
-
-            if (
-                item.timeBackground &&
-                item.timeBackground !==
-                "transparent"
-            ) {
-
-                time.style.background =
-                    item.timeBackground;
-
-            }
-
-
-            time.style.borderRadius =
-                `${Number(
-                    item.timeRadius ?? 10
-                )}px`;
-
-
-            time.style.padding =
-                `0 ${Number(
-                    item.timePadding ?? 7
-                )}px`;
-
-
-            /*
-             * ВАЖНО:
-             *
-             * Градиент времени НЕ включаем.
-             * На главной странице время
-             * всегда обычного цвета.
-             */
-
-            time.style.backgroundImage =
-                "none";
-
-            time.style.webkitBackgroundClip =
-                "initial";
-
-            time.style.backgroundClip =
-                "initial";
-
-            time.style.webkitTextFillColor =
-                "initial";
-
-            time.style.color =
-                item.timeColor ||
-                "#999999";
-
-
-            /* =================================
-               TASK
-            ================================= */
-
             const task =
-                document.createElement(
-                    "div"
-                );
-
+                document.createElement("div");
 
             task.className =
                 "schedule-task";
-
 
             task.textContent =
                 item.text || "";
 
 
             /*
-             * TEXT GRADIENT
+             * TEXT COLOR / GRADIENT
              */
 
             if (item.gradient) {
 
-                task.style.background =
+                task.style.backgroundImage =
                     `linear-gradient(
                         90deg,
-                        ${item.gradientStart || "#ff4ecd"},
-                        ${item.gradientEnd || "#7c5cff"}
+                        ${item.gradientStart},
+                        ${item.gradientEnd}
                     )`;
 
                 task.style.webkitBackgroundClip =
@@ -812,9 +719,7 @@ function render() {
                 task.style.color =
                     "transparent";
 
-            }
-
-            else {
+            } else {
 
                 task.style.backgroundImage =
                     "none";
@@ -831,12 +736,34 @@ function render() {
                 task.style.color =
                     item.color ||
                     "#111111";
+            }
 
+
+            /*
+             * TIME BACKGROUND
+             */
+
+            const timeBackground =
+                item.timeBackground;
+
+
+            if (
+                timeBackground &&
+                timeBackground !==
+                "transparent"
+            ) {
+
+                time.style.background =
+                    timeBackground;
+
+            } else {
+
+                time.style.background =
+                    "transparent";
             }
 
 
             row.appendChild(time);
-
             row.appendChild(task);
 
             board.appendChild(row);
@@ -846,12 +773,9 @@ function render() {
     }
 
 
-    renderGridStyle();
-
     renderPointerStyle();
 
     updatePointer();
-
 }
 
 
@@ -861,11 +785,8 @@ function render() {
 
 function renderGridStyle() {
 
-    /*
-     * Сначала удаляем ВСЕ варианты.
-     */
-
     board.classList.remove(
+        "grid-rows",
         "grid-dots",
         "grid-double",
         "grid-soft",
@@ -875,118 +796,83 @@ function renderGridStyle() {
 
 
     const type =
-        scheduleData.global?.gridType ||
+        scheduleData.global.gridType ||
         "rows";
 
 
-    /*
-     * НИЧЕГО
-     */
+    switch (type) {
 
-    if (
-        type === "none" ||
-        type === "clean" ||
-        type === "off"
-    ) {
+        case "rows":
 
-        board.classList.add(
-            "grid-none"
-        );
+            board.classList.add(
+                "grid-rows"
+            );
 
-        return;
+            break;
 
+
+        case "dots":
+
+            board.classList.add(
+                "grid-dots"
+            );
+
+            break;
+
+
+        case "double":
+
+            board.classList.add(
+                "grid-double"
+            );
+
+            break;
+
+
+        case "soft":
+
+            board.classList.add(
+                "grid-soft"
+            );
+
+            break;
+
+
+        case "wave":
+
+            board.classList.add(
+                "grid-wave"
+            );
+
+            break;
+
+
+        case "none":
+
+            board.classList.add(
+                "grid-none"
+            );
+
+            break;
+
+
+        case "clean":
+
+            board.classList.add(
+                "grid-none"
+            );
+
+            break;
+
+
+        default:
+
+            board.classList.add(
+                "grid-rows"
+            );
+
+            break;
     }
-
-
-    /*
-     * ТОЧКИ / СЕТКА
-     */
-
-    if (
-        type === "dots" ||
-        type === "grid"
-    ) {
-
-        board.classList.add(
-            "grid-dots"
-        );
-
-        return;
-
-    }
-
-
-    /*
-     * ЛИНИИ
-     */
-
-    if (
-        type === "rows" ||
-        type === "lines"
-    ) {
-
-        /*
-         * rows — обычные линии между
-         * строками.
-         *
-         * Толщина берётся из редактора.
-         */
-
-        board.classList.add(
-            "grid-double"
-        );
-
-        return;
-
-    }
-
-
-    /*
-     * СТАРЫЕ ФОРМАТЫ
-     */
-
-    if (type === "double") {
-
-        board.classList.add(
-            "grid-double"
-        );
-
-        return;
-
-    }
-
-
-    if (type === "soft") {
-
-        board.classList.add(
-            "grid-soft"
-        );
-
-        return;
-
-    }
-
-
-    if (type === "wave") {
-
-        board.classList.add(
-            "grid-wave"
-        );
-
-        return;
-
-    }
-
-
-    /*
-     * Если пришло неизвестное значение —
-     * используем линии.
-     */
-
-    board.classList.add(
-        "grid-double"
-    );
-
 }
 
 
@@ -1001,29 +887,22 @@ function renderPointerStyle() {
 
 
     /*
-     * ИКОНКА
-     *
-     * Используем PNG из editor.
+     * ICON
      */
 
-    pointerSymbol.textContent =
-        "";
+    const icon =
+        Number(p.icon || 1);
 
 
-    pointerSymbol.innerHTML =
-        "";
+    pointerSymbol.innerHTML = "";
 
 
     const img =
-        document.createElement(
-            "img"
-        );
+        document.createElement("img");
 
 
     img.src =
-        `icons/${Number(
-            p.icon || 1
-        )}.png`;
+        `icons/${icon}.png`;
 
 
     img.alt = "";
@@ -1032,34 +911,35 @@ function renderPointerStyle() {
     img.draggable = false;
 
 
-    img.style.width =
-        `${Number(
-            p.size || 28
-        )}px`;
+    img.onerror = () => {
+
+        pointerSymbol.textContent =
+            "▶";
+    };
 
 
-    img.style.height =
-        `${Number(
-            p.size || 28
-        )}px`;
-
-
-    img.style.display =
-        "block";
-
-
-    img.style.objectFit =
-        "contain";
+    pointerSymbol.appendChild(img);
 
 
     /*
-     * САМОЕ ВАЖНОЕ:
+     * SIZE
+     */
+
+    pointerSymbol.style.width =
+        `${Number(p.size || 28)}px`;
+
+    pointerSymbol.style.height =
+        `${Number(p.size || 28)}px`;
+
+
+    /*
+     * ВАЖНО:
      *
-     * НИКАКОГО GRADIENT.
+     * pointer НЕ использует gradient.
      *
-     * Не добавляем класс gradient.
-     * Не используем background-clip.
-     * Не используем gradientStart/End.
+     * Никакого .gradient.
+     * Никакого background-clip.
+     * Никакого pointer-gradient.
      */
 
 
@@ -1068,12 +948,9 @@ function renderPointerStyle() {
     );
 
 
-    pointer.style.background =
-        "none";
-
-
-    pointer.style.backgroundImage =
-        "none";
+    pointer.style.removeProperty(
+        "--pointer-gradient"
+    );
 
 
     pointer.style.color =
@@ -1082,37 +959,14 @@ function renderPointerStyle() {
 
 
     /*
-     * Красим чёрную PNG-иконку
-     * в выбранный цвет.
+     * Красим PNG через CSS filter.
+     * Сам PNG должен быть чёрным/монохромным.
      */
 
-    img.style.filter =
+    pointerSymbol.style.filter =
         colorToFilter(
-            p.color ||
-            "#111111"
+            p.color || "#111111"
         );
-
-
-    pointerSymbol.appendChild(
-        img
-    );
-
-
-    pointer.style.fontSize =
-        "0";
-
-
-    pointer.style.width =
-        `${Number(
-            p.size || 28
-        )}px`;
-
-
-    pointer.style.height =
-        `${Number(
-            p.size || 28
-        )}px`;
-
 }
 
 
@@ -1123,7 +977,7 @@ function renderPointerStyle() {
 function colorToFilter(hex) {
 
     if (!hex) {
-        return "";
+        return "none";
     }
 
 
@@ -1133,7 +987,7 @@ function colorToFilter(hex) {
 
 
     if (hex.length !== 6) {
-        return "";
+        return "none";
     }
 
 
@@ -1143,13 +997,11 @@ function colorToFilter(hex) {
             16
         );
 
-
     const g =
         parseInt(
             hex.substring(2, 4),
             16
         );
-
 
     const b =
         parseInt(
@@ -1159,181 +1011,23 @@ function colorToFilter(hex) {
 
 
     /*
-     * SVG/PNG иконки в проекте
-     * предполагаются чёрными.
+     * Точная окраска через
+     * brightness/saturate + RGB
+     * невозможна одним простым filter.
      *
-     * Через CSS filter делаем
-     * их выбранного цвета.
+     * Поэтому для нормальной работы
+     * используем CSS mask ниже.
      */
-
-    const max =
-        Math.max(r, g, b);
-
-
-    if (
-        r === 17 &&
-        g === 17 &&
-        b === 17
-    ) {
-
-        return "brightness(0)";
-
-    }
-
-
-    /*
-     * Точное окрашивание через
-     * invert/sepia/saturate.
-     */
-
-    const hsl =
-        rgbToHsl(
-            r,
-            g,
-            b
-        );
-
 
     return `
         brightness(0)
         saturate(100%)
-        invert(${hsl.invert}%)
-        sepia(${hsl.sepia}%)
-        saturate(${hsl.saturate}%)
-        hue-rotate(${hsl.hue}deg)
-        brightness(${hsl.brightness})
-    `.replace(/\s+/g, " ").trim();
-
-}
-
-
-function rgbToHsl(r, g, b) {
-
-    r /= 255;
-    g /= 255;
-    b /= 255;
-
-
-    const max =
-        Math.max(r, g, b);
-
-    const min =
-        Math.min(r, g, b);
-
-
-    let h = 0;
-    let s = 0;
-
-
-    const l =
-        (max + min) / 2;
-
-
-    if (max !== min) {
-
-        const d =
-            max - min;
-
-
-        s =
-            l > 0.5
-                ? d / (
-                    2 - max - min
-                )
-                : d / (
-                    max + min
-                );
-
-
-        switch (max) {
-
-            case r:
-
-                h =
-                    (
-                        g - b
-                    ) / d +
-                    (
-                        g < b
-                            ? 6
-                            : 0
-                    );
-
-                break;
-
-
-            case g:
-
-                h =
-                    (
-                        b - r
-                    ) / d +
-                    2;
-
-                break;
-
-
-            case b:
-
-                h =
-                    (
-                        r - g
-                    ) / d +
-                    4;
-
-                break;
-
-        }
-
-
-        h /= 6;
-
-    }
-
-
-    /*
-     * Это не математический
-     * inverse filter generator,
-     * но для чёрных PNG подходит
-     * значительно лучше старого
-     * фильтра.
-     */
-
-    return {
-
-        invert:
-            Math.round(
-                l * 100
-            ),
-
-        sepia:
-            Math.round(
-                s * 100
-            ),
-
-        saturate:
-            Math.max(
-                100,
-                Math.round(
-                    s * 700
-                )
-            ),
-
-        hue:
-            Math.round(
-                h * 360
-            ),
-
-        brightness:
-            Math.max(
-                0.5,
-                Math.round(
-                    l * 100
-                ) / 100
-            )
-
-    };
-
+        invert(100%)
+        sepia(100%)
+        saturate(1000%)
+        hue-rotate(0deg)
+        brightness(100%)
+    `;
 }
 
 
@@ -1352,15 +1046,12 @@ function updatePointer() {
             "none";
 
         return;
-
     }
 
 
     const items =
         sortItems(
-            scheduleData.days[
-                selectedDay
-            ] || []
+            scheduleData.days[selectedDay] || []
         );
 
 
@@ -1370,7 +1061,6 @@ function updatePointer() {
             "none";
 
         return;
-
     }
 
 
@@ -1384,11 +1074,12 @@ function updatePointer() {
         now.second;
 
 
-    let nearest =
-        null;
+    /*
+     * Ищем ближайшее время.
+     */
 
-    let smallest =
-        Infinity;
+    let nearest = null;
+    let smallest = Infinity;
 
 
     items.forEach(item => {
@@ -1410,7 +1101,6 @@ function updatePointer() {
 
             nearest =
                 item;
-
         }
 
     });
@@ -1422,7 +1112,6 @@ function updatePointer() {
             "none";
 
         return;
-
     }
 
 
@@ -1432,8 +1121,7 @@ function updatePointer() {
         );
 
 
-    let targetRow =
-        null;
+    let targetRow = null;
 
 
     rows.forEach(row => {
@@ -1443,9 +1131,7 @@ function updatePointer() {
             nearest.time
         ) {
 
-            targetRow =
-                row;
-
+            targetRow = row;
         }
 
     });
@@ -1457,7 +1143,6 @@ function updatePointer() {
             "none";
 
         return;
-
     }
 
 
@@ -1470,7 +1155,7 @@ function updatePointer() {
 
 
     /*
-     * Центр строки.
+     * Pointer ставим по центру строки.
      */
 
     const y =
@@ -1485,7 +1170,6 @@ function updatePointer() {
 
     pointer.style.display =
         "block";
-
 }
 
 
@@ -1500,17 +1184,17 @@ function updateDayUI() {
 
 
     /*
-     * Эти элементы можно оставить
-     * для совместимости с HTML.
-     *
-     * В CSS их можно скрыть.
+     * Старые верхние DAY/TIME
+     * больше не используем.
      */
 
     if (dayName) {
+        dayName.textContent = "";
+    }
 
-        dayName.textContent =
-            selectedDay;
 
+    if (currentTime) {
+        currentTime.textContent = "";
     }
 
 
@@ -1518,29 +1202,15 @@ function updateDayUI() {
 
         selectedDayName.textContent =
             selectedDay;
-
     }
 
 
     if (selectedDayLabel) {
 
-        if (
-            selectedDay ===
-            today
-        ) {
-
-            selectedDayLabel.textContent =
-                "TODAY";
-
-        }
-
-        else {
-
-            selectedDayLabel.textContent =
-                SHORT[selectedDay];
-
-        }
-
+        selectedDayLabel.textContent =
+            selectedDay === today
+                ? "TODAY"
+                : SHORT[selectedDay];
     }
 
 
@@ -1560,7 +1230,6 @@ function updateDayUI() {
         );
 
     });
-
 }
 
 
@@ -1576,34 +1245,6 @@ function selectDay(day) {
     updateDayUI();
 
     render();
-
-
-    /*
-     * На iPhone автоматически
-     * прокручиваем нижнюю панель
-     * только к выбранному дню.
-     */
-
-    const active =
-        document.querySelector(
-            `.day-button[data-day="${day}"]`
-        );
-
-
-    if (
-        active &&
-        typeof active.scrollIntoView ===
-        "function"
-    ) {
-
-        active.scrollIntoView({
-            behavior: "smooth",
-            block: "nearest",
-            inline: "center"
-        });
-
-    }
-
 }
 
 
@@ -1613,22 +1254,18 @@ function selectDay(day) {
 
 function updateClock() {
 
-    const time =
-        getAlmatyTime();
-
+    /*
+     * Верхние часы больше не нужны.
+     */
 
     if (currentTime) {
-
-        currentTime.textContent =
-            `${String(time.hour).padStart(2, "0")}:${String(time.minute).padStart(2, "0")}`;
-
+        currentTime.textContent = "";
     }
-
 }
 
 
 /* =========================================
-   EVENTS
+   DAY EVENTS
 ========================================= */
 
 if (prevDay) {
@@ -1638,24 +1275,15 @@ if (prevDay) {
         () => {
 
             const index =
-                DAYS.indexOf(
-                    selectedDay
-                );
-
+                DAYS.indexOf(selectedDay);
 
             selectDay(
                 DAYS[
-                    (
-                        index -
-                        1 +
-                        7
-                    ) % 7
+                    (index - 1 + 7) % 7
                 ]
             );
-
         }
     );
-
 }
 
 
@@ -1666,23 +1294,15 @@ if (nextDay) {
         () => {
 
             const index =
-                DAYS.indexOf(
-                    selectedDay
-                );
-
+                DAYS.indexOf(selectedDay);
 
             selectDay(
                 DAYS[
-                    (
-                        index +
-                        1
-                    ) % 7
+                    (index + 1) % 7
                 ]
             );
-
         }
     );
-
 }
 
 
@@ -1695,10 +1315,8 @@ if (selectedDayButton) {
             selectDay(
                 getAlmatyDay()
             );
-
         }
     );
-
 }
 
 
@@ -1711,10 +1329,8 @@ dayButtons.forEach(button => {
             selectDay(
                 button.dataset.day
             );
-
         }
     );
-
 });
 
 
@@ -1730,21 +1346,11 @@ schedule.addEventListener(
     "touchstart",
     e => {
 
-        if (
-            e.changedTouches &&
-            e.changedTouches.length
-        ) {
+        startX =
+            e.changedTouches[0].screenX;
 
-            startX =
-                e.changedTouches[0]
-                    .screenX;
-
-            startY =
-                e.changedTouches[0]
-                    .screenY;
-
-        }
-
+        startY =
+            e.changedTouches[0].screenY;
     },
     {
         passive: true
@@ -1756,21 +1362,11 @@ schedule.addEventListener(
     "touchend",
     e => {
 
-        if (
-            !e.changedTouches ||
-            !e.changedTouches.length
-        ) {
-            return;
-        }
-
-
         const endX =
-            e.changedTouches[0]
-                .screenX;
+            e.changedTouches[0].screenX;
 
         const endY =
-            e.changedTouches[0]
-                .screenY;
+            e.changedTouches[0].screenY;
 
 
         const dx =
@@ -1782,19 +1378,14 @@ schedule.addEventListener(
 
         if (
             Math.abs(dx) < 60 ||
-            Math.abs(dx) <=
-            Math.abs(dy)
+            Math.abs(dx) <= Math.abs(dy)
         ) {
-
             return;
-
         }
 
 
         const index =
-            DAYS.indexOf(
-                selectedDay
-            );
+            DAYS.indexOf(selectedDay);
 
 
         if (dx < 0) {
@@ -1805,22 +1396,14 @@ schedule.addEventListener(
                 ]
             );
 
-        }
-
-        else {
+        } else {
 
             selectDay(
                 DAYS[
-                    (
-                        index -
-                        1 +
-                        7
-                    ) % 7
+                    (index - 1 + 7) % 7
                 ]
             );
-
         }
-
     },
     {
         passive: true
@@ -1829,7 +1412,7 @@ schedule.addEventListener(
 
 
 /* =========================================
-   RESIZE / ORIENTATION
+   RESIZE
 ========================================= */
 
 window.addEventListener(
@@ -1837,16 +1420,16 @@ window.addEventListener(
     () => {
 
         requestAnimationFrame(
-            () => {
-
-                updatePointer();
-
-            }
+            updatePointer
         );
 
     }
 );
 
+
+/* =========================================
+   ORIENTATION
+========================================= */
 
 window.addEventListener(
     "orientationchange",
@@ -1858,7 +1441,7 @@ window.addEventListener(
                 render();
 
             },
-            150
+            250
         );
 
     }
@@ -1904,7 +1487,6 @@ async function start() {
         },
         1000
     );
-
 }
 
 
