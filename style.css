@@ -1,10 +1,5 @@
-/* =========================================================
-   RESET
-========================================================= */
-
 * {
     box-sizing: border-box;
-
     margin: 0;
     padding: 0;
 
@@ -58,7 +53,7 @@ body {
 
 
 /* =========================================================
-   OLD HEADER
+   HEADER
 ========================================================= */
 
 .header {
@@ -67,7 +62,7 @@ body {
 
 
 /* =========================================================
-   MENU BUTTON
+   MENU
 ========================================================= */
 
 .menu-button {
@@ -87,7 +82,6 @@ body {
     height: 44px;
 
     border: 0;
-
     border-radius: 50%;
 
     background:
@@ -99,7 +93,7 @@ body {
         );
 
     box-shadow:
-        0 6px 24px
+        0 6px 25px
         rgba(
             0,
             0,
@@ -111,28 +105,25 @@ body {
 
     flex-direction: column;
 
-    justify-content: center;
-
     align-items: center;
+    justify-content: center;
 
     gap: 5px;
 }
 
 
 .menu-button span {
-    display: block;
-
     width: 18px;
     height: 2px;
 
-    border-radius: 10px;
+    border-radius: 20px;
 
     background: #111;
 }
 
 
 /* =========================================================
-   TOP NAV
+   DAY NAVIGATION
 ========================================================= */
 
 .day-navigation {
@@ -169,18 +160,19 @@ body {
 
     border-radius: 50%;
 
-    background: rgba(
-        255,
-        255,
-        255,
-        .95
-    );
-
-    color: #111;
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            .96
+        );
 
     font-size: 25px;
 
     line-height: 1;
+
+    color: #111;
 
     box-shadow:
         0 5px 20px
@@ -205,7 +197,7 @@ body {
 
     background: #111;
 
-    color: #fff;
+    color: white;
 
     display: flex;
 
@@ -216,7 +208,7 @@ body {
     justify-content: center;
 
     box-shadow:
-        0 7px 24px
+        0 8px 26px
         rgba(
             0,
             0,
@@ -275,8 +267,7 @@ body {
 
     overflow-x: hidden;
 
-    -webkit-overflow-scrolling:
-        touch;
+    -webkit-overflow-scrolling: touch;
 
     touch-action:
         pan-y;
@@ -303,22 +294,16 @@ body {
     margin:
         0 auto;
 
-    padding-top: 30px;
-
-    padding-right: 18px;
-
-    padding-bottom: 110px;
-
     /*
-     * Это динамически увеличивается
-     * в зависимости от pointer.
+     * НЕТ огромного padding-left.
+     *
+     * Таблица остаётся центрированной.
      */
 
-    padding-left:
-        max(
-            76px,
-            var(--pointer-space, 58px)
-        );
+    padding:
+        30px
+        18px
+        110px;
 
     background:
         transparent !important;
@@ -334,10 +319,6 @@ body {
 
     --time-column-width:
         52px;
-
-    --pointer-space:
-        58px;
-
 }
 
 
@@ -354,17 +335,21 @@ body {
     display: grid;
 
     /*
-     * Ширина TIME теперь ДИНАМИЧЕСКАЯ.
+     * Динамическая колонка TIME.
      */
 
     grid-template-columns:
-        var(--time-column-width)
-        minmax(0, 1fr);
+        var(
+            --time-column-width
+        )
+        minmax(
+            0,
+            1fr
+        );
 
     /*
-     * Вместо большого gap используем
-     * небольшое пространство непосредственно
-     * перед текстом.
+     * Небольшое и постоянное
+     * пространство между колонками.
      */
 
     gap: 14px;
@@ -375,15 +360,17 @@ body {
         9px 0;
 
     border-bottom:
-        var(--grid-thickness)
+        var(
+            --grid-thickness
+        )
         solid
-        var(--grid-color);
+        var(
+            --grid-color
+        );
 
     transition:
         background
-        .2s ease,
-        border-color
-        .2s ease;
+        .18s ease;
 }
 
 
@@ -400,13 +387,13 @@ body {
                 0,
                 0,
                 0,
-                .018
+                .015
             ),
             rgba(
                 0,
                 0,
                 0,
-                .035
+                .03
             )
         );
 
@@ -421,11 +408,17 @@ body {
 
 .schedule-time {
 
-    min-width: 0;
-
     width: 100%;
 
-    text-align: right;
+    min-width: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
 
     white-space:
         nowrap;
@@ -459,12 +452,16 @@ body {
         Helvetica,
         sans-serif;
 
+    /*
+     * Safari doesn't resize it
+     * automatically.
+     */
+
     -webkit-text-size-adjust:
         none;
 
     text-size-adjust:
         none;
-
 }
 
 
@@ -479,7 +476,8 @@ body {
     max-width: 100%;
 
     padding:
-        8px 10px;
+        8px
+        10px;
 
     border-radius:
         10px;
@@ -508,21 +506,20 @@ body {
             #111
         );
 
+    line-height:
+        1.22;
+
     overflow-wrap:
         anywhere;
 
     word-break:
         break-word;
 
-    line-height:
-        1.22;
-
     -webkit-text-size-adjust:
         none;
 
     text-size-adjust:
         none;
-
 }
 
 
@@ -537,7 +534,6 @@ body {
 
     background-image:
         none !important;
-
 }
 
 
@@ -548,7 +544,6 @@ body {
         var(--grid-thickness)
         solid
         var(--grid-color);
-
 }
 
 
@@ -563,7 +558,6 @@ body {
 
     background-image:
         none !important;
-
 }
 
 
@@ -572,7 +566,6 @@ body {
 
     border-bottom:
         none !important;
-
 }
 
 
@@ -587,19 +580,8 @@ body {
 
     background-image:
         none !important;
-
 }
 
-
-/*
- * Здесь только ОДНА вертикальная линия.
- *
- * Она строится относительно
- * реальной ширины TIME.
- *
- * Поэтому если timeSize меняется,
- * линия автоматически едет.
- */
 
 .schedule-board.grid-grid
 .schedule-row {
@@ -608,9 +590,16 @@ body {
         var(--grid-thickness)
         solid
         var(--grid-color);
-
 }
 
+
+/*
+ * Вертикальный разделитель.
+ *
+ * Он привязан к реальной ширине
+ * TIME-колонки, поэтому двигается
+ * при изменении размера времени.
+ */
 
 .schedule-board.grid-grid
 .schedule-row::before {
@@ -620,12 +609,7 @@ body {
     position: absolute;
 
     top: 0;
-
     bottom: 0;
-
-    /*
-     * Центр gap.
-     */
 
     left:
         calc(
@@ -640,22 +624,25 @@ body {
     background:
         var(--grid-color);
 
-    opacity: .9;
+    pointer-events:
+        none;
 
-    pointer-events: none;
-
+    opacity:
+        .88;
 }
 
 
 /*
- * Никаких других псевдосеток.
+ * Полностью запрещаем старые
+ * фоновые сетки.
  */
 
 .schedule-board::before,
 .schedule-board::after {
 
-    content: none !important;
+    display: none !important;
 
+    content: none !important;
 }
 
 
@@ -667,7 +654,7 @@ body {
 
     position: absolute;
 
-    z-index: 250;
+    z-index: 400;
 
     display: none;
 
@@ -675,7 +662,8 @@ body {
 
     justify-content: center;
 
-    pointer-events: none;
+    pointer-events:
+        none;
 
     transform:
         translateY(-50%);
@@ -697,22 +685,17 @@ body {
         none !important;
 
     /*
-     * Лёгкая визуальная тень делает
-     * pointer заметнее на светлом фоне.
+     * Лёгкая тень.
      */
 
     box-shadow:
-        0 4px 12px
+        0 5px 14px
         rgba(
             0,
             0,
             0,
-            .10
+            .11
         );
-
-    /*
-     * Mask.
-     */
 
     -webkit-mask-repeat:
         no-repeat;
@@ -731,13 +714,8 @@ body {
 
     mask-size:
         contain;
-
 }
 
-
-/*
- * Никакого pointer gradient.
- */
 
 .time-pointer.gradient {
 
@@ -750,37 +728,10 @@ body {
 }
 
 
-/*
- * Старый символ больше
- * не используется.
- */
-
 #pointerSymbol {
 
     display:
         none !important;
-
-}
-
-
-/* =========================================================
-   POINTER — CURRENT ROW ACCENT
-========================================================= */
-
-.schedule-board.grid-none
-.schedule-row.current-row {
-
-    border-left:
-        2px solid
-        rgba(
-            0,
-            0,
-            0,
-            .08
-        );
-
-    padding-left:
-        8px;
 
 }
 
@@ -818,9 +769,7 @@ body {
     position: fixed;
 
     left: 0;
-
     right: 0;
-
     bottom: 0;
 
     z-index: 300;
@@ -855,7 +804,6 @@ body {
             0,
             .055
         );
-
 }
 
 
@@ -878,33 +826,38 @@ body {
             )
         ) !important;
 
-    gap: 5px;
+    gap:
+        5px;
 
     overflow:
         hidden !important;
 
-    padding: 0;
+    padding:
+        0;
 
     scrollbar-width:
         none;
-
 }
 
 
 .days-scroll::-webkit-scrollbar {
 
-    display: none;
+    display:
+        none;
 
 }
 
 
 .day-button {
 
-    width: 100%;
+    width:
+        100%;
 
-    min-width: 0;
+    min-width:
+        0;
 
-    height: 40px;
+    height:
+        40px;
 
     border:
         0;
@@ -962,17 +915,18 @@ body {
             0,
             0,
             0,
-            .10
+            .09
         );
-
 }
 
 
 .day-button span {
 
-    width: 3px;
+    width:
+        3px;
 
-    height: 3px;
+    height:
+        3px;
 
     border-radius:
         50%;
@@ -982,7 +936,6 @@ body {
 
     opacity:
         0;
-
 }
 
 
@@ -1001,11 +954,14 @@ span {
 
 .menu-overlay {
 
-    position: fixed;
+    position:
+        fixed;
 
-    inset: 0;
+    inset:
+        0;
 
-    z-index: 600;
+    z-index:
+        600;
 
     background:
         rgba(
@@ -1015,34 +971,38 @@ span {
             .28
         );
 
-    opacity: 0;
+    opacity:
+        0;
 
     pointer-events:
         none;
 
     transition:
-        opacity .25s ease;
-
+        opacity
+        .25s ease;
 }
 
 
 .menu-overlay.open {
 
-    opacity: 1;
+    opacity:
+        1;
 
     pointer-events:
         auto;
-
 }
 
 
 .side-menu {
 
-    position: fixed;
+    position:
+        fixed;
 
-    top: 0;
+    top:
+        0;
 
-    left: 0;
+    left:
+        0;
 
     width:
         min(
@@ -1101,7 +1061,6 @@ span {
 
     -webkit-overflow-scrolling:
         touch;
-
 }
 
 
@@ -1124,7 +1083,6 @@ span {
 
     justify-content:
         flex-end;
-
 }
 
 
@@ -1147,7 +1105,6 @@ span {
 
     font-size:
         27px;
-
 }
 
 
@@ -1164,7 +1121,6 @@ span {
 
     gap:
         14px;
-
 }
 
 
@@ -1175,6 +1131,9 @@ span {
 
     height:
         55px;
+
+    flex:
+        0 0 55px;
 
     border-radius:
         50%;
@@ -1196,7 +1155,6 @@ span {
 
     font-weight:
         700;
-
 }
 
 
@@ -1207,7 +1165,6 @@ span {
 
     font-weight:
         700;
-
 }
 
 
@@ -1233,7 +1190,6 @@ span {
 
     white-space:
         nowrap;
-
 }
 
 
@@ -1245,7 +1201,6 @@ span {
     border-top:
         1px solid
         #eee;
-
 }
 
 
@@ -1281,7 +1236,6 @@ span {
 
     letter-spacing:
         1.5px;
-
 }
 
 
@@ -1311,12 +1265,11 @@ span {
 
     letter-spacing:
         1.5px;
-
 }
 
 
 /* =========================================================
-   MOBILE / iPHONE
+   MOBILE
 ========================================================= */
 
 @media (max-width: 767px) {
@@ -1423,11 +1376,14 @@ span {
         padding-bottom:
             90px;
 
+        /*
+         * ВАЖНО:
+         * никаких 70-100px слева.
+         * Таблица остаётся нормальной.
+         */
+
         padding-left:
-            max(
-                70px,
-                var(--pointer-space)
-            );
+            14px;
 
     }
 
@@ -1441,14 +1397,13 @@ span {
             12px;
 
         grid-template-columns:
-            var(--time-column-width)
+            var(
+                --time-column-width
+            )
             minmax(
                 0,
                 1fr
             );
-
-        border-bottom-width:
-            var(--grid-thickness);
 
     }
 
@@ -1469,11 +1424,24 @@ span {
     .schedule-task {
 
         padding:
-            7px
-            9px;
+            7px 9px;
 
         border-radius:
             9px;
+
+    }
+
+
+    /*
+     * Pointer находится в левом
+     * пространстве, но сам board
+     * его не сдвигает.
+     */
+
+    .time-pointer {
+
+        z-index:
+            450;
 
     }
 
@@ -1502,19 +1470,11 @@ span {
 
     }
 
-
-    .time-pointer {
-
-        z-index:
-            250;
-
-    }
-
 }
 
 
 /* =========================================================
-   iPHONE 14+
+   IPHONE 14+
 ========================================================= */
 
 @media (
