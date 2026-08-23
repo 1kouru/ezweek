@@ -307,13 +307,10 @@ function normalizeSchedule(input) {
     };
 
 
-    /*
-     * Совместимость со старыми версиями.
-     */
+    /* old versions */
 
     if (
-        !source.global?.gridMode
-        &&
+        !source.global?.gridMode &&
         source.global?.gridType
     ) {
 
@@ -324,8 +321,7 @@ function normalizeSchedule(input) {
 
 
     if (
-        !source.global?.gridMode
-        &&
+        !source.global?.gridMode &&
         source.global?.grid
     ) {
 
@@ -334,12 +330,6 @@ function normalizeSchedule(input) {
 
     }
 
-
-    /*
-     * Только три режима,
-     * которые реально есть
-     * в последнем editor.js.
-     */
 
     if (
         ![
@@ -357,10 +347,6 @@ function normalizeSchedule(input) {
     }
 
 
-    /*
-     * GRID thickness.
-     */
-
     result.global.gridThickness =
         Math.max(
             1,
@@ -373,10 +359,6 @@ function normalizeSchedule(input) {
         );
 
 
-    /*
-     * GRID color.
-     */
-
     if (
         typeof result.global.gridColor !==
         "string"
@@ -388,9 +370,7 @@ function normalizeSchedule(input) {
     }
 
 
-    /*
-     * POINTER.
-     */
+    /* pointer */
 
     result.pointer.icon =
         Math.max(
@@ -427,9 +407,7 @@ function normalizeSchedule(input) {
     }
 
 
-    /*
-     * TASKS.
-     */
+    /* tasks */
 
     DAYS.forEach(day => {
 
@@ -559,8 +537,7 @@ function getAlmatyTime() {
         Number(
             parts.find(
                 part =>
-                    part.type ===
-                    "hour"
+                    part.type === "hour"
             )?.value || 0
         );
 
@@ -578,8 +555,7 @@ function getAlmatyTime() {
             Number(
                 parts.find(
                     part =>
-                        part.type ===
-                        "minute"
+                        part.type === "minute"
                 )?.value || 0
             ),
 
@@ -587,8 +563,7 @@ function getAlmatyTime() {
             Number(
                 parts.find(
                     part =>
-                        part.type ===
-                        "second"
+                        part.type === "second"
                 )?.value || 0
             )
 
@@ -619,7 +594,10 @@ function getAlmatyDay() {
 
 function seconds(time) {
 
-    const parts =
+    const [
+        hour,
+        minute
+    ] =
         String(
             time || "00:00"
         )
@@ -628,9 +606,8 @@ function seconds(time) {
 
 
     return (
-        (parts[0] || 0) * 3600
-        +
-        (parts[1] || 0) * 60
+        (hour || 0) * 3600 +
+        (minute || 0) * 60
     );
 }
 
@@ -653,6 +630,79 @@ function sortItems(items) {
 
 
 /* =========================================================
+   CURRENT ITEM
+========================================================= */
+
+function getCurrentItem() {
+
+    if (
+        selectedDay !==
+        getAlmatyDay()
+    ) {
+
+        return null;
+    }
+
+
+    const items =
+        sortItems(
+            scheduleData.days[
+                selectedDay
+            ]
+        );
+
+
+    if (!items.length) {
+        return null;
+    }
+
+
+    const now =
+        getAlmatyTime();
+
+
+    const currentSeconds =
+        now.hour * 3600 +
+        now.minute * 60 +
+        now.second;
+
+
+    let nearest = null;
+
+    let smallest =
+        Infinity;
+
+
+    items.forEach(item => {
+
+        const difference =
+            Math.abs(
+                seconds(item.time) -
+                currentSeconds
+            );
+
+
+        if (
+            difference <
+            smallest
+        ) {
+
+            smallest =
+                difference;
+
+            nearest =
+                item;
+
+        }
+
+    });
+
+
+    return nearest;
+}
+
+
+/* =========================================================
    RENDER
 ========================================================= */
 
@@ -663,16 +713,20 @@ function render() {
     }
 
 
-    /*
-     * Полностью очищаем старую разметку.
-     */
-
     board.innerHTML = "";
 
 
     /*
-     * GRID VARIABLES.
+     * Important:
+     * никакой фоновой сетки.
      */
+
+    board.style.background =
+        "transparent";
+
+    board.style.backgroundImage =
+        "none";
+
 
     board.style.setProperty(
         "--grid-color",
@@ -687,36 +741,17 @@ function render() {
 
 
     /*
-     * Место под pointer слева.
+     * Pointer space.
      */
 
     board.style.setProperty(
         "--pointer-space",
-        `${scheduleData.pointer.size + 22}px`
+        `${scheduleData.pointer.size + 30}px`
     );
-
-
-    /*
-     * Очень важно:
-     * Убираем старый background-image,
-     * из-за которого у тебя появлялась
-     * квадратная сетка поверх настоящей.
-     */
-
-    board.style.backgroundImage =
-        "none";
-
-
-    board.style.backgroundColor =
-        "transparent";
 
 
     applyGrid();
 
-
-    /*
-     * TASKS.
-     */
 
     const items =
         sortItems(
@@ -757,10 +792,19 @@ function render() {
 
 
     /*
-     * POINTER.
+     * После создания строк
+     * вычисляем реальную ширину TIME.
      */
 
-    renderPointer();
+    requestAnimationFrame(
+        () => {
+
+            updateTimeColumnWidth();
+
+            renderPointer();
+
+        }
+    );
 }
 
 
@@ -785,7 +829,7 @@ function createScheduleRow(item) {
 
 
     /*
-     * TIME.
+     * TIME
      */
 
     row.style.setProperty(
@@ -811,7 +855,7 @@ function createScheduleRow(item) {
 
 
     /*
-     * TEXT.
+     * TEXT
      */
 
     row.style.setProperty(
@@ -843,7 +887,7 @@ function createScheduleRow(item) {
 
 
     /*
-     * TIME ELEMENT.
+     * TIME
      */
 
     const time =
@@ -861,7 +905,7 @@ function createScheduleRow(item) {
 
 
     /*
-     * TEXT ELEMENT.
+     * TEXT
      */
 
     const task =
@@ -879,8 +923,7 @@ function createScheduleRow(item) {
 
 
     /*
-     * GRADIENT ТОЛЬКО У ТЕКСТА,
-     * если включен в editor.
+     * Gradient текста
      */
 
     if (
@@ -948,83 +991,108 @@ function createScheduleRow(item) {
 
 
 /* =========================================================
+   DYNAMIC TIME COLUMN
+========================================================= */
+
+function updateTimeColumnWidth() {
+
+    const times =
+        board.querySelectorAll(
+            ".schedule-time"
+        );
+
+
+    let maxWidth =
+        0;
+
+
+    times.forEach(
+        timeElement => {
+
+            const width =
+                timeElement
+                    .getBoundingClientRect()
+                    .width;
+
+
+            maxWidth =
+                Math.max(
+                    maxWidth,
+                    width
+                );
+
+        }
+    );
+
+
+    /*
+     * Минимальная ширина.
+     *
+     * Если размер TIME маленький,
+     * колонка всё равно остаётся аккуратной.
+     */
+
+    const timeColumn =
+        Math.max(
+            48,
+            Math.ceil(
+                maxWidth + 2
+            )
+        );
+
+
+    board.style.setProperty(
+        "--time-column-width",
+        `${timeColumn}px`
+    );
+}
+
+
+/* =========================================================
    GRID
 ========================================================= */
 
 function applyGrid() {
 
-    /*
-     * Сначала удаляем ВСЕ старые
-     * сеточные классы.
-     */
-
     board.classList.remove(
         "grid-rows",
         "grid-grid",
-        "grid-none",
-        "grid-dots",
-        "grid-double",
-        "grid-soft",
-        "grid-wave"
-    );
-
-
-    /*
-     * Убираем ВСЕ возможные старые
-     * фоновые сетки.
-     */
-
-    board.style.backgroundImage =
-        "none";
-
-
-    board.style.background =
-        "transparent";
-
-
-    const mode =
-        scheduleData.global.gridMode;
-
-
-    /*
-     * ROWS
-     */
-
-    if (
-        mode === "rows"
-    ) {
-
-        board.classList.add(
-            "grid-rows"
-        );
-
-        return;
-    }
-
-
-    /*
-     * GRID
-     */
-
-    if (
-        mode === "grid"
-    ) {
-
-        board.classList.add(
-            "grid-grid"
-        );
-
-        return;
-    }
-
-
-    /*
-     * NONE
-     */
-
-    board.classList.add(
         "grid-none"
     );
+
+
+    switch (
+        scheduleData.global.gridMode
+    ) {
+
+        case "grid":
+
+            board.classList.add(
+                "grid-grid"
+            );
+
+            break;
+
+
+        case "none":
+
+            board.classList.add(
+                "grid-none"
+            );
+
+            break;
+
+
+        case "rows":
+        default:
+
+            board.classList.add(
+                "grid-rows"
+            );
+
+            break;
+
+    }
 }
 
 
@@ -1069,8 +1137,8 @@ function renderPointer() {
 
 
     /*
-     * Полностью чистим старые
-     * способы отрисовки.
+     * Уничтожаем старые градиентные
+     * правила.
      */
 
     pointer.classList.remove(
@@ -1083,24 +1151,24 @@ function renderPointer() {
     );
 
 
-    pointer.style.backgroundImage =
-        "none";
-
-
-    pointer.style.backgroundColor =
-        color;
-
-
-    pointer.style.filter =
-        "none";
-
-
     pointer.style.width =
         `${size}px`;
 
 
     pointer.style.height =
         `${size}px`;
+
+
+    pointer.style.backgroundColor =
+        color;
+
+
+    pointer.style.backgroundImage =
+        "none";
+
+
+    pointer.style.filter =
+        "none";
 
 
     pointer.style.color =
@@ -1112,18 +1180,19 @@ function renderPointer() {
 
 
     /*
-     * Сам POINTER становится маской.
-     *
-     * Это проще и стабильнее на iOS,
-     * чем отдельный img внутри.
+     * PNG как mask.
      */
 
-    pointer.style.webkitMaskImage =
+    const iconUrl =
         `url("icons/${icon}.png")`;
+
+
+    pointer.style.webkitMaskImage =
+        iconUrl;
 
 
     pointer.style.maskImage =
-        `url("icons/${icon}.png")`;
+        iconUrl;
 
 
     pointer.style.webkitMaskRepeat =
@@ -1151,7 +1220,7 @@ function renderPointer() {
 
 
     /*
-     * Старый span полностью отключаем.
+     * Старый символ скрываем.
      */
 
     if (pointerSymbol) {
@@ -1163,15 +1232,6 @@ function renderPointer() {
             "none";
 
     }
-
-
-    /*
-     * Показываем только когда
-     * действительно нашли строку.
-     */
-
-    pointer.style.display =
-        "none";
 
 
     updatePointerPosition();
@@ -1189,123 +1249,25 @@ function updatePointerPosition() {
     }
 
 
-    /*
-     * Pointer нужен только сегодня.
-     */
+    const current =
+        getCurrentItem();
 
-    if (
-        selectedDay !==
-        getAlmatyDay()
-    ) {
+
+    if (!current) {
 
         pointer.style.display =
             "none";
+
+        removeCurrentRow();
 
         return;
     }
 
 
-    const items =
-        sortItems(
-            scheduleData.days[
-                selectedDay
-            ]
+    const targetRow =
+        board.querySelector(
+            `.schedule-row[data-time="${current.time}"]`
         );
-
-
-    if (!items.length) {
-
-        pointer.style.display =
-            "none";
-
-        return;
-    }
-
-
-    /*
-     * Current time.
-     */
-
-    const now =
-        getAlmatyTime();
-
-
-    const currentSeconds =
-        now.hour * 3600 +
-        now.minute * 60 +
-        now.second;
-
-
-    /*
-     * Ближайший task.
-     */
-
-    let nearest =
-        null;
-
-    let nearestDifference =
-        Infinity;
-
-
-    items.forEach(item => {
-
-        const difference =
-            Math.abs(
-                seconds(item.time) -
-                currentSeconds
-            );
-
-
-        if (
-            difference <
-            nearestDifference
-        ) {
-
-            nearestDifference =
-                difference;
-
-            nearest =
-                item;
-
-        }
-
-    });
-
-
-    if (!nearest) {
-
-        pointer.style.display =
-            "none";
-
-        return;
-    }
-
-
-    /*
-     * Ищем строку.
-     */
-
-    let targetRow =
-        null;
-
-
-    board
-        .querySelectorAll(
-            ".schedule-row"
-        )
-        .forEach(row => {
-
-            if (
-                row.dataset.time ===
-                nearest.time
-            ) {
-
-                targetRow =
-                    row;
-
-            }
-
-        });
 
 
     if (!targetRow) {
@@ -1317,12 +1279,18 @@ function updatePointerPosition() {
     }
 
 
+    removeCurrentRow();
+
+
     /*
-     * Координаты.
-     *
-     * Считаем относительно schedule,
-     * который является родителем pointer.
+     * Подсвечиваем текущую строку
+     * очень аккуратно.
      */
+
+    targetRow.classList.add(
+        "current-row"
+    );
+
 
     const rowRect =
         targetRow.getBoundingClientRect();
@@ -1334,12 +1302,6 @@ function updatePointerPosition() {
 
     const boardRect =
         board.getBoundingClientRect();
-
-
-    const pointerSize =
-        Number(
-            scheduleData.pointer.size
-        ) || 28;
 
 
     /*
@@ -1362,28 +1324,30 @@ function updatePointerPosition() {
     /*
      * X.
      *
-     * Pointer ставим внутри
-     * левой части board.
-     *
-     * Благодаря большому padding-left
-     * он не обрезается iPhone Safari.
+     * Pointer располагается
+     * слева от реальной области
+     * расписания.
      */
+
+    const size =
+        Number(
+            scheduleData.pointer.size
+        ) || 28;
+
 
     const x =
         boardRect.left
         -
         scheduleRect.left
-        +
-        (
-            scheduleData.pointer.size / 2
-        )
-        +
-        4;
+        -
+        size
+        -
+        10;
 
 
     pointer.style.left =
         `${Math.max(
-            2,
+            3,
             x
         )}px`;
 
@@ -1393,7 +1357,26 @@ function updatePointerPosition() {
 
 
     pointer.style.display =
-        "flex";
+        "block";
+}
+
+
+/* =========================================================
+   CURRENT ROW
+========================================================= */
+
+function removeCurrentRow() {
+
+    board
+        .querySelectorAll(
+            ".current-row"
+        )
+        .forEach(
+            row =>
+                row.classList.remove(
+                    "current-row"
+                )
+        );
 }
 
 
@@ -1406,10 +1389,6 @@ function updateDayUI() {
     const today =
         getAlmatyDay();
 
-
-    /*
-     * Удаляем верхний DAY/TIME.
-     */
 
     if (dayName) {
 
@@ -1534,7 +1513,6 @@ if (prevDay) {
 
         }
     );
-
 }
 
 
@@ -1561,7 +1539,6 @@ if (nextDay) {
 
         }
     );
-
 }
 
 
@@ -1577,7 +1554,6 @@ if (selectedDayButton) {
 
         }
     );
-
 }
 
 
@@ -1604,7 +1580,6 @@ dayButtons.forEach(
 ========================================================= */
 
 let startX = 0;
-
 let startY = 0;
 
 
@@ -1656,7 +1631,6 @@ schedule.addEventListener(
         ) {
 
             return;
-
         }
 
 
@@ -1677,7 +1651,8 @@ schedule.addEventListener(
                 ]
             );
 
-        } else {
+        }
+        else {
 
             selectDay(
                 DAYS[
@@ -1699,6 +1674,25 @@ schedule.addEventListener(
 
 
 /* =========================================================
+   SCROLL
+========================================================= */
+
+schedule.addEventListener(
+    "scroll",
+    () => {
+
+        requestAnimationFrame(
+            updatePointerPosition
+        );
+
+    },
+    {
+        passive: true
+    }
+);
+
+
+/* =========================================================
    RESIZE
 ========================================================= */
 
@@ -1707,7 +1701,13 @@ window.addEventListener(
     () => {
 
         requestAnimationFrame(
-            updatePointerPosition
+            () => {
+
+                updateTimeColumnWidth();
+
+                updatePointerPosition();
+
+            }
         );
 
     }
