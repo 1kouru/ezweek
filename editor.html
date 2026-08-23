@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 
 <head>
 
@@ -10,6 +10,11 @@
         content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     >
 
+    <meta
+        name="theme-color"
+        content="#f5f5f5"
+    >
+
     <title>Edit Schedule</title>
 
     <link
@@ -18,6 +23,7 @@
     >
 
 </head>
+
 
 <body>
 
@@ -92,6 +98,7 @@
             class="tool-button"
             type="button"
         >
+            <span class="tool-icon">▦</span>
             GRID
         </button>
 
@@ -100,6 +107,7 @@
             class="tool-button"
             type="button"
         >
+            <span class="tool-icon">›</span>
             POINTER
         </button>
 
@@ -113,11 +121,13 @@
         class="global-panel hidden"
     >
 
-        <div class="panel-heading">
+        <div class="panel-top">
 
             <div>
-                <strong>GRID</strong>
-                <span>preview</span>
+                <div class="panel-title">GRID</div>
+                <div class="panel-subtitle">
+                    schedule lines
+                </div>
             </div>
 
             <button
@@ -132,33 +142,62 @@
 
 
         <div
-            class="grid-preview"
             id="gridPreview"
-            data-grid="clean"
+            class="grid-preview grid-clean"
         >
 
             <div class="grid-preview-time">
                 08:00
             </div>
 
-            <div class="grid-preview-content">
+            <div class="grid-preview-body">
 
-                <div class="preview-row">
-                    <span class="preview-example">
+                <div class="grid-row">
+
+                    <div class="grid-example-time">
+                        08:00
+                    </div>
+
+                    <div class="grid-example-task">
                         Morning routine
-                    </span>
+                    </div>
+
                 </div>
 
-                <div class="preview-row">
-                    <span class="preview-example">
+                <div class="grid-row">
+
+                    <div class="grid-example-time">
+                        09:00
+                    </div>
+
+                    <div class="grid-example-task">
                         Breakfast
-                    </span>
+                    </div>
+
                 </div>
 
-                <div class="preview-row">
-                    <span class="preview-example">
-                        Go outside
-                    </span>
+                <div class="grid-row">
+
+                    <div class="grid-example-time">
+                        10:00
+                    </div>
+
+                    <div class="grid-example-task">
+                        Study
+                    </div>
+
+                </div>
+
+                <div class="grid-row">
+
+                    <div class="grid-example-time">
+                        11:00
+                    </div>
+
+                    <div class="grid-example-task">
+                        Walk
+                    </div>
+
                 </div>
 
             </div>
@@ -166,58 +205,50 @@
         </div>
 
 
-        <div class="grid-choices">
+        <div class="grid-options">
 
-            <button
-                data-grid="clean"
-                type="button"
-            >
-                <span class="grid-mini clean"></span>
-                CLEAN
+            <button data-grid="clean" type="button">
+                <span class="grid-icon clean"></span>
+                <span>Clean</span>
             </button>
 
-            <button
-                data-grid="dots"
-                type="button"
-            >
-                <span class="grid-mini dots"></span>
-                DOTS
+            <button data-grid="dots" type="button">
+                <span class="grid-icon dots"></span>
+                <span>Dots</span>
             </button>
 
-            <button
-                data-grid="double"
-                type="button"
-            >
-                <span class="grid-mini double"></span>
-                DOUBLE
+            <button data-grid="double" type="button">
+                <span class="grid-icon double"></span>
+                <span>Double</span>
             </button>
 
-            <button
-                data-grid="soft"
-                type="button"
-            >
-                <span class="grid-mini soft"></span>
-                SOFT
+            <button data-grid="soft" type="button">
+                <span class="grid-icon soft"></span>
+                <span>Soft</span>
             </button>
 
-            <button
-                data-grid="wave"
-                type="button"
-            >
-                <span class="grid-mini wave"></span>
-                WAVE
+            <button data-grid="wave" type="button">
+                <span class="grid-icon wave"></span>
+                <span>Wave</span>
             </button>
 
         </div>
 
 
-        <div class="small-color">
+        <div class="setting-line">
 
-            <span>COLOR</span>
+            <span>Line color</span>
+
+            <button
+                id="gridColorButton"
+                class="color-swatch"
+                type="button"
+            ></button>
 
             <input
-                type="color"
                 id="gridColor"
+                class="native-color"
+                type="color"
             >
 
         </div>
@@ -232,11 +263,13 @@
         class="global-panel hidden"
     >
 
-        <div class="panel-heading">
+        <div class="panel-top">
 
             <div>
-                <strong>POINTER</strong>
-                <span>preview</span>
+                <div class="panel-title">POINTER</div>
+                <div class="panel-subtitle">
+                    current time
+                </div>
             </div>
 
             <button
@@ -252,147 +285,195 @@
 
         <div class="pointer-preview">
 
-            <div id="pointerPreview">
+            <div
+                id="pointerPreview"
+                class="pointer-preview-icon"
+            >
+                <span class="pointer-fallback">›</span>
             </div>
 
-            <div class="pointer-preview-text">
-                14:00&nbsp;&nbsp; Current task
+            <div class="pointer-preview-info">
+
+                <strong>14:00</strong>
+
+                <span>
+                    current task
+                </span>
+
             </div>
 
         </div>
 
 
-        <div class="pointer-controls">
+        <div class="pointer-settings">
 
-            <div class="pointer-control">
+            <div class="setting-line">
 
-                <div class="control-label">
-                    <span>STYLE</span>
-                </div>
+                <span>Symbol</span>
 
-                <select
-                    id="pointerSymbol"
-                    class="pointer-select"
+                <button
+                    id="pointerSymbolButton"
+                    class="symbol-button"
+                    type="button"
                 >
-
-                    <option value="triangle">
-                        Triangle
-                    </option>
-
-                    <option value="circle">
-                        Circle
-                    </option>
-
-                    <option value="diamond">
-                        Diamond
-                    </option>
-
-                    <option value="star">
-                        Star
-                    </option>
-
-                    <option value="arrow">
-                        Arrow
-                    </option>
-
-                    <option value="chevron">
-                        Chevron
-                    </option>
-
-                    <option value="heart">
-                        Heart
-                    </option>
-
-                </select>
+                    <span
+                        id="pointerSymbolIcon"
+                        class="selected-symbol"
+                    ></span>
+                </button>
 
             </div>
 
 
-            <div class="pointer-control">
+            <div class="setting-line">
 
-                <div class="control-label">
-                    <span>COLOR</span>
-                </div>
+                <span>Color</span>
+
+                <button
+                    id="pointerColorButton"
+                    class="color-swatch"
+                    type="button"
+                ></button>
 
                 <input
-                    type="color"
                     id="pointerColor"
-                    class="pointer-color"
+                    class="native-color"
+                    type="color"
                 >
 
             </div>
 
 
-            <div class="pointer-control full">
+            <div class="range-row">
 
-                <div class="control-label">
-
-                    <span>SIZE</span>
-
-                    <output
-                        id="pointerSizeValue"
-                        class="control-output"
-                    >
-                        28
-                    </output>
-
+                <div class="range-name">
+                    Size
                 </div>
 
                 <input
-                    type="range"
                     id="pointerSize"
+                    type="range"
                     min="12"
-                    max="70"
+                    max="60"
                     step="1"
                 >
 
+                <output id="pointerSizeValue">
+                    28
+                </output>
+
             </div>
 
-        </div>
+
+            <div class="toggle-line">
+
+                <span>Gradient</span>
+
+                <label class="switch">
+
+                    <input
+                        type="checkbox"
+                        id="pointerGradient"
+                    >
+
+                    <span></span>
+
+                </label>
+
+            </div>
 
 
-        <div class="gradient-toggle">
+            <div
+                id="pointerGradientOptions"
+                class="gradient-mini hidden"
+            >
 
-            <label>
+                <button
+                    id="pointerGradientStartButton"
+                    class="gradient-color"
+                    type="button"
+                ></button>
+
+                <button
+                    id="pointerGradientEndButton"
+                    class="gradient-color"
+                    type="button"
+                ></button>
 
                 <input
-                    type="checkbox"
-                    id="pointerGradient"
-                >
-
-                GRADIENT
-
-            </label>
-
-        </div>
-
-
-        <div
-            id="pointerGradientOptions"
-            class="gradient-options hidden"
-        >
-
-            <label>
-                START
-
-                <input
-                    type="color"
                     id="pointerGradientStart"
+                    class="native-color"
+                    type="color"
                 >
-            </label>
-
-            <label>
-                END
 
                 <input
-                    type="color"
                     id="pointerGradientEnd"
+                    class="native-color"
+                    type="color"
                 >
-            </label>
+
+            </div>
 
         </div>
 
     </section>
+
+
+    <!-- SYMBOL POPUP -->
+
+    <div
+        id="symbolPopup"
+        class="floating-popup hidden"
+    >
+
+        <div class="popup-title">
+            SYMBOL
+        </div>
+
+        <div
+            id="symbolGrid"
+            class="symbol-grid"
+        ></div>
+
+    </div>
+
+
+    <!-- COLOR POPUP -->
+
+    <div
+        id="colorPopup"
+        class="color-popup hidden"
+    >
+
+        <div class="popup-title">
+            COLOR
+        </div>
+
+        <div class="color-preview-row">
+
+            <div
+                id="colorPreview"
+                class="big-color-preview"
+            ></div>
+
+            <div>
+                <div class="color-name">
+                    Custom color
+                </div>
+
+                <div class="color-hint">
+                    tap below to choose
+                </div>
+            </div>
+
+        </div>
+
+        <input
+            id="popupColorInput"
+            type="color"
+        >
+
+    </div>
 
 
     <!-- TASKS -->
@@ -401,6 +482,7 @@
         id="tasks"
         class="tasks"
     ></section>
+
 
 </main>
 
