@@ -7,17 +7,29 @@
 }
 
 
+:root {
+    --black: #111111;
+    --white: #ffffff;
+    --background: #f5f5f7;
+    --soft: #f0f0f2;
+    --line: #e5e5e8;
+    --muted: #8c8c94;
+}
+
+
 html,
 body {
+    width: 100%;
     min-height: 100%;
 
-    background: #f4f4f5;
-
-    color: #111;
+    background: var(--background);
+    color: var(--black);
 
     font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
         Arial,
-        Helvetica,
         sans-serif;
 }
 
@@ -31,7 +43,7 @@ body {
 button,
 input,
 select {
-    font-family: inherit;
+    font: inherit;
 }
 
 
@@ -49,25 +61,26 @@ button {
 
     top: 0;
 
-    z-index: 100;
+    z-index: 1000;
 
-    min-height: 68px;
+    min-height: 66px;
 
     padding:
-        max(
-            10px,
-            env(safe-area-inset-top)
-        )
-        14px;
+        max(10px, env(safe-area-inset-top))
+        14px
+        10px;
 
     background:
-        rgba(255,255,255,.94);
+        rgba(255,255,255,.92);
 
     backdrop-filter:
-        blur(18px);
+        blur(20px);
+
+    -webkit-backdrop-filter:
+        blur(20px);
 
     border-bottom:
-        1px solid #e8e8e8;
+        1px solid rgba(0,0,0,.06);
 
     display: flex;
 
@@ -77,15 +90,15 @@ button {
 }
 
 
-.back {
+.back-button {
+    flex: 0 0 42px;
+
     width: 42px;
     height: 42px;
 
-    flex: 0 0 42px;
+    border-radius: 14px;
 
-    border-radius: 50%;
-
-    background: #f0f0f0;
+    background: #f0f0f2;
 
     color: #111;
 
@@ -94,10 +107,9 @@ button {
     display: flex;
 
     align-items: center;
-
     justify-content: center;
 
-    font-size: 30px;
+    font-size: 29px;
 
     line-height: 1;
 }
@@ -124,11 +136,15 @@ button {
 
     font-size: 8px;
 
+    font-weight: 600;
+
     letter-spacing: 1px;
 }
 
 
 .save-button {
+    flex: 0 0 auto;
+
     margin-left: auto;
 
     height: 40px;
@@ -138,7 +154,7 @@ button {
 
     border: 0;
 
-    border-radius: 12px;
+    border-radius: 13px;
 
     background: #111;
 
@@ -164,20 +180,32 @@ button {
 .editor {
     width: 100%;
 
-    max-width: 850px;
+    max-width: 680px;
 
-    margin: auto;
+    margin: 0 auto;
 
     padding:
-        12px
+        14px
         12px
         60px;
 }
 
 
-/* =========================================
-   DAYS
-========================================= */
+.section-label {
+    color: #a0a0a7;
+
+    font-size: 8px;
+
+    font-weight: 800;
+
+    letter-spacing: 1.5px;
+}
+
+
+.days-section {
+    margin-bottom: 12px;
+}
+
 
 .day-tabs {
     display: flex;
@@ -186,9 +214,11 @@ button {
 
     overflow-x: auto;
 
-    scrollbar-width: none;
+    margin-top: 8px;
 
-    margin-bottom: 12px;
+    padding-bottom: 2px;
+
+    scrollbar-width: none;
 }
 
 
@@ -200,24 +230,27 @@ button {
 .day-tabs button {
     flex: 0 0 auto;
 
-    min-width: 55px;
+    min-width: 53px;
+    height: 40px;
 
-    height: 42px;
+    padding: 0 12px;
 
     border: 0;
 
-    border-radius: 12px;
+    border-radius: 13px;
 
-    background: #e9e9ea;
+    background: #e9e9ec;
 
-    color: #999;
+    color: #8c8c92;
 
     font-size: 9px;
 
     font-weight: 800;
 
+    letter-spacing: .6px;
+
     transition:
-        .15s ease;
+        .18s ease;
 }
 
 
@@ -225,652 +258,76 @@ button {
     background: #111;
 
     color: white;
+
+    transform:
+        translateY(-1px);
 }
 
 
 /* =========================================
-   PREVIEW
+   QUICK ACTIONS
 ========================================= */
 
-.preview-section {
-    margin-bottom: 13px;
-}
-
-
-.section-heading {
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    margin:
-        2px
-        3px
-        8px;
-
-    color: #888;
-
-    font-size: 8px;
-
-    font-weight: 800;
-
-    letter-spacing: 1.3px;
-}
-
-
-.section-heading span {
-    color: #bbb;
-}
-
-
-.preview {
-    position: relative;
-
-    width: 100%;
-
-    height: 330px;
-
-    overflow: hidden;
-
-    border-radius: 20px;
-
-    background: white;
-
-    border:
-        1px solid #e7e7e7;
-
-    box-shadow:
-        0 7px 30px
-        rgba(0,0,0,.045);
-}
-
-
-.preview-grid {
-    position: absolute;
-
-    inset: 0;
-
-    pointer-events: none;
-}
-
-
-.preview-grid.clean {
-    background:
-        repeating-linear-gradient(
-            to bottom,
-            transparent 0,
-            transparent 39px,
-            var(--grid-color) 40px
-        );
-}
-
-
-.preview-grid.double {
-    background:
-        repeating-linear-gradient(
-            to bottom,
-            transparent 0,
-            transparent 38px,
-            var(--grid-color) 39px,
-            transparent 40px,
-            transparent 78px,
-            var(--grid-color) 79px
-        );
-}
-
-
-.preview-grid.soft {
-    background:
-        repeating-linear-gradient(
-            to bottom,
-            transparent 0,
-            transparent 39px,
-            color-mix(
-                in srgb,
-                var(--grid-color) 45%,
-                transparent
-            ) 40px
-        );
-}
-
-
-.preview-grid.dots {
-    background-image:
-        radial-gradient(
-            circle,
-            var(--grid-color) 1px,
-            transparent 1px
-        );
-
-    background-size:
-        18px 40px;
-}
-
-
-.preview-grid.wave {
-    background:
-        repeating-linear-gradient(
-            0deg,
-            transparent 0,
-            transparent 34px,
-            var(--grid-color) 35px,
-            transparent 36px
-        );
-
-    mask-image:
-        linear-gradient(
-            90deg,
-            transparent,
-            black 10%,
-            black 90%,
-            transparent
-        );
-}
-
-
-.preview-tasks {
-    position: absolute;
-
-    inset: 0;
-}
-
-
-.preview-task {
-    position: absolute;
-
-    left: 16px;
-
-    right: 16px;
-
-    min-height: 32px;
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-
-    transform:
-        translateY(-50%);
-}
-
-
-.preview-time {
-    flex: 0 0 auto;
-
-    font-size: 10px;
-
-    white-space: nowrap;
-}
-
-
-.preview-label {
-    min-width: 0;
-
-    max-width: 100%;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
-
-    white-space: nowrap;
-
-    line-height: 1.1;
-}
-
-
-.preview-pointer {
-    position: absolute;
-
-    left: 7px;
-
-    top: 50%;
-
-    z-index: 20;
-
-    font-size: 28px;
-
-    line-height: 1;
-
-    transform:
-        translateY(-50%);
-
-    pointer-events: none;
-}
-
-
-/* =========================================
-   TOOLBAR
-========================================= */
-
-.toolbar {
+.quick-actions {
     display: grid;
 
     grid-template-columns:
-        1fr
-        1fr
-        1fr;
+        1.25fr
+        .875fr
+        .875fr;
 
     gap: 7px;
 
-    margin-bottom: 13px;
+    margin-bottom: 12px;
 }
 
 
-.primary-button,
-.secondary-button {
-    min-height: 46px;
+.quick-button {
+    min-width: 0;
 
-    border-radius: 13px;
+    height: 50px;
 
-    font-size: 9px;
+    border: 1px solid #e5e5e8;
 
-    font-weight: 800;
-
-    letter-spacing: .8px;
-}
-
-
-.primary-button {
-    border: 0;
-
-    background: #111;
-
-    color: white;
-}
-
-
-.secondary-button {
-    border:
-        1px solid #e4e4e4;
+    border-radius: 15px;
 
     background: white;
 
     color: #555;
-}
 
-
-/* =========================================
-   TASK LIST
-========================================= */
-
-.tasks {
-    width: 100%;
-}
-
-
-.empty-state {
-    padding: 45px 15px;
-
-    text-align: center;
-
-    color: #aaa;
-
-    font-size: 11px;
-}
-
-
-/* =========================================
-   TASK CARD
-========================================= */
-
-.task-card {
-    position: relative;
-
-    margin-bottom: 10px;
-
-    padding: 12px;
-
-    border:
-        1px solid #e5e5e5;
-
-    border-radius: 18px;
-
-    background: white;
-
-    box-shadow:
-        0 5px 22px
-        rgba(0,0,0,.025);
-
-    overflow: hidden;
-}
-
-
-.task-card.expanded {
-    border-color: #d9d9d9;
-
-    box-shadow:
-        0 8px 30px
-        rgba(0,0,0,.055);
-}
-
-
-.task-top {
-    display: grid;
-
-    grid-template-columns:
-        82px
-        minmax(0,1fr)
-        42px;
-
-    gap: 7px;
-
-    align-items: center;
-}
-
-
-.time-input,
-.text-input {
-    height: 45px;
-
-    border:
-        1px solid #dedede;
-
-    border-radius: 11px;
-
-    background: #fafafa;
-
-    outline: none;
-
-    padding:
-        0 10px;
-
-    color: #111;
-
-    font-size: 13px;
-}
-
-
-.time-input {
-    font-weight: 700;
-}
-
-
-.text-input {
-    width: 100%;
-}
-
-
-.time-input:focus,
-.text-input:focus,
-select:focus {
-    border-color: #111;
-}
-
-
-.delete-task {
-    width: 42px;
-    height: 45px;
-
-    border: 0;
-
-    border-radius: 11px;
-
-    background: #f3f3f3;
-
-    color: #888;
-
-    font-size: 20px;
-}
-
-
-.delete-task:active {
-    background: #ffe7e7;
-
-    color: #d00;
-}
-
-
-/* =========================================
-   TASK PREVIEW STRIP
-========================================= */
-
-.task-style-preview {
     display: flex;
 
     align-items: center;
-
-    gap: 8px;
-
-    margin-top: 10px;
-
-    padding:
-        8px
-        10px;
-
-    border-radius: 11px;
-
-    background: #fafafa;
-
-    overflow: hidden;
-}
-
-
-.task-style-time {
-    flex: 0 0 auto;
-
-    font-size: 9px;
-}
-
-
-.task-style-text {
-    min-width: 0;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
-
-    white-space: nowrap;
-}
-
-
-/* =========================================
-   EXPAND BUTTON
-========================================= */
-
-.expand-hint {
-    display: flex;
-
-    align-items: center;
-
     justify-content: center;
 
-    gap: 5px;
-
-    margin-top: 8px;
-
-    color: #aaa;
-
-    font-size: 8px;
-
-    font-weight: 700;
-
-    letter-spacing: 1px;
-
-    user-select: none;
-}
-
-
-.expand-arrow {
-    font-size: 12px;
-
-    transition:
-        transform .2s ease;
-}
-
-
-.task-card.expanded
-.expand-arrow {
-    transform:
-        rotate(180deg);
-}
-
-
-/* =========================================
-   CONTROLS
-========================================= */
-
-.task-controls {
-    display: none;
-
-    grid-template-columns:
-        1fr
-        1fr;
-
-    gap: 8px;
-
-    margin-top: 11px;
-
-    padding-top: 11px;
-
-    border-top:
-        1px solid #eee;
-}
-
-
-.task-card.expanded
-.task-controls {
-    display: grid;
-}
-
-
-.control {
-    min-width: 0;
-
-    padding: 9px;
-
-    border:
-        1px solid #eeeeee;
-
-    border-radius: 12px;
-
-    background: #fafafa;
-}
-
-
-.control-title {
-    margin-bottom: 7px;
-
-    color: #999;
+    gap: 7px;
 
     font-size: 8px;
 
     font-weight: 800;
 
-    letter-spacing: 1px;
+    letter-spacing: .7px;
 }
 
 
-.control input[type="color"] {
-    display: block;
-
-    width: 100%;
-
-    height: 35px;
-
-    padding: 0;
-
-    border: 0;
-
-    background: transparent;
+.quick-button:active {
+    transform: scale(.97);
 }
 
 
-.control input[type="range"] {
-    width: 100%;
+.quick-icon {
+    font-size: 15px;
 
-    accent-color: #111;
+    line-height: 1;
 }
 
 
-.control select {
-    width: 100%;
+.add-button {
+    background: #111;
 
-    height: 35px;
+    color: white;
 
-    padding:
-        0 7px;
-
-    border:
-        1px solid #e1e1e1;
-
-    border-radius: 9px;
-
-    outline: none;
-
-    background: white;
-
-    color: #111;
-
-    font-size: 10px;
-}
-
-
-.range-row {
-    display: flex;
-
-    align-items: center;
-
-    gap: 7px;
-}
-
-
-.range-row output {
-    min-width: 28px;
-
-    text-align: right;
-
-    color: #777;
-
-    font-size: 9px;
-}
-
-
-.switch-line {
-    display: flex;
-
-    align-items: center;
-
-    gap: 8px;
-
-    font-size: 9px;
-
-    font-weight: 700;
-}
-
-
-.switch-line input {
-    width: 18px;
-    height: 18px;
-}
-
-
-.gradient-row {
-    display: grid;
-
-    grid-template-columns:
-        1fr
-        38px
-        38px;
-
-    gap: 6px;
-
-    align-items: center;
-}
-
-
-.gradient-row label {
-    font-size: 9px;
-
-    font-weight: 700;
-}
-
-
-.gradient-row input[type="color"] {
-    width: 38px;
-
-    height: 32px;
+    border-color: #111;
 }
 
 
@@ -879,187 +336,19 @@ select:focus {
 ========================================= */
 
 .settings-panel {
-    margin:
-        0
-        0
-        13px;
+    margin-bottom: 13px;
 
     padding: 15px;
 
-    border:
-        1px solid #e5e5e5;
-
-    border-radius: 18px;
-
-    background: white;
-}
-
-
-.panel-title {
-    margin-bottom: 13px;
-
-    font-size: 10px;
-
-    font-weight: 800;
-
-    letter-spacing: 1.3px;
-}
-
-
-.choice-grid {
-    display: grid;
-
-    grid-template-columns:
-        repeat(2,1fr);
-
-    gap: 7px;
-}
-
-
-.choice-grid button {
-    min-height: 44px;
-
-    border: 0;
-
-    border-radius: 11px;
-
-    background: #f1f1f1;
-
-    color: #777;
-
-    font-size: 9px;
-
-    font-weight: 800;
-}
-
-
-.choice-grid button.active {
-    background: #111;
-
-    color: white;
-}
-
-
-.global-control {
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    gap: 12px;
-
-    margin-top: 12px;
-
-    padding: 9px;
-
-    border-radius: 12px;
-
-    background: #fafafa;
-
-    color: #777;
-
-    font-size: 8px;
-
-    font-weight: 800;
-
-    letter-spacing: .8px;
-}
-
-
-.global-control input[type="color"] {
-    width: 50px;
-
-    height: 34px;
-
-    padding: 0;
-
-    border: 0;
-
-    background: transparent;
-}
-
-
-.global-control select {
-    min-width: 145px;
-
-    height: 35px;
-
-    border:
-        1px solid #ddd;
-
-    border-radius: 9px;
-
     background: white;
 
-    padding: 0 8px;
-}
+    border: 1px solid #e6e6e8;
 
+    border-radius: 20px;
 
-.range-line {
-    display: flex;
-
-    align-items: center;
-
-    gap: 8px;
-
-    width: 60%;
-}
-
-
-.range-line input {
-    flex: 1;
-
-    accent-color: #111;
-}
-
-
-.range-line output {
-    min-width: 25px;
-
-    color: #777;
-
-    text-align: right;
-}
-
-
-.switch-row {
-    display: flex;
-
-    align-items: center;
-
-    gap: 9px;
-
-    margin-top: 12px;
-
-    padding: 10px;
-
-    border-radius: 12px;
-
-    background: #fafafa;
-
-    color: #555;
-
-    font-size: 9px;
-
-    font-weight: 800;
-}
-
-
-.switch-row input {
-    width: 18px;
-    height: 18px;
-}
-
-
-.gradient-options {
-    display: grid;
-
-    grid-template-columns:
-        1fr
-        1fr;
-
-    gap: 8px;
+    box-shadow:
+        0 8px 30px
+        rgba(0,0,0,.035);
 }
 
 
@@ -1068,104 +357,883 @@ select:focus {
 }
 
 
-/* =========================================
-   DELETE MODAL
-========================================= */
-
-.modal-backdrop {
-    position: fixed;
-
-    inset: 0;
-
-    z-index: 1000;
-
+.panel-header {
     display: flex;
 
-    align-items: center;
+    align-items: flex-start;
 
-    justify-content: center;
+    justify-content: space-between;
 
-    padding: 20px;
+    gap: 12px;
 
-    background:
-        rgba(0,0,0,.35);
-
-    backdrop-filter:
-        blur(7px);
+    margin-bottom: 18px;
 }
 
 
-.confirm-modal {
-    width: min(100%, 350px);
+.panel-title {
+    font-size: 12px;
 
-    padding: 20px;
-
-    border-radius: 20px;
-
-    background: white;
-
-    box-shadow:
-        0 20px 60px
-        rgba(0,0,0,.18);
-}
-
-
-.confirm-title {
-    font-size: 13px;
-
-    font-weight: 800;
+    font-weight: 850;
 
     letter-spacing: 1px;
 }
 
 
-.confirm-text {
-    margin-top: 8px;
+.panel-description {
+    margin-top: 4px;
 
-    color: #888;
+    max-width: 260px;
 
-    font-size: 11px;
-
-    line-height: 1.5;
-}
-
-
-.confirm-buttons {
-    display: grid;
-
-    grid-template-columns:
-        1fr
-        1fr;
-
-    gap: 8px;
-
-    margin-top: 20px;
-}
-
-
-.confirm-buttons button {
-    height: 45px;
-
-    border: 0;
-
-    border-radius: 12px;
-
-    background: #eee;
-
-    color: #555;
+    color: #999;
 
     font-size: 9px;
 
+    line-height: 1.45;
+}
+
+
+.panel-close {
+    flex: 0 0 34px;
+
+    width: 34px;
+    height: 34px;
+
+    border: 0;
+
+    border-radius: 11px;
+
+    background: #f0f0f2;
+
+    color: #666;
+
+    font-size: 21px;
+
+    line-height: 1;
+}
+
+
+.setting-block {
+    margin-top: 15px;
+
+    padding-top: 15px;
+
+    border-top:
+        1px solid #eeeeef;
+}
+
+
+.setting-block:first-of-type {
+    margin-top: 0;
+
+    padding-top: 0;
+
+    border-top: 0;
+}
+
+
+.setting-title {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #999;
+
+    font-size: 8px;
+
     font-weight: 800;
+
+    letter-spacing: 1.2px;
+}
+
+
+.full-select {
+    width: 100%;
+
+    height: 45px;
+
+    padding: 0 12px;
+
+    border: 1px solid #e2e2e5;
+
+    border-radius: 12px;
+
+    background: #fafafa;
+
+    outline: none;
+
+    font-size: 12px;
+}
+
+
+.color-control {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    min-height: 45px;
+
+    padding:
+        5px 10px 5px 5px;
+
+    border: 1px solid #e2e2e5;
+
+    border-radius: 12px;
+
+    background: #fafafa;
+}
+
+
+.color-control input[type="color"] {
+    width: 35px;
+    height: 35px;
+
+    padding: 0;
+
+    border: 0;
+
+    background: transparent;
+
+    border-radius: 9px;
+
+    overflow: hidden;
+}
+
+
+.color-control span {
+    color: #777;
+
+    font-family:
+        ui-monospace,
+        monospace;
+
+    font-size: 10px;
+}
+
+
+.range-line {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.range-line input {
+    flex: 1;
+}
+
+
+.range-line output {
+    min-width: 35px;
+
+    padding: 6px 7px;
+
+    border-radius: 8px;
+
+    background: #f1f1f3;
+
+    text-align: center;
+
+    color: #555;
+
+    font-size: 10px;
+
+    font-weight: 700;
+}
+
+
+input[type="range"] {
+    appearance: none;
+
+    -webkit-appearance: none;
+
+    height: 5px;
+
+    border-radius: 5px;
+
+    background: #e5e5e8;
+
+    outline: none;
+}
+
+
+input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+
+    -webkit-appearance: none;
+
+    width: 23px;
+    height: 23px;
+
+    border-radius: 50%;
+
+    background: #111;
+
+    border: 3px solid white;
+
+    box-shadow:
+        0 1px 5px rgba(0,0,0,.18);
+}
+
+
+.toggle-row {
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    cursor: pointer;
+}
+
+
+.toggle-row strong {
+    display: block;
+
+    font-size: 10px;
+
+    letter-spacing: .5px;
+}
+
+
+.toggle-row small {
+    display: block;
+
+    margin-top: 3px;
+
+    color: #999;
+
+    font-size: 8px;
+}
+
+
+.toggle-row input {
+    position: absolute;
+
+    opacity: 0;
+}
+
+
+.toggle {
+    flex: 0 0 auto;
+
+    width: 45px;
+    height: 26px;
+
+    border-radius: 20px;
+
+    background: #ddd;
+
+    position: relative;
+
+    transition: .2s;
+}
+
+
+.toggle::after {
+    content: "";
+
+    position: absolute;
+
+    width: 20px;
+    height: 20px;
+
+    top: 3px;
+    left: 3px;
+
+    border-radius: 50%;
+
+    background: white;
+
+    box-shadow:
+        0 2px 5px rgba(0,0,0,.15);
+
+    transition: .2s;
+}
+
+
+.toggle-row input:checked + .toggle {
+    background: #111;
+}
+
+
+.toggle-row input:checked + .toggle::after {
+    transform:
+        translateX(19px);
+}
+
+
+.gradient-options {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 10px;
+
+    margin-top: 12px;
+}
+
+
+.big-color {
+    width: 100%;
+    height: 42px;
+
+    border: 0;
+
+    border-radius: 11px;
+
+    overflow: hidden;
+}
+
+
+/* =========================================
+   GRID CHOICES
+========================================= */
+
+.grid-choices {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 8px;
+}
+
+
+.grid-choices button {
+    min-height: 67px;
+
+    padding: 8px;
+
+    border:
+        1px solid #e5e5e8;
+
+    border-radius: 13px;
+
+    background: #fafafa;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    color: #777;
+
+    font-size: 8px;
+
+    font-weight: 800;
+
+    letter-spacing: .7px;
+}
+
+
+.grid-choices button.active {
+    border-color: #111;
+
+    background: #111;
+
+    color: white;
+}
+
+
+.grid-preview {
+    width: 75px;
+    height: 27px;
+
+    border-radius: 6px;
+
+    display: block;
+}
+
+
+.clean-preview {
+    background:
+        linear-gradient(
+            #ddd 1px,
+            transparent 1px
+        );
+
+    background-size:
+        100% 9px;
+}
+
+
+.dots-preview {
+    background-image:
+        radial-gradient(
+            #aaa 1px,
+            transparent 1px
+        );
+
+    background-size:
+        7px 7px;
+}
+
+
+.double-preview {
+    background:
+        repeating-linear-gradient(
+            to bottom,
+            #bbb 0,
+            #bbb 1px,
+            transparent 1px,
+            transparent 7px,
+            #ddd 7px,
+            #ddd 8px,
+            transparent 8px,
+            transparent 12px
+        );
+}
+
+
+.soft-preview {
+    background:
+        repeating-linear-gradient(
+            to bottom,
+            rgba(0,0,0,.06) 0,
+            rgba(0,0,0,.06) 1px,
+            transparent 1px,
+            transparent 9px
+        );
+}
+
+
+.wave-preview {
+    position: relative;
+
+    overflow: hidden;
+}
+
+
+.wave-preview::after {
+    content: "";
+
+    position: absolute;
+
+    left: -5px;
+    right: -5px;
+
+    top: 7px;
+
+    height: 15px;
+
+    border-top:
+        1px solid #aaa;
+
+    border-radius: 50%;
+}
+
+
+/* =========================================
+   TASKS
+========================================= */
+
+.tasks-section {
+    margin-top: 4px;
+}
+
+
+.tasks-heading {
+    margin-bottom: 9px;
+}
+
+
+.selected-day-title {
+    margin-top: 3px;
+
+    font-size: 18px;
+
+    font-weight: 850;
+
+    letter-spacing: -.5px;
+}
+
+
+.task-card {
+    position: relative;
+
+    margin-bottom: 10px;
+
+    background: white;
+
+    border:
+        1px solid #e4e4e7;
+
+    border-radius: 19px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 5px 25px
+        rgba(0,0,0,.035);
+}
+
+
+/* =========================================
+   TASK PREVIEW
+========================================= */
+
+.task-preview {
+    position: relative;
+
+    min-height: 78px;
+
+    padding:
+        14px
+        48px
+        14px
+        14px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    cursor: pointer;
+
+    user-select: none;
+}
+
+
+.task-preview:active {
+    background: #fafafa;
+}
+
+
+.preview-time {
+    flex: 0 0 auto;
+
+    min-width: 48px;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    letter-spacing: .3px;
+}
+
+
+.preview-text {
+    min-width: 0;
+
+    word-break: break-word;
+
+    font-size: 15px;
+
+    line-height: 1.2;
+}
+
+
+.task-open-icon {
+    position: absolute;
+
+    right: 14px;
+    top: 50%;
+
+    width: 25px;
+    height: 25px;
+
+    transform:
+        translateY(-50%);
+
+    border-radius: 8px;
+
+    background: #f1f1f3;
+
+    color: #888;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 12px;
+
+    transition: .2s;
+}
+
+
+.task-card.open
+.task-open-icon {
+    transform:
+        translateY(-50%)
+        rotate(180deg);
+}
+
+
+/* =========================================
+   TASK EDITOR
+========================================= */
+
+.task-editor {
+    display: none;
+
+    padding:
+        0
+        13px
+        13px;
+}
+
+
+.task-card.open
+.task-editor {
+    display: block;
+}
+
+
+.editor-group {
+    padding:
+        14px
+        0;
+
+    border-top:
+        1px solid #eeeeef;
+}
+
+
+.editor-group-title {
+    margin-bottom: 10px;
+
+    color: #888;
+
+    font-size: 8px;
+
+    font-weight: 850;
+
+    letter-spacing: 1.3px;
+}
+
+
+.field-label {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: #999;
+
+    font-size: 8px;
+
+    font-weight: 700;
 
     letter-spacing: .8px;
 }
 
 
-.confirm-buttons .danger {
-    background: #111;
+.field + .field {
+    margin-top: 12px;
+}
 
-    color: white;
+
+.text-field,
+.time-field,
+.font-select {
+    width: 100%;
+
+    height: 45px;
+
+    padding:
+        0 11px;
+
+    border:
+        1px solid #e1e1e4;
+
+    border-radius: 12px;
+
+    background: #fafafa;
+
+    outline: none;
+
+    color: #111;
+
+    font-size: 12px;
+}
+
+
+.text-field {
+    font-size: 14px;
+}
+
+
+.text-field:focus,
+.time-field:focus,
+.font-select:focus {
+    border-color: #aaa;
+}
+
+
+.control-grid {
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 8px;
+}
+
+
+.mini-control {
+    min-width: 0;
+
+    padding: 10px;
+
+    border:
+        1px solid #e8e8ea;
+
+    border-radius: 12px;
+
+    background: #fafafa;
+}
+
+
+.mini-control .field-label {
+    margin-bottom: 7px;
+}
+
+
+.mini-color {
+    width: 100%;
+    height: 35px;
+
+    border: 0;
+
+    padding: 0;
+
+    border-radius: 8px;
+
+    overflow: hidden;
+}
+
+
+.mini-range {
+    width: 100%;
+}
+
+
+.range-value {
+    display: block;
+
+    margin-top: 5px;
+
+    color: #777;
+
+    text-align: right;
+
+    font-size: 9px;
+
+    font-weight: 700;
+}
+
+
+.select-row {
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 8px;
+}
+
+
+/* =========================================
+   GRADIENT TEXT
+========================================= */
+
+.gradient-settings {
+    margin-top: 10px;
+
+    padding: 10px;
+
+    border-radius: 12px;
+
+    background: #f7f7f8;
+}
+
+
+.gradient-colors {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 8px;
+}
+
+
+/* =========================================
+   ACTIONS
+========================================= */
+
+.task-actions {
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 8px;
+
+    margin-top: 14px;
+}
+
+
+.task-action {
+    height: 43px;
+
+    border: 0;
+
+    border-radius: 12px;
+
+    font-size: 8px;
+
+    font-weight: 850;
+
+    letter-spacing: .8px;
+}
+
+
+.duplicate-task {
+    background: #f0f0f2;
+
+    color: #444;
+}
+
+
+.delete-task {
+    background: #fff0f0;
+
+    color: #c33;
+}
+
+
+.empty-state {
+    padding:
+        45px
+        15px;
+
+    border-radius: 18px;
+
+    background: white;
+
+    border:
+        1px dashed #ddd;
+
+    text-align: center;
+
+    color: #999;
+
+    font-size: 10px;
+
+    line-height: 1.6;
 }
 
 
@@ -1179,18 +1247,18 @@ select:focus {
         padding:
             25px
             20px
-            80px;
+            70px;
     }
 
 
-    .preview {
-        height: 420px;
+    .task-preview {
+        min-height: 84px;
     }
 
 
-    .task-controls {
+    .control-grid {
         grid-template-columns:
-            repeat(4,1fr);
+            repeat(3, 1fr);
     }
 
 }
