@@ -1,93 +1,115 @@
 * {
     margin: 0;
     padding: 0;
-
     box-sizing: border-box;
 
-    -webkit-tap-highlight-color:
-        transparent;
+    -webkit-tap-highlight-color: transparent;
 }
 
+:root {
+    --schedule-background: #ffffff;
+    --schedule-text: #111111;
+    --schedule-time: #777777;
+    --schedule-grid: rgba(17,17,17,0.10);
+    --schedule-accent: #111111;
+
+    --schedule-font:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    --task-size: 14px;
+    --time-size: 10px;
+    --row-height: 58px;
+    --grid-width: 1px;
+    --schedule-radius: 0px;
+
+    --pointer-color: #111111;
+    --pointer-size: 26px;
+    --pointer-opacity: 1;
+}
+
+
+/* =====================================================
+   BASE
+===================================================== */
 
 html,
 body {
     width: 100%;
     height: 100%;
 
-    background: #ffffff;
-}
+    background:
+        var(--schedule-background);
 
-
-body {
-    color: #111111;
+    color:
+        var(--schedule-text);
 
     font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
+        var(--schedule-font);
 
     overflow: hidden;
 
-    -webkit-font-smoothing:
-        antialiased;
+    -webkit-font-smoothing: antialiased;
 }
 
+button {
+    font-family: inherit;
+}
 
 .app {
     position: relative;
 
     width: 100vw;
-    height: 100vh;
-
     width: 100dvw;
+
+    height: 100vh;
     height: 100dvh;
 }
 
 
-/* =========================================
+/* =====================================================
    HEADER
-========================================= */
+===================================================== */
 
 .header {
     position: fixed;
 
     top:
         max(
-            20px,
+            18px,
             env(safe-area-inset-top)
         );
 
-    left: 18px;
+    left: 78px;
 
     z-index: 100;
 
     pointer-events: none;
 }
 
-
 .day {
-    font-size: 15px;
+    font-size: 14px;
 
     font-weight: 600;
 
-    letter-spacing: 2.5px;
+    letter-spacing: 2.2px;
 }
 
-
 .time {
-    margin-top: 6px;
+    margin-top: 5px;
 
-    font-size: 12px;
+    font-size: 11px;
 
-    letter-spacing: 2px;
+    letter-spacing: 1.8px;
 
     opacity: 0.4;
 }
 
 
-/* =========================================
-   MENU BUTTON
-========================================= */
+/* =====================================================
+   MENU
+===================================================== */
 
 .menu-button {
     position: fixed;
@@ -98,7 +120,7 @@ body {
             env(safe-area-inset-top)
         );
 
-    right: 16px;
+    left: 16px;
 
     z-index: 200;
 
@@ -107,8 +129,10 @@ body {
 
     border: none;
 
+    border-radius: 50%;
+
     background:
-        rgba(255, 255, 255, 0.92);
+        rgba(255,255,255,0.96);
 
     display: flex;
 
@@ -121,25 +145,23 @@ body {
 
     cursor: pointer;
 
-    border-radius: 50%;
-
     box-shadow:
         0 2px 12px
-        rgba(0, 0, 0, 0.06);
+        rgba(0,0,0,0.07);
 }
-
 
 .menu-button span {
     width: 17px;
     height: 1px;
 
-    background: #111111;
+    background:
+        var(--schedule-text);
 }
 
 
-/* =========================================
+/* =====================================================
    DAY NAVIGATION
-========================================= */
+===================================================== */
 
 .day-navigation {
     position: fixed;
@@ -164,10 +186,9 @@ body {
     gap: 5px;
 }
 
-
 .nav-button {
-    width: 46px;
-    height: 46px;
+    width: 44px;
+    height: 44px;
 
     border: none;
 
@@ -175,27 +196,28 @@ body {
 
     background: #ffffff;
 
-    color: #111111;
+    color:
+        var(--schedule-text);
 
-    font-size: 30px;
+    font-size: 28px;
 
     cursor: pointer;
 
     box-shadow:
         0 2px 12px
-        rgba(0, 0, 0, 0.06);
+        rgba(0,0,0,0.06);
 }
 
-
 .selected-day {
-    min-width: 130px;
-    height: 46px;
+    min-width: 126px;
+    height: 44px;
 
     border: none;
 
-    border-radius: 24px;
+    border-radius: 23px;
 
-    background: #111111;
+    background:
+        var(--schedule-accent);
 
     color: #ffffff;
 
@@ -209,15 +231,13 @@ body {
     cursor: pointer;
 }
 
-
 .selected-day-label {
     font-size: 7px;
 
-    letter-spacing: 1.8px;
+    letter-spacing: 1.7px;
 
     opacity: 0.55;
 }
-
 
 .selected-day-name {
     margin-top: 2px;
@@ -226,22 +246,22 @@ body {
 
     font-weight: 600;
 
-    letter-spacing: 1.5px;
+    letter-spacing: 1.4px;
 }
 
 
-/* =========================================
-   TODAY
-========================================= */
+/* =====================================================
+   REMOVE OLD TODAY BUTTON
+===================================================== */
 
 .today-button {
-    display: none;
+    display: none !important;
 }
 
 
-/* =========================================
+/* =====================================================
    SCHEDULE
-========================================= */
+===================================================== */
 
 .schedule {
     position: absolute;
@@ -253,87 +273,256 @@ body {
     align-items: center;
     justify-content: center;
 
-    padding-top: 70px;
-
-    padding-bottom:
+    padding:
+        82px
+        10px
         calc(
-            80px +
+            88px +
             env(safe-area-inset-bottom)
         );
+
+    overflow: hidden;
 
     touch-action: pan-y;
 }
 
-
-.image-wrapper {
+.schedule-wrapper {
     position: relative;
 
     width:
         min(
-            94vw,
-            calc(
-                (100dvh - 145px)
-                * 1080 / 1920
-            )
+            100%,
+            760px
         );
 
-    aspect-ratio:
-        1080 / 1920;
+    max-height:
+        calc(
+            100dvh - 170px
+        );
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    scrollbar-width: none;
+
+    background:
+        var(--schedule-background);
+
+    border-radius:
+        var(--schedule-radius);
+
+    -webkit-overflow-scrolling:
+        touch;
 }
 
+.schedule-wrapper::-webkit-scrollbar {
+    display: none;
+}
 
-#scheduleImage {
-    position: absolute;
-
-    inset: 0;
+.schedule-grid {
+    position: relative;
 
     width: 100%;
-    height: 100%;
-
-    object-fit: fill;
-
-    user-select: none;
-
-    -webkit-user-drag: none;
 }
 
 
-.pointer {
+/* =====================================================
+   ROW
+===================================================== */
+
+.schedule-row {
+    position: relative;
+
+    height:
+        var(--row-height);
+
+    min-height:
+        var(--row-height);
+
+    display: grid;
+
+    grid-template-columns:
+        70px minmax(0, 1fr);
+
+    border-bottom:
+        var(--grid-width)
+        solid
+        var(--schedule-grid);
+}
+
+.schedule-row:first-child {
+    border-top:
+        var(--grid-width)
+        solid
+        var(--schedule-grid);
+}
+
+
+/* =====================================================
+   TIME
+===================================================== */
+
+.schedule-time {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    padding:
+        0 12px 0 0;
+
+    color:
+        var(--schedule-time);
+
+    font-size:
+        var(--time-size);
+
+    letter-spacing:
+        0.6px;
+
+    border-right:
+        var(--grid-width)
+        solid
+        var(--schedule-grid);
+}
+
+
+/* =====================================================
+   TASK
+===================================================== */
+
+.schedule-task {
+    min-width: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    padding:
+        0 14px;
+
+    color:
+        var(--schedule-text);
+
+    font-size:
+        var(--task-size);
+
+    line-height: 1.25;
+
+    word-break: break-word;
+}
+
+.empty-task {
+    opacity: 0;
+}
+
+
+/* =====================================================
+   CURRENT TIME POINTER
+===================================================== */
+
+/*
+    ВАЖНО:
+
+    Теперь pointer НЕ рисует линию.
+
+    Он находится ровно в центре
+    нужной строки.
+*/
+
+.current-time-pointer {
     position: absolute;
 
-    inset: 0;
+    left: 0;
+
+    width: 100%;
+
+    height: 0;
+
+    z-index: 50;
 
     pointer-events: none;
 
-    z-index: 10;
+    display: none;
 }
 
 
-.triangle {
+/* Старую линию полностью отключаем */
+
+.pointer-line {
+    display: none !important;
+}
+
+
+/*
+    Сам символ
+*/
+
+.pointer-triangle {
     position: absolute;
 
-    left: -16px;
+    left: 0;
 
-    width: 0;
-    height: 0;
+    top: 0;
 
-    border-top:
-        7px solid transparent;
+    width: auto;
+    height: auto;
 
-    border-bottom:
-        7px solid transparent;
-
-    border-left:
-        11px solid #111111;
+    border: none !important;
 
     transform:
-        translateY(-50%);
+        translate(
+            -3px,
+            -50%
+        );
+
+    color:
+        var(--pointer-color);
+
+    font-size:
+        var(--pointer-size);
+
+    line-height: 1;
+
+    font-weight: 700;
+
+    opacity:
+        var(--pointer-opacity);
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    transition:
+        transform 0.2s ease,
+        color 0.2s ease;
 }
 
 
-/* =========================================
-   BOTTOM NAVIGATION
-========================================= */
+/* =====================================================
+   GRADIENT POINTER
+===================================================== */
+
+.pointer-gradient .pointer-triangle {
+    background:
+        linear-gradient(
+            135deg,
+            var(--pointer-gradient-start),
+            var(--pointer-gradient-end)
+        );
+
+    -webkit-background-clip: text;
+    background-clip: text;
+
+    -webkit-text-fill-color:
+        transparent;
+}
+
+
+/* =====================================================
+   BOTTOM DAYS
+===================================================== */
 
 .bottom-navigation {
     position: fixed;
@@ -344,22 +533,25 @@ body {
 
     z-index: 100;
 
-    padding-top: 10px;
-
-    padding-bottom:
+    padding:
+        9px 0
         max(
             12px,
             env(safe-area-inset-bottom)
         );
 
     background:
-        rgba(255, 255, 255, 0.96);
+        rgba(
+            255,
+            255,
+            255,
+            0.97
+        );
 
     border-top:
         1px solid
-        rgba(17, 17, 17, 0.06);
+        rgba(17,17,17,0.06);
 }
-
 
 .days-scroll {
     display: flex;
@@ -369,24 +561,24 @@ body {
     overflow-x: auto;
 
     padding:
-        0
-        18px;
+        0 15px;
 
     scrollbar-width: none;
 
-    -webkit-overflow-scrolling: touch;
+    -webkit-overflow-scrolling:
+        touch;
 }
-
 
 .days-scroll::-webkit-scrollbar {
     display: none;
 }
 
-
 .day-button {
-    flex: 0 0 auto;
+    flex:
+        0 0 auto;
 
     min-width: 54px;
+
     height: 42px;
 
     border: none;
@@ -394,10 +586,10 @@ body {
     border-radius: 14px;
 
     background:
-        rgba(17, 17, 17, 0.04);
+        rgba(17,17,17,0.04);
 
     color:
-        rgba(17, 17, 17, 0.4);
+        rgba(17,17,17,0.4);
 
     font-size: 9px;
 
@@ -417,13 +609,13 @@ body {
     gap: 4px;
 }
 
-
 .day-button.active {
-    background: #111111;
+    background:
+        var(--schedule-accent);
 
-    color: #ffffff;
+    color:
+        #ffffff;
 }
-
 
 .day-indicator {
     width: 4px;
@@ -431,27 +623,24 @@ body {
 
     border-radius: 50%;
 
-    background: currentColor;
+    background:
+        currentColor;
 
     opacity: 0;
 }
 
-
-.day-button.today
-.day-indicator {
+.day-button.today .day-indicator {
     opacity: 0.55;
 }
 
-
-.day-button.active
-.day-indicator {
+.day-button.active .day-indicator {
     opacity: 0;
 }
 
 
-/* =========================================
-   MENU OVERLAY
-========================================= */
+/* =====================================================
+   SIDE MENU
+===================================================== */
 
 .menu-overlay {
     position: fixed;
@@ -461,7 +650,7 @@ body {
     z-index: 300;
 
     background:
-        rgba(0, 0, 0, 0.25);
+        rgba(0,0,0,0.25);
 
     opacity: 0;
 
@@ -471,23 +660,17 @@ body {
         opacity 0.25s ease;
 }
 
-
 .menu-overlay.open {
     opacity: 1;
 
     pointer-events: auto;
 }
 
-
-/* =========================================
-   SIDE MENU
-========================================= */
-
 .side-menu {
     position: fixed;
 
     top: 0;
-    right: 0;
+    left: 0;
 
     z-index: 400;
 
@@ -513,7 +696,7 @@ body {
     background: #ffffff;
 
     transform:
-        translateX(100%);
+        translateX(-100%);
 
     transition:
         transform 0.3s
@@ -529,23 +712,16 @@ body {
     flex-direction: column;
 }
 
-
 .side-menu.open {
     transform:
         translateX(0);
 }
-
-
-/* =========================================
-   MENU TOP
-========================================= */
 
 .menu-top {
     display: flex;
 
     justify-content: flex-end;
 }
-
 
 .close-menu {
     width: 42px;
@@ -554,7 +730,7 @@ body {
     border: none;
 
     background:
-        rgba(17, 17, 17, 0.05);
+        rgba(17,17,17,0.05);
 
     border-radius: 50%;
 
@@ -562,15 +738,8 @@ body {
 
     font-size: 27px;
 
-    font-weight: 300;
-
     cursor: pointer;
 }
-
-
-/* =========================================
-   PROFILE
-========================================= */
 
 .menu-profile {
     margin-top: 45px;
@@ -581,7 +750,6 @@ body {
 
     gap: 15px;
 }
-
 
 .menu-avatar {
     width: 58px;
@@ -603,11 +771,9 @@ body {
     font-weight: 600;
 }
 
-
 .menu-user-info {
     min-width: 0;
 }
-
 
 .menu-username {
     font-size: 15px;
@@ -616,7 +782,6 @@ body {
 
     letter-spacing: 0.5px;
 }
-
 
 .menu-email {
     margin-top: 6px;
@@ -630,36 +795,29 @@ body {
     font-size: 11px;
 
     color:
-        rgba(17, 17, 17, 0.4);
+        rgba(17,17,17,0.4);
 }
-
-
-/* =========================================
-   MENU LINKS
-========================================= */
 
 .menu-links {
     margin-top: 45px;
 
     border-top:
         1px solid
-        rgba(17, 17, 17, 0.1);
+        rgba(17,17,17,0.1);
 }
-
 
 .menu-link {
     height: 62px;
 
     padding:
-        0
-        3px;
+        0 3px;
 
     border-bottom:
         1px solid
-        rgba(17, 17, 17, 0.08);
+        rgba(17,17,17,0.08);
 
     color:
-        rgba(17, 17, 17, 0.45);
+        rgba(17,17,17,0.45);
 
     text-decoration: none;
 
@@ -675,22 +833,13 @@ body {
     letter-spacing: 1.6px;
 }
 
-
 .menu-link.active {
     color: #111111;
 }
 
-
 .menu-arrow {
     font-size: 22px;
-
-    font-weight: 300;
 }
-
-
-/* =========================================
-   LOGOUT
-========================================= */
 
 .logout-button {
     margin-top: auto;
@@ -700,13 +849,11 @@ body {
 
     border:
         1px solid
-        rgba(17, 17, 17, 0.14);
+        rgba(17,17,17,0.14);
 
     background: #ffffff;
 
     color: #111111;
-
-    font-family: inherit;
 
     font-size: 10px;
 
@@ -718,43 +865,39 @@ body {
 }
 
 
-/* =========================================
+/* =====================================================
    DESKTOP
-========================================= */
+===================================================== */
 
 @media (min-width: 768px) {
 
     .header {
         top: 30px;
-        left: 35px;
+        left: 90px;
     }
-
 
     .menu-button {
         top: 25px;
-        right: 30px;
+        left: 30px;
     }
-
 
     .day-navigation {
         top: 25px;
     }
 
+    .schedule {
+        padding:
+            85px
+            30px
+            100px;
+    }
 
-    .image-wrapper {
+    .schedule-wrapper {
         width:
             min(
                 70vw,
-                calc(
-                    (100vh - 150px)
-                    * 1080 / 1920
-                )
+                760px
             );
-    }
-
-
-    .days-scroll {
-        justify-content: center;
     }
 
 }

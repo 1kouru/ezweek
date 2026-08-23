@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Edit Schedule</title>
+
+    <link
+        rel="stylesheet"
+        href="schedule-editor.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<header class="editor-header">
+
+    <a
+        href="index.html"
+        class="back-button"
+    >
+        ‹
+    </a>
+
+
+    <div class="editor-title">
+
+        <div>
+            EDIT SCHEDULE
+        </div>
+
+        <span id="saveStatus">
+            SAVED
+        </span>
+
+    </div>
+
+
+    <button
+        id="settingsButton"
+        class="settings-button"
+    >
+        ⚙
+    </button>
+
+</header>
+
+
+<main class="editor">
+
+
+    <!-- DAYS -->
+
+    <div class="editor-days">
+
+        <button data-day="MONDAY">MON</button>
+        <button data-day="TUESDAY">TUE</button>
+        <button data-day="WEDNESDAY">WED</button>
+        <button data-day="THURSDAY">THU</button>
+        <button data-day="FRIDAY">FRI</button>
+        <button data-day="SATURDAY">SAT</button>
+        <button data-day="SUNDAY">SUN</button>
+
+    </div>
+
+
+    <!-- CURRENT DAY -->
+
+    <div class="editor-day-title">
+
+        <span id="editorDayName">
+            MONDAY
+        </span>
+
+        <button id="addRowButton">
+            + ADD TIME
+        </button>
+
+    </div>
+
+
+    <!-- ROWS -->
+
+    <section
+        id="editorRows"
+        class="editor-rows"
+    ></section>
+
+
+</main>
+
+
+<!-- SETTINGS -->
+
+<div
+    id="settingsOverlay"
+    class="settings-overlay"
+>
+
+    <div class="settings-panel">
+
+        <div class="settings-header">
+
+            <span>
+                APPEARANCE
+            </span>
+
+            <button id="closeSettings">
+                ×
+            </button>
+
+        </div>
+
+
+        <div class="settings-section">
+
+            <label>
+                BACKGROUND
+            </label>
+
+            <input
+                id="backgroundColor"
+                type="color"
+            >
+
+        </div>
+
+
+        <div class="settings-section">
+
+            <label>
+                TEXT
+            </label>
+
+            <input
+                id="textColor"
+                type="color"
+            >
+
+        </div>
+
+
+        <div class="settings-section">
+
+            <label>
+                TIME COLOR
+            </label>
+
+            <input
+                id="timeColor"
+                type="color"
+            >
+
+        </div>
+
+
+        <div class="settings-section">
+
+            <label>
+                GRID COLOR
+            </label>
+
+            <input
+                id="gridColor"
+                type="color"
+            >
+
+        </div>
+
+
+        <div class="settings-section">
+
+            <label>
+                ACCENT
+            </label>
+
+            <input
+                id="accentColor"
+                type="color"
+            >
+
+        </div>
+
+
+        <div class="settings-section">
+
+            <label>
+                FONT
+            </label>
+
+            <select id="fontSelect">
+
+                <option value="Arial">
+                    Arial
+                </option>
+
+                <option value="Helvetica">
+                    Helvetica
+                </option>
+
+                <option value="Georgia">
+                    Georgia
+                </option>
+
+                <option value="Verdana">
+                    Verdana
+                </option>
+
+                <option value="Tahoma">
+                    Tahoma
+                </option>
+
+                <option value="Trebuchet MS">
+                    Trebuchet
+                </option>
+
+                <option value="Courier New">
+                    Courier
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="settings-section">
+
+            <label>
+                TASK SIZE
+            </label>
+
+            <input
+                id="taskSize"
+                type="range"
+                min="9"
+                max="28"
+                step="1"
+            >
+
+            <span id="taskSizeValue"></span>
+
+        </div>
+
+
+        <div class="settings-section">
+
+            <label>
+                TIME SIZE
+            </label>
+
+            <input
+                id="timeSize"
+                type="range"
+                min="7"
+                max="20"
+                step="1"
+            >
+
+            <span id="timeSizeValue"></span>
+
+        </div>
+
+
+        <div class="settings-section">
+
+            <label>
+                ROW HEIGHT
+            </label>
+
+            <input
+                id="rowHeight"
+                type="range"
+                min="35"
+                max="100"
+                step="1"
+            >
+
+            <span id="rowHeightValue"></span>
+
+        </div>
+
+
+        <div class="settings-section">
+
+            <label>
+                GRID WIDTH
+            </label>
+
+            <input
+                id="gridWidth"
+                type="range"
+                min="0"
+                max="3"
+                step="1"
+            >
+
+            <span id="gridWidthValue"></span>
+
+        </div>
+
+
+        <div class="settings-section">
+
+            <label>
+                CORNER RADIUS
+            </label>
+
+            <input
+                id="borderRadius"
+                type="range"
+                min="0"
+                max="30"
+                step="1"
+            >
+
+            <span id="borderRadiusValue"></span>
+
+        </div>
+<div class="pointer-settings">
+
+    <div class="settings-subtitle">
+        CURRENT TIME POINTER
+    </div>
+
+
+    <div class="settings-section">
+
+        <label>
+            SYMBOL
+        </label>
+
+        <select id="pointerSymbol">
+
+            <option value="➜">➜ Arrow</option>
+            <option value="➤">➤ Arrow 2</option>
+            <option value="♥">♥ Heart</option>
+            <option value="♡">♡ Heart outline</option>
+            <option value="✦">✦ Star</option>
+            <option value="★">★ Star 2</option>
+            <option value="✿">✿ Flower</option>
+            <option value="❀">❀ Flower 2</option>
+            <option value="◆">◆ Diamond</option>
+            <option value="●">● Circle</option>
+            <option value="✚">✚ Plus</option>
+            <option value="☀">☀ Sun</option>
+            <option value="☁">☁ Cloud</option>
+
+        </select>
+
+    </div>
+
+
+    <div class="settings-section">
+
+        <label>
+            POINTER COLOR
+        </label>
+
+        <input
+            id="pointerColor"
+            type="color"
+        >
+
+    </div>
+
+
+    <div class="settings-section">
+
+        <label>
+            SIZE
+        </label>
+
+        <input
+            id="pointerSize"
+            type="range"
+            min="14"
+            max="52"
+            step="1"
+        >
+
+        <span id="pointerSizeValue">
+            26px
+        </span>
+
+    </div>
+
+
+    <div class="settings-section">
+
+        <label>
+            OPACITY
+        </label>
+
+        <input
+            id="pointerOpacity"
+            type="range"
+            min="0.2"
+            max="1"
+            step="0.05"
+        >
+
+        <span id="pointerOpacityValue">
+            100%
+        </span>
+
+    </div>
+
+
+    <div class="gradient-toggle">
+
+        <label>
+            GRADIENT POINTER
+        </label>
+
+        <input
+            id="pointerGradient"
+            type="checkbox"
+        >
+
+    </div>
+
+
+    <div
+        id="gradientOptions"
+        class="gradient-options"
+    >
+
+        <div class="settings-section">
+
+            <label>
+                GRADIENT START
+            </label>
+
+            <input
+                id="pointerGradientStart"
+                type="color"
+            >
+
+        </div>
+
+
+        <div class="settings-section">
+
+            <label>
+                GRADIENT END
+            </label>
+
+            <input
+                id="pointerGradientEnd"
+                type="color"
+            >
+
+        </div>
+
+    </div>
+
+</div>
+
+        <button
+            id="resetSettings"
+            class="reset-settings"
+        >
+            RESET APPEARANCE
+        </button>
+
+    </div>
+
+</div>
+
+
+<script
+    type="module"
+    src="schedule-editor.js"
+></script>
+
+
+</body>
+
+</html>
