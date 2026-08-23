@@ -16,24 +16,13 @@ const DAYS = [
 ];
 
 
-const SHORT = {
-    MONDAY: "MON",
-    TUESDAY: "TUE",
-    WEDNESDAY: "WED",
-    THURSDAY: "THU",
-    FRIDAY: "FRI",
-    SATURDAY: "SAT",
-    SUNDAY: "SUN"
-};
-
-
 let selectedDay = "MONDAY";
 
 let user = null;
 
 let data = null;
 
-let deleteTarget = null;
+let openedTaskId = null;
 
 let saveTimer = null;
 
@@ -45,28 +34,13 @@ let saveTimer = null;
 const tasks =
     document.getElementById("tasks");
 
-const preview =
-    document.getElementById("preview");
-
-const previewTasks =
-    document.getElementById("previewTasks");
-
-const previewGrid =
-    document.getElementById("previewGrid");
-
-const previewPointer =
-    document.getElementById("previewPointer");
-
-const previewDay =
-    document.getElementById("previewDay");
-
 const saveButton =
     document.getElementById("saveButton");
 
 const saveStatus =
     document.getElementById("saveStatus");
 
-const addTask =
+const addTaskButton =
     document.getElementById("addTask");
 
 const gridButton =
@@ -81,54 +55,8 @@ const gridPanel =
 const pointerPanel =
     document.getElementById("pointerPanel");
 
-const gridColor =
-    document.getElementById("gridColor");
-
-const pointerSymbol =
-    document.getElementById("pointerSymbol");
-
-const pointerColor =
-    document.getElementById("pointerColor");
-
-const pointerSize =
-    document.getElementById("pointerSize");
-
-const pointerSizeValue =
-    document.getElementById("pointerSizeValue");
-
-const pointerGradient =
-    document.getElementById("pointerGradient");
-
-const pointerGradientStart =
-    document.getElementById("pointerGradientStart");
-
-const pointerGradientEnd =
-    document.getElementById("pointerGradientEnd");
-
-const pointerGradientOptions =
-    document.getElementById(
-        "pointerGradientOptions"
-    );
-
-const deleteModal =
-    document.getElementById(
-        "deleteModal"
-    );
-
-const deleteText =
-    document.getElementById(
-        "deleteText"
-    );
-
-const cancelDelete =
-    document.getElementById(
-        "cancelDelete"
-    );
-
-const confirmDelete =
-    document.getElementById(
-        "confirmDelete"
-    );
+const selectedDayTitle =
+    document.getElementById("selectedDayTitle");
 
 
 /* =========================================
@@ -154,7 +82,21 @@ function defaultData() {
 
             grid: "clean",
 
-            gridColor: "#e8e8e8"
+            gridColor: "#e8e8e8",
+
+            timeColor: "#999999",
+
+            timeSize: 11,
+
+            taskSize: 15,
+
+            taskColor: "#111111",
+
+            taskBackground: "transparent",
+
+            taskRadius: 12,
+
+            taskPadding: 10
 
         },
 
@@ -180,65 +122,148 @@ function defaultData() {
 
 
 /* =========================================
-   DEFAULT TASK
+   NORMALIZE
 ========================================= */
 
-function createDefaultTask() {
+function normalize() {
 
-    return {
+    const base =
+        defaultData();
 
-        id:
-            crypto.randomUUID(),
 
-        time:
-            "08:00",
+    data = {
 
-        text:
-            "NEW TASK",
+        ...base,
 
-        color:
-            "#111111",
+        ...data,
 
-        fontSize:
-            15,
+        global: {
 
-        fontFamily:
-            "Arial",
+            ...base.global,
 
-        fontWeight:
-            500,
+            ...(data.global || {})
 
-        italic:
-            false,
+        },
 
-        background:
-            "transparent",
+        pointer: {
 
-        radius:
-            12,
+            ...base.pointer,
 
-        padding:
-            10,
+            ...(data.pointer || {})
 
-        timeColor:
-            "#999999",
+        },
 
-        timeSize:
-            11,
+        days: {
 
-        timeWeight:
-            600,
+            ...base.days,
 
-        gradient:
-            false,
+            ...(data.days || {})
 
-        gradientStart:
-            "#ff4ecd",
-
-        gradientEnd:
-            "#7c5cff"
+        }
 
     };
+
+
+    DAYS.forEach(day => {
+
+        if (
+            !Array.isArray(
+                data.days[day]
+            )
+        ) {
+
+            data.days[day] = [];
+
+        }
+
+
+        data.days[day] =
+            data.days[day].map(item => {
+
+                return {
+
+                    id:
+                        item.id ||
+                        crypto.randomUUID(),
+
+                    time:
+                        item.time ||
+                        "08:00",
+
+                    text:
+                        item.text ||
+                        "NEW TASK",
+
+                    color:
+                        item.color ||
+                        data.global.taskColor,
+
+                    fontSize:
+                        Number(
+                            item.fontSize ||
+                            data.global.taskSize
+                        ),
+
+                    fontFamily:
+                        item.fontFamily ||
+                        "Arial",
+
+                    fontWeight:
+                        Number(
+                            item.fontWeight ||
+                            500
+                        ),
+
+                    background:
+                        item.background ||
+                        "transparent",
+
+                    radius:
+                        Number(
+                            item.radius ??
+                            data.global.taskRadius
+                        ),
+
+                    padding:
+                        Number(
+                            item.padding ??
+                            data.global.taskPadding
+                        ),
+
+                    timeColor:
+                        item.timeColor ||
+                        data.global.timeColor,
+
+                    timeSize:
+                        Number(
+                            item.timeSize ||
+                            data.global.timeSize
+                        ),
+
+                    timeWeight:
+                        Number(
+                            item.timeWeight ||
+                            600
+                        ),
+
+                    gradient:
+                        Boolean(
+                            item.gradient
+                        ),
+
+                    gradientStart:
+                        item.gradientStart ||
+                        "#ff4ecd",
+
+                    gradientEnd:
+                        item.gradientEnd ||
+                        "#7c5cff"
+
+                };
+
+            });
+
+    });
 
 }
 
@@ -335,80 +360,6 @@ async function loadData() {
 
 
 /* =========================================
-   NORMALIZE
-========================================= */
-
-function normalize() {
-
-    const base =
-        defaultData();
-
-
-    data = {
-
-        ...base,
-
-        ...data,
-
-        global: {
-
-            ...base.global,
-
-            ...(data.global || {})
-
-        },
-
-        pointer: {
-
-            ...base.pointer,
-
-            ...(data.pointer || {})
-
-        },
-
-        days: {
-
-            ...base.days,
-
-            ...(data.days || {})
-
-        }
-
-    };
-
-
-    DAYS.forEach(day => {
-
-        if (
-            !Array.isArray(
-                data.days[day]
-            )
-        ) {
-
-            data.days[day] = [];
-
-        }
-
-
-        data.days[day] =
-            data.days[day].map(task => {
-
-                return {
-
-                    ...createDefaultTask(),
-
-                    ...task
-
-                };
-
-            });
-
-    });
-
-}
-
-
-/* =========================================
    SAVE
 ========================================= */
 
@@ -463,7 +414,7 @@ async function save() {
     if (error) {
 
         console.error(
-            "SAVE ERROR:",
+            "SUPABASE SAVE ERROR:",
             error
         );
 
@@ -485,17 +436,10 @@ async function save() {
     setTimeout(
         () => {
 
-            if (
-                saveStatus.textContent ===
-                "SAVED ✓"
-            ) {
-
-                setStatus("READY");
-
-            }
+            setStatus("READY");
 
         },
-        1600
+        1200
     );
 
 
@@ -546,9 +490,7 @@ function setStatus(text) {
 ========================================= */
 
 document
-    .querySelectorAll(
-        ".day-tabs button"
-    )
+    .querySelectorAll(".day-tabs button")
     .forEach(button => {
 
         button.addEventListener(
@@ -558,16 +500,12 @@ document
                 selectedDay =
                     button.dataset.day;
 
+                openedTaskId =
+                    null;
+
                 updateTabs();
 
                 renderTasks();
-
-                renderPreview();
-
-                window.scrollTo({
-                    top: 0,
-                    behavior: "smooth"
-                });
 
             }
         );
@@ -578,9 +516,7 @@ document
 function updateTabs() {
 
     document
-        .querySelectorAll(
-            ".day-tabs button"
-        )
+        .querySelectorAll(".day-tabs button")
         .forEach(button => {
 
             button.classList.toggle(
@@ -591,6 +527,10 @@ function updateTabs() {
 
         });
 
+
+    selectedDayTitle.textContent =
+        selectedDay;
+
 }
 
 
@@ -598,97 +538,75 @@ function updateTabs() {
    ADD TASK
 ========================================= */
 
-addTask.addEventListener(
+addTaskButton.addEventListener(
     "click",
     () => {
 
-        const task =
-            createDefaultTask();
+        const task = {
+
+            id:
+                crypto.randomUUID(),
+
+            time:
+                "08:00",
+
+            text:
+                "NEW TASK",
+
+            color:
+                data.global.taskColor,
+
+            fontSize:
+                data.global.taskSize,
+
+            fontFamily:
+                "Arial",
+
+            fontWeight:
+                500,
+
+            background:
+                "transparent",
+
+            radius:
+                data.global.taskRadius,
+
+            padding:
+                data.global.taskPadding,
+
+            timeColor:
+                data.global.timeColor,
+
+            timeSize:
+                data.global.timeSize,
+
+            timeWeight:
+                600,
+
+            gradient:
+                false,
+
+            gradientStart:
+                "#ff4ecd",
+
+            gradientEnd:
+                "#7c5cff"
+
+        };
 
 
-        const dayTasks =
-            data.days[
-                selectedDay
-            ];
+        data.days[selectedDay].push(
+            task
+        );
 
 
-        /*
-         * Ищем ближайшее свободное время.
-         */
-
-        const used =
-            new Set(
-                dayTasks.map(
-                    x => x.time
-                )
-            );
-
-
-        let hour = 8;
-
-        while (
-            used.has(
-                `${String(hour)
-                    .padStart(2,"0")}:00`
-            )
-            &&
-            hour < 24
-        ) {
-
-            hour++;
-
-        }
-
-
-        task.time =
-            `${String(hour)
-                .padStart(2,"0")}:00`;
-
-
-        dayTasks.push(task);
+        openedTaskId =
+            task.id;
 
 
         renderTasks();
 
-        renderPreview();
-
         queueSave();
-
-
-        /*
-         * Автоматически раскрываем
-         * новую задачу.
-         */
-
-        setTimeout(
-            () => {
-
-                const cards =
-                    document.querySelectorAll(
-                        ".task-card"
-                    );
-
-                const last =
-                    cards[
-                        cards.length - 1
-                    ];
-
-                if (last) {
-
-                    last.classList.add(
-                        "expanded"
-                    );
-
-                    last.scrollIntoView({
-                        behavior: "smooth",
-                        block: "center"
-                    });
-
-                }
-
-            },
-            50
-        );
 
     }
 );
@@ -706,32 +624,30 @@ function renderTasks() {
     const items =
         [...data.days[selectedDay]]
         .sort(
-            (a,b) =>
-                a.time.localeCompare(
-                    b.time
-                )
+            (a, b) =>
+                timeToMinutes(a.time) -
+                timeToMinutes(b.time)
         );
 
 
     if (!items.length) {
 
         const empty =
-            document.createElement(
-                "div"
-            );
+            document.createElement("div");
 
 
         empty.className =
             "empty-state";
 
 
-        empty.textContent =
-            "Нажми + ADD TASK";
+        empty.innerHTML =
+            `
+            Здесь пока ничего нет.<br>
+            Нажми <b>ADD TASK</b>, чтобы создать первую задачу.
+            `;
 
 
-        tasks.appendChild(
-            empty
-        );
+        tasks.appendChild(empty);
 
         return;
 
@@ -750,256 +666,425 @@ function renderTasks() {
 
 
 /* =========================================
+   TIME SORT
+========================================= */
+
+function timeToMinutes(time) {
+
+    const [
+        hours,
+        minutes
+    ] =
+        String(time || "00:00")
+        .split(":")
+        .map(Number);
+
+
+    return (
+        hours * 60 +
+        minutes
+    );
+
+}
+
+
+/* =========================================
    CREATE TASK CARD
 ========================================= */
 
 function createTaskCard(item) {
 
     const card =
-        document.createElement(
-            "article"
-        );
+        document.createElement("article");
 
 
     card.className =
         "task-card";
 
 
-    /* -------------------------------------
-       TOP
-    -------------------------------------- */
+    if (
+        openedTaskId === item.id
+    ) {
 
-    const top =
-        document.createElement(
-            "div"
-        );
+        card.classList.add("open");
+
+    }
 
 
-    top.className =
-        "task-top";
+    /* =====================================
+       PREVIEW
+    ===================================== */
+
+    const preview =
+        document.createElement("div");
+
+
+    preview.className =
+        "task-preview";
 
 
     const time =
-        document.createElement(
-            "input"
-        );
+        document.createElement("div");
 
-
-    time.type =
-        "time";
 
     time.className =
-        "time-input";
+        "preview-time";
 
-    time.value =
+
+    time.textContent =
         item.time;
 
 
+    time.style.color =
+        item.timeColor;
+
+
+    time.style.fontSize =
+        `${item.timeSize}px`;
+
+
+    time.style.fontWeight =
+        item.timeWeight;
+
+
     const text =
-        document.createElement(
-            "input"
-        );
+        document.createElement("div");
 
-
-    text.type =
-        "text";
 
     text.className =
-        "text-input";
+        "preview-text";
 
-    text.value =
+
+    text.textContent =
         item.text;
 
 
-    const remove =
-        document.createElement(
-            "button"
-        );
+    text.style.fontFamily =
+        item.fontFamily;
 
 
-    remove.type =
-        "button";
-
-    remove.className =
-        "delete-task";
-
-    remove.textContent =
-        "×";
+    text.style.fontSize =
+        `${item.fontSize}px`;
 
 
-    top.append(
+    text.style.fontWeight =
+        item.fontWeight;
+
+
+    text.style.padding =
+        `${item.padding}px`;
+
+
+    text.style.borderRadius =
+        `${item.radius}px`;
+
+
+    if (item.gradient) {
+
+        text.style.color =
+            "transparent";
+
+        text.style.background =
+            `linear-gradient(
+                90deg,
+                ${item.gradientStart},
+                ${item.gradientEnd}
+            )`;
+
+        text.style.backgroundClip =
+            "text";
+
+        text.style.webkitBackgroundClip =
+            "text";
+
+    }
+
+    else {
+
+        text.style.color =
+            item.color;
+
+    }
+
+
+    if (
+        item.background !==
+        "transparent"
+    ) {
+
+        text.style.backgroundColor =
+            item.background;
+
+    }
+
+
+    const openIcon =
+        document.createElement("div");
+
+
+    openIcon.className =
+        "task-open-icon";
+
+
+    openIcon.textContent =
+        "⌄";
+
+
+    preview.append(
         time,
         text,
-        remove
-    );
-
-
-    card.appendChild(top);
-
-
-    /* -------------------------------------
-       STYLE PREVIEW
-    -------------------------------------- */
-
-    const stylePreview =
-        document.createElement(
-            "div"
-        );
-
-
-    stylePreview.className =
-        "task-style-preview";
-
-
-    const styleTime =
-        document.createElement(
-            "span"
-        );
-
-
-    styleTime.className =
-        "task-style-time";
-
-
-    const styleText =
-        document.createElement(
-            "span"
-        );
-
-
-    styleText.className =
-        "task-style-text";
-
-
-    stylePreview.append(
-        styleTime,
-        styleText
+        openIcon
     );
 
 
     card.appendChild(
-        stylePreview
+        preview
     );
 
 
-    /* -------------------------------------
-       EXPAND HINT
-    -------------------------------------- */
+    /* =====================================
+       EDITOR
+    ===================================== */
 
-    const expandHint =
-        document.createElement(
-            "div"
-        );
+    const editor =
+        document.createElement("div");
 
 
-    expandHint.className =
-        "expand-hint";
+    editor.className =
+        "task-editor";
 
 
-    expandHint.innerHTML = `
-        <span>EDIT STYLE</span>
-        <span class="expand-arrow">⌄</span>
-    `;
+    /* =====================================
+       TIME
+    ===================================== */
 
+    editor.appendChild(
+        createGroup(
+            "TIME",
+            [
+                createField(
+                    "TIME",
+                    createTimeInput(
+                        item.time,
+                        value => {
 
-    card.appendChild(
-        expandHint
-    );
+                            item.time =
+                                value ||
+                                "00:00";
 
+                            renderTasks();
 
-    /* -------------------------------------
-       CONTROLS
-    -------------------------------------- */
+                            openedTaskId =
+                                item.id;
 
-    const controls =
-        document.createElement(
-            "div"
-        );
+                            queueSave();
 
-
-    controls.className =
-        "task-controls";
-
-
-    /*
-     * TEXT COLOR
-     */
-
-    controls.appendChild(
-        colorControl(
-            "TEXT COLOR",
-            item.color,
-            value => {
-
-                item.color =
-                    value;
-
-                refreshCard();
-
-            }
+                        }
+                    )
+                )
+            ]
         )
     );
 
 
-    /*
-     * TEXT SIZE
-     */
+    /* =====================================
+       TEXT
+    ===================================== */
 
-    controls.appendChild(
-        rangeControl(
-            "TEXT SIZE",
+    editor.appendChild(
+        createGroup(
+            "TEXT",
+            [
+
+                createField(
+                    "TASK NAME",
+                    createTextInput(
+                        item.text,
+                        value => {
+
+                            item.text =
+                                value;
+
+                            updatePreview();
+
+                            queueSave();
+
+                        }
+                    )
+                )
+
+            ]
+        )
+    );
+
+
+    /* =====================================
+       TEXT STYLE
+    ===================================== */
+
+    const textStyleGroup =
+        document.createElement("div");
+
+
+    textStyleGroup.className =
+        "editor-group";
+
+
+    textStyleGroup.innerHTML =
+        `
+        <div class="editor-group-title">
+            TEXT STYLE
+        </div>
+        `;
+
+
+    const fontField =
+        document.createElement("div");
+
+
+    fontField.className =
+        "field";
+
+
+    fontField.innerHTML =
+        `
+        <label class="field-label">
+            FONT
+        </label>
+        `;
+
+
+    const fontSelect =
+        document.createElement("select");
+
+
+    fontSelect.className =
+        "font-select";
+
+
+    const fonts = [
+
+        ["Arial", "Arial"],
+
+        ["Inter", "Inter, sans-serif"],
+
+        ["Helvetica", "Helvetica"],
+
+        ["Georgia", "Georgia"],
+
+        ["Times New Roman", "Times New Roman"],
+
+        ["Garamond", "Garamond"],
+
+        ["Courier New", "Courier New"],
+
+        ["Trebuchet MS", "Trebuchet MS"],
+
+        ["Verdana", "Verdana"],
+
+        ["Tahoma", "Tahoma"],
+
+        ["Impact", "Impact"],
+
+        ["Comic Sans MS", "Comic Sans MS"],
+
+        ["Lucida Console", "Lucida Console"],
+
+        ["Palatino", "Palatino"],
+
+        ["Brush Script MT", "Brush Script MT"],
+
+        ["Century Gothic", "Century Gothic"]
+
+    ];
+
+
+    fonts.forEach(
+        ([name, value]) => {
+
+            const option =
+                document.createElement("option");
+
+            option.value =
+                value;
+
+            option.textContent =
+                name;
+
+            if (
+                value ===
+                item.fontFamily
+            ) {
+
+                option.selected =
+                    true;
+
+            }
+
+            fontSelect.appendChild(
+                option
+            );
+
+        }
+    );
+
+
+    fontSelect.addEventListener(
+        "change",
+        () => {
+
+            item.fontFamily =
+                fontSelect.value;
+
+            updatePreview();
+
+            queueSave();
+
+        }
+    );
+
+
+    fontField.appendChild(
+        fontSelect
+    );
+
+
+    textStyleGroup.appendChild(
+        fontField
+    );
+
+
+    const styleGrid =
+        document.createElement("div");
+
+
+    styleGrid.className =
+        "control-grid";
+
+
+    styleGrid.append(
+
+        miniRange(
+            "SIZE",
             8,
-            60,
+            50,
             item.fontSize,
             value => {
 
                 item.fontSize =
                     Number(value);
 
-                refreshCard();
+                updatePreview();
+
+                queueSave();
 
             }
-        )
-    );
+        ),
 
-
-    /*
-     * FONT
-     */
-
-    controls.appendChild(
-        selectControl(
-            "FONT",
-            [
-                "Arial",
-                "Georgia",
-                "Times New Roman",
-                "Courier New",
-                "Trebuchet MS",
-                "Verdana",
-                "Impact"
-            ],
-            item.fontFamily,
-            value => {
-
-                item.fontFamily =
-                    value;
-
-                refreshCard();
-
-            }
-        )
-    );
-
-
-    /*
-     * WEIGHT
-     */
-
-    controls.appendChild(
-        selectControl(
+        miniSelect(
             "WEIGHT",
             [
+                "300",
                 "400",
                 "500",
                 "600",
@@ -1013,39 +1098,191 @@ function createTaskCard(item) {
                 item.fontWeight =
                     Number(value);
 
-                refreshCard();
+                updatePreview();
+
+                queueSave();
 
             }
-        )
-    );
+        ),
 
-
-    /*
-     * ITALIC
-     */
-
-    controls.appendChild(
-        checkboxControl(
-            "ITALIC",
-            item.italic,
+        miniColor(
+            "COLOR",
+            item.color,
             value => {
 
-                item.italic =
+                item.color =
                     value;
 
-                refreshCard();
+                updatePreview();
+
+                queueSave();
 
             }
         )
+
     );
 
 
-    /*
-     * BACKGROUND
-     */
+    textStyleGroup.appendChild(
+        styleGrid
+    );
 
-    controls.appendChild(
-        colorControl(
+
+    /* =====================================
+       GRADIENT
+    ===================================== */
+
+    const gradientSettings =
+        document.createElement("div");
+
+
+    gradientSettings.className =
+        "gradient-settings";
+
+
+    const gradientToggle =
+        document.createElement("label");
+
+
+    gradientToggle.className =
+        "toggle-row";
+
+
+    gradientToggle.innerHTML =
+        `
+        <span>
+            <strong>TEXT GRADIENT</strong>
+            <small>Make this task colorful.</small>
+        </span>
+
+        <input
+            type="checkbox"
+            ${item.gradient ? "checked" : ""}
+        >
+
+        <span class="toggle"></span>
+        `;
+
+
+    const gradientCheckbox =
+        gradientToggle.querySelector(
+            "input"
+        );
+
+
+    gradientCheckbox.addEventListener(
+        "change",
+        () => {
+
+            item.gradient =
+                gradientCheckbox.checked;
+
+            updatePreview();
+
+            queueSave();
+
+        }
+    );
+
+
+    gradientSettings.appendChild(
+        gradientToggle
+    );
+
+
+    const gradientColors =
+        document.createElement("div");
+
+
+    gradientColors.className =
+        "gradient-colors";
+
+
+    gradientColors.style.marginTop =
+        "10px";
+
+
+    gradientColors.append(
+
+        miniColor(
+            "START",
+            item.gradientStart,
+            value => {
+
+                item.gradientStart =
+                    value;
+
+                updatePreview();
+
+                queueSave();
+
+            }
+        ),
+
+        miniColor(
+            "END",
+            item.gradientEnd,
+            value => {
+
+                item.gradientEnd =
+                    value;
+
+                updatePreview();
+
+                queueSave();
+
+            }
+        )
+
+    );
+
+
+    gradientSettings.appendChild(
+        gradientColors
+    );
+
+
+    textStyleGroup.appendChild(
+        gradientSettings
+    );
+
+
+    editor.appendChild(
+        textStyleGroup
+    );
+
+
+    /* =====================================
+       CARD STYLE
+    ===================================== */
+
+    const cardStyle =
+        document.createElement("div");
+
+
+    cardStyle.className =
+        "editor-group";
+
+
+    cardStyle.innerHTML =
+        `
+        <div class="editor-group-title">
+            CARD STYLE
+        </div>
+        `;
+
+
+    const cardGrid =
+        document.createElement("div");
+
+
+    cardGrid.className =
+        "control-grid";
+
+
+    cardGrid.append(
+
+        miniColor(
             "BACKGROUND",
             item.background ===
                 "transparent"
@@ -1056,20 +1293,15 @@ function createTaskCard(item) {
                 item.background =
                     value;
 
-                refreshCard();
+                updatePreview();
+
+                queueSave();
 
             }
-        )
-    );
+        ),
 
-
-    /*
-     * ROUND
-     */
-
-    controls.appendChild(
-        rangeControl(
-            "ROUND",
+        miniRange(
+            "ROUNDING",
             0,
             40,
             item.radius,
@@ -1078,19 +1310,14 @@ function createTaskCard(item) {
                 item.radius =
                     Number(value);
 
-                refreshCard();
+                updatePreview();
+
+                queueSave();
 
             }
-        )
-    );
+        ),
 
-
-    /*
-     * PADDING
-     */
-
-    controls.appendChild(
-        rangeControl(
+        miniRange(
             "PADDING",
             0,
             30,
@@ -1100,62 +1327,90 @@ function createTaskCard(item) {
                 item.padding =
                     Number(value);
 
-                refreshCard();
+                updatePreview();
+
+                queueSave();
 
             }
         )
+
     );
 
 
-    /*
-     * TIME COLOR
-     */
+    cardStyle.appendChild(
+        cardGrid
+    );
 
-    controls.appendChild(
-        colorControl(
-            "TIME COLOR",
+
+    editor.appendChild(
+        cardStyle
+    );
+
+
+    /* =====================================
+       TIME STYLE
+    ===================================== */
+
+    const timeStyle =
+        document.createElement("div");
+
+
+    timeStyle.className =
+        "editor-group";
+
+
+    timeStyle.innerHTML =
+        `
+        <div class="editor-group-title">
+            TIME STYLE
+        </div>
+        `;
+
+
+    const timeGrid =
+        document.createElement("div");
+
+
+    timeGrid.className =
+        "control-grid";
+
+
+    timeGrid.append(
+
+        miniColor(
+            "COLOR",
             item.timeColor,
             value => {
 
                 item.timeColor =
                     value;
 
-                refreshCard();
+                updatePreview();
+
+                queueSave();
 
             }
-        )
-    );
+        ),
 
-
-    /*
-     * TIME SIZE
-     */
-
-    controls.appendChild(
-        rangeControl(
-            "TIME SIZE",
+        miniRange(
+            "SIZE",
             8,
-            30,
+            25,
             item.timeSize,
             value => {
 
                 item.timeSize =
                     Number(value);
 
-                refreshCard();
+                updatePreview();
+
+                queueSave();
 
             }
-        )
-    );
+        ),
 
-
-    /*
-     * TIME WEIGHT
-     */
-
-    controls.appendChild(
-        selectControl(
-            "TIME WEIGHT",
+        miniSelect(
+            "WEIGHT",
             [
                 "400",
                 "500",
@@ -1169,155 +1424,52 @@ function createTaskCard(item) {
                 item.timeWeight =
                     Number(value);
 
-                refreshCard();
+                updatePreview();
+
+                queueSave();
 
             }
         )
+
     );
 
 
-    /*
-     * TEXT GRADIENT
-     */
-
-    const gradient =
-        document.createElement(
-            "div"
-        );
-
-
-    gradient.className =
-        "control";
-
-
-    gradient.innerHTML = `
-        <div class="control-title">
-            TEXT GRADIENT
-        </div>
-
-        <div class="gradient-row">
-
-            <label class="switch-line">
-
-                <input
-                    type="checkbox"
-                    data-gradient-toggle
-                >
-
-                ON
-
-            </label>
-
-            <input
-                type="color"
-                data-gradient-start
-            >
-
-            <input
-                type="color"
-                data-gradient-end
-            >
-
-        </div>
-    `;
-
-
-    const gradientToggle =
-        gradient.querySelector(
-            "[data-gradient-toggle]"
-        );
-
-
-    const gradientStart =
-        gradient.querySelector(
-            "[data-gradient-start]"
-        );
-
-
-    const gradientEnd =
-        gradient.querySelector(
-            "[data-gradient-end]"
-        );
-
-
-    gradientToggle.checked =
-        !!item.gradient;
-
-
-    gradientStart.value =
-        item.gradientStart;
-
-
-    gradientEnd.value =
-        item.gradientEnd;
-
-
-    gradientToggle.addEventListener(
-        "change",
-        () => {
-
-            item.gradient =
-                gradientToggle.checked;
-
-            refreshCard();
-
-        }
+    timeStyle.appendChild(
+        timeGrid
     );
 
 
-    gradientStart.addEventListener(
-        "input",
-        () => {
-
-            item.gradientStart =
-                gradientStart.value;
-
-            refreshCard();
-
-        }
+    editor.appendChild(
+        timeStyle
     );
 
 
-    gradientEnd.addEventListener(
-        "input",
-        () => {
+    /* =====================================
+       ACTIONS
+    ===================================== */
 
-            item.gradientEnd =
-                gradientEnd.value;
-
-            refreshCard();
-
-        }
-    );
+    const actions =
+        document.createElement("div");
 
 
-    controls.appendChild(
-        gradient
-    );
+    actions.className =
+        "task-actions";
 
-
-    /* -------------------------------------
-       DUPLICATE
-    -------------------------------------- */
 
     const duplicate =
-        document.createElement(
-            "button"
-        );
+        document.createElement("button");
 
 
     duplicate.type =
         "button";
 
+
     duplicate.className =
-        "secondary-button";
+        "task-action duplicate-task";
+
 
     duplicate.textContent =
-        "DUPLICATE TASK";
-
-
-    duplicate.style.gridColumn =
-        "1 / -1";
+        "DUPLICATE";
 
 
     duplicate.addEventListener(
@@ -1326,116 +1478,26 @@ function createTaskCard(item) {
 
             event.stopPropagation();
 
-
-            const copy =
-                JSON.parse(
-                    JSON.stringify(item)
-                );
-
-
-            copy.id =
-                crypto.randomUUID();
-
-
-            copy.text =
-                item.text;
-
-
-            /*
-             * Ставим копию на +10 минут.
-             */
-
-            copy.time =
-                addMinutes(
-                    item.time,
-                    10
-                );
-
-
-            data.days[
-                selectedDay
-            ].push(copy);
-
-
-            renderTasks();
-
-            renderPreview();
-
-            queueSave();
+            duplicateTask(item);
 
         }
     );
 
 
-    controls.appendChild(
-        duplicate
-    );
+    const remove =
+        document.createElement("button");
 
 
-    card.appendChild(
-        controls
-    );
+    remove.type =
+        "button";
 
 
-    /* -------------------------------------
-       EXPAND / COLLAPSE
-    -------------------------------------- */
-
-    function toggleCard() {
-
-        card.classList.toggle(
-            "expanded"
-        );
-
-    }
+    remove.className =
+        "task-action delete-task";
 
 
-    expandHint.addEventListener(
-        "click",
-        toggleCard
-    );
-
-
-    stylePreview.addEventListener(
-        "click",
-        toggleCard
-    );
-
-
-    /* -------------------------------------
-       INPUT EVENTS
-    -------------------------------------- */
-
-    time.addEventListener(
-        "change",
-        () => {
-
-            item.time =
-                time.value ||
-                "00:00";
-
-
-            renderTasks();
-
-            renderPreview();
-
-            queueSave();
-
-        }
-    );
-
-
-    text.addEventListener(
-        "input",
-        () => {
-
-            item.text =
-                text.value;
-
-            refreshCard();
-
-        }
-    );
+    remove.textContent =
+        "DELETE";
 
 
     remove.addEventListener(
@@ -1444,586 +1506,65 @@ function createTaskCard(item) {
 
             event.stopPropagation();
 
-            openDeleteModal(item);
+            deleteTask(item);
 
         }
     );
 
 
-    /*
-     * Не даём клику по input
-     * раскрывать карточку.
-     */
+    actions.append(
+        duplicate,
+        remove
+    );
 
-    time.addEventListener(
+
+    editor.appendChild(
+        actions
+    );
+
+
+    card.appendChild(
+        editor
+    );
+
+
+    /* =====================================
+       OPEN / CLOSE
+    ===================================== */
+
+    preview.addEventListener(
         "click",
-        event =>
-            event.stopPropagation()
-    );
-
-
-    text.addEventListener(
-        "click",
-        event =>
-            event.stopPropagation()
-    );
-
-
-    /* -------------------------------------
-       REFRESH CARD
-    -------------------------------------- */
-
-    function refreshCard() {
-
-        applyStylePreview();
-
-        renderPreview();
-
-        queueSave();
-
-    }
-
-
-    function applyStylePreview() {
-
-        styleTime.textContent =
-            item.time;
-
-
-        styleText.textContent =
-            item.text;
-
-
-        styleTime.style.color =
-            item.timeColor;
-
-
-        styleTime.style.fontSize =
-            `${item.timeSize}px`;
-
-
-        styleTime.style.fontWeight =
-            item.timeWeight;
-
-
-        styleText.style.fontFamily =
-            item.fontFamily;
-
-
-        styleText.style.fontSize =
-            `${item.fontSize}px`;
-
-
-        styleText.style.fontWeight =
-            item.fontWeight;
-
-
-        styleText.style.fontStyle =
-            item.italic
-                ? "italic"
-                : "normal";
-
-
-        styleText.style.padding =
-            `${item.padding}px`;
-
-
-        styleText.style.borderRadius =
-            `${item.radius}px`;
-
-
-        if (
-            item.background ===
-            "transparent"
-        ) {
-
-            styleText.style.background =
-                "transparent";
-
-        }
-
-        else {
-
-            styleText.style.background =
-                item.background;
-
-        }
-
-
-        if (item.gradient) {
-
-            styleText.style.background =
-                `linear-gradient(
-                    90deg,
-                    ${item.gradientStart},
-                    ${item.gradientEnd}
-                )`;
-
-            styleText.style.webkitBackgroundClip =
-                "text";
-
-            styleText.style.webkitTextFillColor =
-                "transparent";
-
-        }
-
-        else {
-
-            styleText.style.webkitBackgroundClip =
-                "";
-
-            styleText.style.webkitTextFillColor =
-                "";
-
-            styleText.style.color =
-                item.color;
-
-        }
-
-    }
-
-
-    applyStylePreview();
-
-
-    return card;
-
-}
-
-
-/* =========================================
-   COLOR CONTROL
-========================================= */
-
-function colorControl(
-    title,
-    value,
-    callback
-) {
-
-    const box =
-        document.createElement(
-            "div"
-        );
-
-
-    box.className =
-        "control";
-
-
-    const titleElement =
-        document.createElement(
-            "div"
-        );
-
-
-    titleElement.className =
-        "control-title";
-
-
-    titleElement.textContent =
-        title;
-
-
-    const input =
-        document.createElement(
-            "input"
-        );
-
-
-    input.type =
-        "color";
-
-
-    input.value =
-        isValidColor(value)
-            ? value
-            : "#111111";
-
-
-    input.addEventListener(
-        "input",
         () => {
 
-            callback(
-                input.value
-            );
+            if (
+                openedTaskId ===
+                item.id
+            ) {
+
+                openedTaskId =
+                    null;
+
+            }
+
+            else {
+
+                openedTaskId =
+                    item.id;
+
+            }
+
+
+            renderTasks();
 
         }
     );
 
 
-    box.append(
-        titleElement,
-        input
-    );
-
-
-    return box;
-
-}
-
-
-/* =========================================
-   RANGE CONTROL
-========================================= */
-
-function rangeControl(
-    title,
-    min,
-    max,
-    value,
-    callback
-) {
-
-    const box =
-        document.createElement(
-            "div"
-        );
-
-
-    box.className =
-        "control";
-
-
-    box.innerHTML = `
-        <div class="control-title">
-            ${title}
-        </div>
-
-        <div class="range-row">
-
-            <input
-                type="range"
-                min="${min}"
-                max="${max}"
-                value="${value}"
-            >
-
-            <output>
-                ${value}
-            </output>
-
-        </div>
-    `;
-
-
-    const input =
-        box.querySelector(
-            "input"
-        );
-
-
-    const output =
-        box.querySelector(
-            "output"
-        );
-
-
-    input.addEventListener(
-        "input",
-        () => {
-
-            output.textContent =
-                input.value;
-
-
-            callback(
-                input.value
-            );
-
-        }
-    );
-
-
-    return box;
-
-}
-
-
-/* =========================================
-   SELECT CONTROL
-========================================= */
-
-function selectControl(
-    title,
-    options,
-    value,
-    callback
-) {
-
-    const box =
-        document.createElement(
-            "div"
-        );
-
-
-    box.className =
-        "control";
-
-
-    const titleElement =
-        document.createElement(
-            "div"
-        );
-
-
-    titleElement.className =
-        "control-title";
-
-
-    titleElement.textContent =
-        title;
-
-
-    const select =
-        document.createElement(
-            "select"
-        );
-
-
-    options.forEach(option => {
-
-        const optionElement =
-            document.createElement(
-                "option"
-            );
-
-
-        optionElement.value =
-            option;
-
-
-        optionElement.textContent =
-            option;
-
-
-        if (
-            option === value
-        ) {
-
-            optionElement.selected =
-                true;
-
-        }
-
-
-        select.appendChild(
-            optionElement
-        );
-
-    });
-
-
-    select.addEventListener(
-        "change",
-        () => {
-
-            callback(
-                select.value
-            );
-
-        }
-    );
-
-
-    box.append(
-        titleElement,
-        select
-    );
-
-
-    return box;
-
-}
-
-
-/* =========================================
-   CHECKBOX CONTROL
-========================================= */
-
-function checkboxControl(
-    title,
-    value,
-    callback
-) {
-
-    const box =
-        document.createElement(
-            "div"
-        );
-
-
-    box.className =
-        "control";
-
-
-    box.innerHTML = `
-        <div class="control-title">
-            ${title}
-        </div>
-
-        <label class="switch-line">
-
-            <input
-                type="checkbox"
-                ${value ? "checked" : ""}
-            >
-
-            ON
-
-        </label>
-    `;
-
-
-    const input =
-        box.querySelector(
-            "input"
-        );
-
-
-    input.addEventListener(
-        "change",
-        () => {
-
-            callback(
-                input.checked
-            );
-
-        }
-    );
-
-
-    return box;
-
-}
-
-
-/* =========================================
-   PREVIEW
-========================================= */
-
-function renderPreview() {
-
-    previewDay.textContent =
-        SHORT[selectedDay];
-
-
-    renderGrid();
-
-    renderPreviewTasks();
-
-    renderPreviewPointer();
-
-}
-
-
-/* =========================================
-   GRID
-========================================= */
-
-function renderGrid() {
-
-    previewGrid.className =
-        "preview-grid " +
-        data.global.grid;
-
-
-    previewGrid.style
-        .setProperty(
-            "--grid-color",
-            data.global.gridColor
-        );
-
-}
-
-
-/* =========================================
-   PREVIEW TASKS
-========================================= */
-
-function renderPreviewTasks() {
-
-    previewTasks.innerHTML =
-        "";
-
-
-    const items =
-        [...data.days[selectedDay]]
-        .sort(
-            (a,b) =>
-                timeToMinutes(a.time) -
-                timeToMinutes(b.time)
-        );
-
-
-    if (!items.length) {
-        return;
-    }
-
-
-    const height =
-        preview.clientHeight;
-
-
-    const start =
-        6 * 60;
-
-
-    const end =
-        24 * 60;
-
-
-    const range =
-        end - start;
-
-
-    items.forEach(item => {
-
-        const row =
-            document.createElement(
-                "div"
-            );
-
-
-        row.className =
-            "preview-task";
-
-
-        const position =
-            (
-                timeToMinutes(
-                    item.time
-                ) -
-                start
-            )
-            /
-            range;
-
-
-        const safePosition =
-            Math.max(
-                0,
-                Math.min(
-                    1,
-                    position
-                )
-            );
-
-
-        row.style.top =
-            `${safePosition * 100}%`;
-
-
-        const time =
-            document.createElement(
-                "span"
-            );
-
-
-        time.className =
-            "preview-time";
-
+    /* =====================================
+       LIVE PREVIEW
+    ===================================== */
+
+    function updatePreview() {
 
         time.textContent =
             item.time;
@@ -2039,16 +1580,6 @@ function renderPreviewTasks() {
 
         time.style.fontWeight =
             item.timeWeight;
-
-
-        const text =
-            document.createElement(
-                "span"
-            );
-
-
-        text.className =
-            "preview-label";
 
 
         text.textContent =
@@ -2067,12 +1598,6 @@ function renderPreviewTasks() {
             item.fontWeight;
 
 
-        text.style.fontStyle =
-            item.italic
-                ? "italic"
-                : "normal";
-
-
         text.style.padding =
             `${item.padding}px`;
 
@@ -2081,18 +1606,10 @@ function renderPreviewTasks() {
             `${item.radius}px`;
 
 
-        if (
-            item.background !==
-            "transparent"
-        ) {
-
-            text.style.background =
-                item.background;
-
-        }
-
-
         if (item.gradient) {
+
+            text.style.color =
+                "transparent";
 
             text.style.background =
                 `linear-gradient(
@@ -2101,11 +1618,11 @@ function renderPreviewTasks() {
                     ${item.gradientEnd}
                 )`;
 
-            text.style.webkitBackgroundClip =
+            text.style.backgroundClip =
                 "text";
 
-            text.style.webkitTextFillColor =
-                "transparent";
+            text.style.webkitBackgroundClip =
+                "text";
 
         }
 
@@ -2114,215 +1631,595 @@ function renderPreviewTasks() {
             text.style.color =
                 item.color;
 
+            text.style.background =
+                "";
+
+            text.style.backgroundClip =
+                "";
+
+            text.style.webkitBackgroundClip =
+                "";
+
         }
 
 
-        row.append(
-            time,
-            text
-        );
+        if (
+            item.background !==
+            "transparent"
+        ) {
+
+            text.style.backgroundColor =
+                item.background;
+
+        }
+
+        else {
+
+            text.style.backgroundColor =
+                "";
+
+        }
+
+    }
 
 
-        previewTasks.appendChild(
-            row
-        );
+    updatePreview();
 
-    });
+
+    return card;
 
 }
 
 
 /* =========================================
-   POINTER PREVIEW
+   FIELD HELPERS
 ========================================= */
 
-function renderPreviewPointer() {
+function createGroup(
+    title,
+    children
+) {
 
-    previewPointer.textContent =
-        data.pointer.symbol;
+    const group =
+        document.createElement("div");
 
 
-    previewPointer.style.fontSize =
-        `${data.pointer.size}px`;
+    group.className =
+        "editor-group";
+
+
+    const titleElement =
+        document.createElement("div");
+
+
+    titleElement.className =
+        "editor-group-title";
+
+
+    titleElement.textContent =
+        title;
+
+
+    group.appendChild(
+        titleElement
+    );
+
+
+    children.forEach(
+        child => {
+
+            group.appendChild(
+                child
+            );
+
+        }
+    );
+
+
+    return group;
+
+}
+
+
+function createField(
+    label,
+    input
+) {
+
+    const field =
+        document.createElement("div");
+
+
+    field.className =
+        "field";
+
+
+    const labelElement =
+        document.createElement("label");
+
+
+    labelElement.className =
+        "field-label";
+
+
+    labelElement.textContent =
+        label;
+
+
+    field.append(
+        labelElement,
+        input
+    );
+
+
+    return field;
+
+}
+
+
+function createTextInput(
+    value,
+    callback
+) {
+
+    const input =
+        document.createElement("input");
+
+
+    input.type =
+        "text";
+
+
+    input.className =
+        "text-field";
+
+
+    input.value =
+        value;
+
+
+    input.addEventListener(
+        "input",
+        () => {
+
+            callback(
+                input.value
+            );
+
+        }
+    );
+
+
+    return input;
+
+}
+
+
+function createTimeInput(
+    value,
+    callback
+) {
+
+    const input =
+        document.createElement("input");
+
+
+    input.type =
+        "time";
+
+
+    input.className =
+        "time-field";
+
+
+    input.value =
+        value;
+
+
+    input.addEventListener(
+        "change",
+        () => {
+
+            callback(
+                input.value
+            );
+
+        }
+    );
+
+
+    return input;
+
+}
+
+
+/* =========================================
+   MINI COLOR
+========================================= */
+
+function miniColor(
+    title,
+    value,
+    callback
+) {
+
+    const box =
+        document.createElement("div");
+
+
+    box.className =
+        "mini-control";
+
+
+    const label =
+        document.createElement("label");
+
+
+    label.className =
+        "field-label";
+
+
+    label.textContent =
+        title;
+
+
+    const input =
+        document.createElement("input");
+
+
+    input.type =
+        "color";
+
+
+    input.className =
+        "mini-color";
+
+
+    input.value =
+        value || "#111111";
+
+
+    input.addEventListener(
+        "input",
+        () => {
+
+            callback(
+                input.value
+            );
+
+        }
+    );
+
+
+    box.append(
+        label,
+        input
+    );
+
+
+    return box;
+
+}
+
+
+/* =========================================
+   MINI RANGE
+========================================= */
+
+function miniRange(
+    title,
+    min,
+    max,
+    value,
+    callback
+) {
+
+    const box =
+        document.createElement("div");
+
+
+    box.className =
+        "mini-control";
+
+
+    const label =
+        document.createElement("label");
+
+
+    label.className =
+        "field-label";
+
+
+    label.textContent =
+        title;
+
+
+    const input =
+        document.createElement("input");
+
+
+    input.type =
+        "range";
+
+
+    input.className =
+        "mini-range";
+
+
+    input.min =
+        min;
+
+    input.max =
+        max;
+
+    input.value =
+        value;
+
+
+    const output =
+        document.createElement("span");
+
+
+    output.className =
+        "range-value";
+
+
+    output.textContent =
+        value;
+
+
+    input.addEventListener(
+        "input",
+        () => {
+
+            output.textContent =
+                input.value;
+
+            callback(
+                input.value
+            );
+
+        }
+    );
+
+
+    box.append(
+        label,
+        input,
+        output
+    );
+
+
+    return box;
+
+}
+
+
+/* =========================================
+   MINI SELECT
+========================================= */
+
+function miniSelect(
+    title,
+    options,
+    value,
+    callback
+) {
+
+    const box =
+        document.createElement("div");
+
+
+    box.className =
+        "mini-control";
+
+
+    const label =
+        document.createElement("label");
+
+
+    label.className =
+        "field-label";
+
+
+    label.textContent =
+        title;
+
+
+    const select =
+        document.createElement("select");
+
+
+    select.className =
+        "font-select";
+
+
+    options.forEach(
+        optionValue => {
+
+            const option =
+                document.createElement("option");
+
+
+            option.value =
+                optionValue;
+
+
+            option.textContent =
+                optionValue;
+
+
+            option.selected =
+                optionValue ===
+                value;
+
+
+            select.appendChild(
+                option
+            );
+
+        }
+    );
+
+
+    select.addEventListener(
+        "change",
+        () => {
+
+            callback(
+                select.value
+            );
+
+        }
+    );
+
+
+    box.append(
+        label,
+        select
+    );
+
+
+    return box;
+
+}
+
+
+/* =========================================
+   DUPLICATE
+========================================= */
+
+function duplicateTask(item) {
+
+    const copy =
+        JSON.parse(
+            JSON.stringify(item)
+        );
+
+
+    copy.id =
+        crypto.randomUUID();
+
+
+    copy.text =
+        item.text +
+        " COPY";
+
+
+    data.days[selectedDay].push(
+        copy
+    );
+
+
+    openedTaskId =
+        copy.id;
+
+
+    renderTasks();
+
+    queueSave();
+
+
+    setTimeout(
+        () => {
+
+            const opened =
+                document.querySelector(
+                    ".task-card.open"
+                );
+
+
+            if (opened) {
+
+                opened.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
+
+            }
+
+        },
+        80
+    );
+
+}
+
+
+/* =========================================
+   DELETE
+========================================= */
+
+function deleteTask(item) {
+
+    const confirmed =
+        window.confirm(
+            `Удалить задачу "${item.text}"?\n\nЭто действие нельзя отменить.`
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    data.days[selectedDay] =
+        data.days[selectedDay]
+        .filter(
+            task =>
+                task.id !==
+                item.id
+        );
 
 
     if (
-        data.pointer.gradient
+        openedTaskId ===
+        item.id
     ) {
 
-        previewPointer.style.background =
-            `linear-gradient(
-                90deg,
-                ${data.pointer.gradientStart},
-                ${data.pointer.gradientEnd}
-            )`;
-
-        previewPointer.style.webkitBackgroundClip =
-            "text";
-
-        previewPointer.style.webkitTextFillColor =
-            "transparent";
-
-    }
-
-    else {
-
-        previewPointer.style.background =
-            "";
-
-        previewPointer.style.webkitBackgroundClip =
-            "";
-
-        previewPointer.style.webkitTextFillColor =
-            "";
-
-        previewPointer.style.color =
-            data.pointer.color;
+        openedTaskId =
+            null;
 
     }
 
 
-    /*
-     * Preview показывает стрелку
-     * примерно на 14:00.
-     *
-     * На главной странице её реальная
-     * позиция будет вычисляться
-     * по текущему времени.
-     */
+    renderTasks();
 
-    const demoTime =
-        14 * 60;
-
-
-    const start =
-        6 * 60;
-
-
-    const end =
-        24 * 60;
-
-
-    const position =
-        (
-            demoTime - start
-        )
-        /
-        (
-            end - start
-        );
-
-
-    previewPointer.style.top =
-        `${position * 100}%`;
+    queueSave();
 
 }
 
 
 /* =========================================
-   TIME HELPERS
-========================================= */
-
-function timeToMinutes(time) {
-
-    if (!time) {
-        return 0;
-    }
-
-
-    const [
-        hours,
-        minutes
-    ] =
-        time
-        .split(":")
-        .map(Number);
-
-
-    return (
-        hours * 60 +
-        minutes
-    );
-
-}
-
-
-function addMinutes(
-    time,
-    amount
-) {
-
-    let total =
-        timeToMinutes(time) +
-        amount;
-
-
-    total =
-        Math.min(
-            total,
-            23 * 60 + 59
-        );
-
-
-    const hours =
-        Math.floor(
-            total / 60
-        );
-
-
-    const minutes =
-        total % 60;
-
-
-    return (
-        String(hours)
-            .padStart(2,"0")
-        +
-        ":"
-        +
-        String(minutes)
-            .padStart(2,"0")
-    );
-
-}
-
-
-function isValidColor(value) {
-
-    return (
-        typeof value === "string" &&
-        /^#[0-9A-F]{6}$/i.test(value)
-    );
-
-}
-
-
-/* =========================================
-   GRID PANEL
+   GRID
 ========================================= */
 
 gridButton.addEventListener(
     "click",
     () => {
 
-        gridPanel.classList.toggle(
-            "hidden"
-        );
+        const shouldOpen =
+            gridPanel.classList.contains(
+                "hidden"
+            );
 
-        pointerPanel.classList.add(
-            "hidden"
-        );
 
-        renderGrid();
+        closeAllPanels();
+
+
+        if (shouldOpen) {
+
+            gridPanel.classList.remove(
+                "hidden"
+            );
+
+        }
 
     }
 );
 
 
 document
-    .querySelectorAll(
-        "[data-grid]"
-    )
+    .querySelectorAll("[data-grid]")
     .forEach(button => {
 
         button.addEventListener(
@@ -2333,21 +2230,7 @@ document
                     button.dataset.grid;
 
 
-                document
-                    .querySelectorAll(
-                        "[data-grid]"
-                    )
-                    .forEach(item => {
-
-                        item.classList.toggle(
-                            "active",
-                            item === button
-                        );
-
-                    });
-
-
-                renderPreview();
+                updateGridButtons();
 
                 queueSave();
 
@@ -2355,6 +2238,18 @@ document
         );
 
     });
+
+
+const gridColor =
+    document.getElementById(
+        "gridColor"
+    );
+
+
+const gridColorValue =
+    document.getElementById(
+        "gridColorValue"
+    );
 
 
 gridColor.addEventListener(
@@ -2365,7 +2260,9 @@ gridColor.addEventListener(
             gridColor.value;
 
 
-        renderPreview();
+        gridColorValue.textContent =
+            gridColor.value.toUpperCase();
+
 
         queueSave();
 
@@ -2374,23 +2271,121 @@ gridColor.addEventListener(
 
 
 /* =========================================
-   POINTER PANEL
+   POINTER
 ========================================= */
 
 pointerButton.addEventListener(
     "click",
     () => {
 
-        pointerPanel.classList.toggle(
-            "hidden"
-        );
+        const shouldOpen =
+            pointerPanel.classList.contains(
+                "hidden"
+            );
 
-        gridPanel.classList.add(
-            "hidden"
-        );
+
+        closeAllPanels();
+
+
+        if (shouldOpen) {
+
+            pointerPanel.classList.remove(
+                "hidden"
+            );
+
+        }
 
     }
 );
+
+
+document
+    .querySelectorAll(
+        "[data-close-panel]"
+    )
+    .forEach(button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                closeAllPanels();
+
+            }
+        );
+
+    });
+
+
+function closeAllPanels() {
+
+    gridPanel.classList.add(
+        "hidden"
+    );
+
+    pointerPanel.classList.add(
+        "hidden"
+    );
+
+}
+
+
+/* =========================================
+   POINTER CONTROLS
+========================================= */
+
+const pointerSymbol =
+    document.getElementById(
+        "pointerSymbol"
+    );
+
+
+const pointerColor =
+    document.getElementById(
+        "pointerColor"
+    );
+
+
+const pointerColorValue =
+    document.getElementById(
+        "pointerColorValue"
+    );
+
+
+const pointerSize =
+    document.getElementById(
+        "pointerSize"
+    );
+
+
+const pointerSizeValue =
+    document.getElementById(
+        "pointerSizeValue"
+    );
+
+
+const pointerGradient =
+    document.getElementById(
+        "pointerGradient"
+    );
+
+
+const pointerGradientStart =
+    document.getElementById(
+        "pointerGradientStart"
+    );
+
+
+const pointerGradientEnd =
+    document.getElementById(
+        "pointerGradientEnd"
+    );
+
+
+const pointerGradientOptions =
+    document.getElementById(
+        "pointerGradientOptions"
+    );
 
 
 pointerSymbol.addEventListener(
@@ -2399,9 +2394,6 @@ pointerSymbol.addEventListener(
 
         data.pointer.symbol =
             pointerSymbol.value;
-
-
-        renderPreview();
 
         queueSave();
 
@@ -2416,8 +2408,8 @@ pointerColor.addEventListener(
         data.pointer.color =
             pointerColor.value;
 
-
-        renderPreview();
+        pointerColorValue.textContent =
+            pointerColor.value.toUpperCase();
 
         queueSave();
 
@@ -2434,12 +2426,8 @@ pointerSize.addEventListener(
                 pointerSize.value
             );
 
-
         pointerSizeValue.textContent =
             pointerSize.value;
-
-
-        renderPreview();
 
         queueSave();
 
@@ -2455,9 +2443,11 @@ pointerGradient.addEventListener(
             pointerGradient.checked;
 
 
-        updateGradientOptions();
+        pointerGradientOptions.classList.toggle(
+            "hidden",
+            !pointerGradient.checked
+        );
 
-        renderPreview();
 
         queueSave();
 
@@ -2472,9 +2462,6 @@ pointerGradientStart.addEventListener(
         data.pointer.gradientStart =
             pointerGradientStart.value;
 
-
-        renderPreview();
-
         queueSave();
 
     }
@@ -2488,34 +2475,17 @@ pointerGradientEnd.addEventListener(
         data.pointer.gradientEnd =
             pointerGradientEnd.value;
 
-
-        renderPreview();
-
         queueSave();
 
     }
 );
 
 
-function updateGradientOptions() {
-
-    pointerGradientOptions.style.opacity =
-        data.pointer.gradient
-            ? "1"
-            : ".45";
-
-}
-
-
 /* =========================================
-   LOAD SETTINGS
+   SETTINGS UI
 ========================================= */
 
-function loadSettingsUI() {
-
-    gridColor.value =
-        data.global.gridColor;
-
+function updateGridButtons() {
 
     document
         .querySelectorAll(
@@ -2531,6 +2501,22 @@ function loadSettingsUI() {
 
         });
 
+}
+
+
+function loadSettingsUI() {
+
+    gridColor.value =
+        data.global.gridColor;
+
+
+    gridColorValue.textContent =
+        data.global.gridColor
+        .toUpperCase();
+
+
+    updateGridButtons();
+
 
     pointerSymbol.value =
         data.pointer.symbol;
@@ -2538,6 +2524,11 @@ function loadSettingsUI() {
 
     pointerColor.value =
         data.pointer.color;
+
+
+    pointerColorValue.textContent =
+        data.pointer.color
+        .toUpperCase();
 
 
     pointerSize.value =
@@ -2560,96 +2551,12 @@ function loadSettingsUI() {
         data.pointer.gradientEnd;
 
 
-    updateGradientOptions();
-
-}
-
-
-/* =========================================
-   DELETE MODAL
-========================================= */
-
-function openDeleteModal(item) {
-
-    deleteTarget =
-        item;
-
-
-    deleteText.textContent =
-        `Удалить «${item.text || "NEW TASK"}»?`;
-
-
-    deleteModal.classList.remove(
-        "hidden"
+    pointerGradientOptions.classList.toggle(
+        "hidden",
+        !data.pointer.gradient
     );
 
 }
-
-
-function closeDeleteModal() {
-
-    deleteTarget =
-        null;
-
-
-    deleteModal.classList.add(
-        "hidden"
-    );
-
-}
-
-
-cancelDelete.addEventListener(
-    "click",
-    closeDeleteModal
-);
-
-
-deleteModal.addEventListener(
-    "click",
-    event => {
-
-        if (
-            event.target ===
-            deleteModal
-        ) {
-
-            closeDeleteModal();
-
-        }
-
-    }
-);
-
-
-confirmDelete.addEventListener(
-    "click",
-    () => {
-
-        if (!deleteTarget) {
-            return;
-        }
-
-
-        data.days[selectedDay] =
-            data.days[selectedDay]
-            .filter(
-                task =>
-                    task.id !==
-                    deleteTarget.id
-            );
-
-
-        closeDeleteModal();
-
-        renderTasks();
-
-        renderPreview();
-
-        queueSave();
-
-    }
-);
 
 
 /* =========================================
@@ -2658,11 +2565,11 @@ confirmDelete.addEventListener(
 
 saveButton.addEventListener(
     "click",
-    () => {
+    async () => {
 
         clearTimeout(saveTimer);
 
-        save();
+        await save();
 
     }
 );
@@ -2697,8 +2604,6 @@ async function start() {
     loadSettingsUI();
 
     renderTasks();
-
-    renderPreview();
 
 }
 
