@@ -109,7 +109,6 @@ function defaultSchedule() {
         }
 
     };
-
 }
 
 
@@ -142,7 +141,6 @@ function defaultTask() {
         gradientEnd: "#7C6CFF"
 
     };
-
 }
 
 
@@ -164,41 +162,43 @@ let user = null;
 
 async function loadUser() {
 
-    const {
-        data,
-        error
-    } =
-        await supabase
-            .auth
-            .getSession();
+    try {
+
+        const {
+            data,
+            error
+        } =
+            await supabase
+                .auth
+                .getSession();
 
 
-    if (error) {
+        if (error) {
+            throw error;
+        }
+
+
+        if (!data.session) {
+
+            window.location.href =
+                "auth.html";
+
+            return null;
+        }
+
+
+        return data.session.user;
+
+    }
+    catch (error) {
 
         console.error(
             "AUTH ERROR:",
             error
         );
 
-        window.location.href =
-            "auth.html";
-
         return null;
-
     }
-
-
-    if (!data.session) {
-
-        window.location.href =
-            "auth.html";
-
-        return null;
-
-    }
-
-
-    return data.session.user;
 }
 
 
@@ -208,51 +208,56 @@ async function loadUser() {
 
 async function loadSchedule() {
 
-    const {
-        data: row,
-        error
-    } =
-        await supabase
-            .from("schedules")
-            .select("data")
-            .eq(
-                "user_id",
-                user.id
-            )
-            .maybeSingle();
+    try {
+
+        const {
+            data: row,
+            error
+        } =
+            await supabase
+                .from("schedules")
+                .select("data")
+                .eq(
+                    "user_id",
+                    user.id
+                )
+                .maybeSingle();
 
 
-    if (error) {
+        if (error) {
+            throw error;
+        }
+
+
+        if (row?.data) {
+
+            scheduleData =
+                normalizeSchedule(
+                    row.data
+                );
+
+        }
+        else {
+
+            scheduleData =
+                defaultSchedule();
+
+            await saveSchedule();
+
+        }
+
+    }
+    catch (error) {
 
         console.error(
             "SCHEDULE LOAD ERROR:",
             error
         );
 
-        return;
-
-    }
-
-
-    if (
-        row &&
-        row.data
-    ) {
-
-        scheduleData =
-            normalizeSchedule(
-                row.data
-            );
-
-    } else {
-
         scheduleData =
             defaultSchedule();
 
-        await saveSchedule();
-
     }
-
 }
 
 
@@ -307,7 +312,8 @@ function normalizeSchedule(input) {
      */
 
     if (
-        !source.global?.gridMode &&
+        !source.global?.gridMode
+        &&
         source.global?.gridType
     ) {
 
@@ -318,7 +324,8 @@ function normalizeSchedule(input) {
 
 
     if (
-        !source.global?.gridMode &&
+        !source.global?.gridMode
+        &&
         source.global?.grid
     ) {
 
@@ -327,6 +334,12 @@ function normalizeSchedule(input) {
 
     }
 
+
+    /*
+     * Только три режима,
+     * которые реально есть
+     * в последнем editor.js.
+     */
 
     if (
         ![
@@ -344,6 +357,10 @@ function normalizeSchedule(input) {
     }
 
 
+    /*
+     * GRID thickness.
+     */
+
     result.global.gridThickness =
         Math.max(
             1,
@@ -355,6 +372,10 @@ function normalizeSchedule(input) {
             )
         );
 
+
+    /*
+     * GRID color.
+     */
 
     if (
         typeof result.global.gridColor !==
@@ -368,7 +389,7 @@ function normalizeSchedule(input) {
 
 
     /*
-     * POINTER
+     * POINTER.
      */
 
     result.pointer.icon =
@@ -407,7 +428,7 @@ function normalizeSchedule(input) {
 
 
     /*
-     * TASKS
+     * TASKS.
      */
 
     DAYS.forEach(day => {
@@ -426,8 +447,11 @@ function normalizeSchedule(input) {
         result.days[day] =
             result.days[day].map(
                 task => ({
+
                     ...defaultTask(),
+
                     ...task
+
                 })
             );
 
@@ -449,46 +473,52 @@ async function saveSchedule() {
     }
 
 
-    const {
-        error
-    } =
-        await supabase
-            .from("schedules")
-            .upsert(
-                {
+    try {
 
-                    user_id:
-                        user.id,
+        const {
+            error
+        } =
+            await supabase
+                .from("schedules")
+                .upsert(
+                    {
 
-                    data:
-                        scheduleData,
+                        user_id:
+                            user.id,
 
-                    updated_at:
-                        new Date()
-                            .toISOString()
+                        data:
+                            scheduleData,
 
-                },
+                        updated_at:
+                            new Date()
+                                .toISOString()
 
-                {
-                    onConflict:
-                        "user_id"
-                }
-            );
+                    },
+
+                    {
+                        onConflict:
+                            "user_id"
+                    }
+                );
 
 
-    if (error) {
+        if (error) {
+            throw error;
+        }
+
+
+        return true;
+
+    }
+    catch (error) {
 
         console.error(
-            "SCHEDULE SAVE ERROR:",
+            "SAVE ERROR:",
             error
         );
 
         return false;
-
     }
-
-
-    return true;
 }
 
 
@@ -502,6 +532,7 @@ function getAlmatyTime() {
         new Intl.DateTimeFormat(
             "en-US",
             {
+
                 timeZone:
                     "Asia/Almaty",
 
@@ -516,6 +547,7 @@ function getAlmatyTime() {
 
                 hour12:
                     false
+
             }
         )
         .formatToParts(
@@ -527,7 +559,8 @@ function getAlmatyTime() {
         Number(
             parts.find(
                 part =>
-                    part.type === "hour"
+                    part.type ===
+                    "hour"
             )?.value || 0
         );
 
@@ -545,7 +578,8 @@ function getAlmatyTime() {
             Number(
                 parts.find(
                     part =>
-                        part.type === "minute"
+                        part.type ===
+                        "minute"
                 )?.value || 0
             ),
 
@@ -553,7 +587,8 @@ function getAlmatyTime() {
             Number(
                 parts.find(
                     part =>
-                        part.type === "second"
+                        part.type ===
+                        "second"
                 )?.value || 0
             )
 
@@ -566,11 +601,13 @@ function getAlmatyDay() {
     return new Intl.DateTimeFormat(
         "en-US",
         {
+
             timeZone:
                 "Asia/Almaty",
 
             weekday:
                 "long"
+
         }
     )
     .format(
@@ -582,10 +619,7 @@ function getAlmatyDay() {
 
 function seconds(time) {
 
-    const [
-        hour,
-        minute
-    ] =
+    const parts =
         String(
             time || "00:00"
         )
@@ -594,8 +628,9 @@ function seconds(time) {
 
 
     return (
-        (hour || 0) * 3600 +
-        (minute || 0) * 60
+        (parts[0] || 0) * 3600
+        +
+        (parts[1] || 0) * 60
     );
 }
 
@@ -628,11 +663,15 @@ function render() {
     }
 
 
+    /*
+     * Полностью очищаем старую разметку.
+     */
+
     board.innerHTML = "";
 
 
     /*
-     * GRID VARIABLES
+     * GRID VARIABLES.
      */
 
     board.style.setProperty(
@@ -648,24 +687,35 @@ function render() {
 
 
     /*
-     * LEFT SPACE FOR POINTER
+     * Место под pointer слева.
      */
 
     board.style.setProperty(
         "--pointer-space",
-        `${scheduleData.pointer.size + 16}px`
+        `${scheduleData.pointer.size + 22}px`
     );
 
 
     /*
-     * GRID MODE
+     * Очень важно:
+     * Убираем старый background-image,
+     * из-за которого у тебя появлялась
+     * квадратная сетка поверх настоящей.
      */
+
+    board.style.backgroundImage =
+        "none";
+
+
+    board.style.backgroundColor =
+        "transparent";
+
 
     applyGrid();
 
 
     /*
-     * TASKS
+     * TASKS.
      */
 
     const items =
@@ -681,12 +731,12 @@ function render() {
         emptyState.style.display =
             "block";
 
+
         board.appendChild(
             emptyState
         );
 
     }
-
     else {
 
         emptyState.style.display =
@@ -694,14 +744,20 @@ function render() {
 
 
         items.forEach(
-            createScheduleRow
+            item => {
+
+                createScheduleRow(
+                    item
+                );
+
+            }
         );
 
     }
 
 
     /*
-     * POINTER
+     * POINTER.
      */
 
     renderPointer();
@@ -729,7 +785,7 @@ function createScheduleRow(item) {
 
 
     /*
-     * TIME
+     * TIME.
      */
 
     row.style.setProperty(
@@ -755,7 +811,7 @@ function createScheduleRow(item) {
 
 
     /*
-     * TEXT
+     * TEXT.
      */
 
     row.style.setProperty(
@@ -787,7 +843,7 @@ function createScheduleRow(item) {
 
 
     /*
-     * TIME ELEMENT
+     * TIME ELEMENT.
      */
 
     const time =
@@ -805,7 +861,7 @@ function createScheduleRow(item) {
 
 
     /*
-     * TEXT ELEMENT
+     * TEXT ELEMENT.
      */
 
     const task =
@@ -823,9 +879,8 @@ function createScheduleRow(item) {
 
 
     /*
-     * TEXT GRADIENT
-     *
-     * Это градиент ТОЛЬКО текста.
+     * GRADIENT ТОЛЬКО У ТЕКСТА,
+     * если включен в editor.
      */
 
     if (
@@ -856,7 +911,6 @@ function createScheduleRow(item) {
             "transparent";
 
     }
-
     else {
 
         task.style.backgroundImage =
@@ -899,11 +953,33 @@ function createScheduleRow(item) {
 
 function applyGrid() {
 
+    /*
+     * Сначала удаляем ВСЕ старые
+     * сеточные классы.
+     */
+
     board.classList.remove(
         "grid-rows",
         "grid-grid",
-        "grid-none"
+        "grid-none",
+        "grid-dots",
+        "grid-double",
+        "grid-soft",
+        "grid-wave"
     );
+
+
+    /*
+     * Убираем ВСЕ возможные старые
+     * фоновые сетки.
+     */
+
+    board.style.backgroundImage =
+        "none";
+
+
+    board.style.background =
+        "transparent";
 
 
     const mode =
@@ -912,8 +988,6 @@ function applyGrid() {
 
     /*
      * ROWS
-     *
-     * Только горизонтальные линии.
      */
 
     if (
@@ -930,10 +1004,6 @@ function applyGrid() {
 
     /*
      * GRID
-     *
-     * Горизонтальные линии +
-     * ОДНА вертикальная линия
-     * между TIME и TEXT.
      */
 
     if (
@@ -969,18 +1039,6 @@ function renderPointer() {
     }
 
 
-    const icon =
-        Math.max(
-            1,
-            Math.min(
-                10,
-                Number(
-                    scheduleData.pointer.icon
-                ) || 1
-            )
-        );
-
-
     const size =
         Math.max(
             10,
@@ -993,13 +1051,26 @@ function renderPointer() {
         );
 
 
+    const icon =
+        Math.max(
+            1,
+            Math.min(
+                10,
+                Number(
+                    scheduleData.pointer.icon
+                ) || 1
+            )
+        );
+
+
     const color =
         scheduleData.pointer.color ||
         "#111111";
 
 
     /*
-     * Убираем старый gradient.
+     * Полностью чистим старые
+     * способы отрисовки.
      */
 
     pointer.classList.remove(
@@ -1012,22 +1083,24 @@ function renderPointer() {
     );
 
 
-    /*
-     * Сам pointer.
-     */
+    pointer.style.backgroundImage =
+        "none";
+
+
+    pointer.style.backgroundColor =
+        color;
+
+
+    pointer.style.filter =
+        "none";
+
 
     pointer.style.width =
         `${size}px`;
 
+
     pointer.style.height =
         `${size}px`;
-
-
-    pointer.style.background =
-        "none";
-
-    pointer.style.backgroundImage =
-        "none";
 
 
     pointer.style.color =
@@ -1038,20 +1111,16 @@ function renderPointer() {
         "0";
 
 
-    pointer.style.filter =
-        "none";
-
-
     /*
-     * Используем MASK.
+     * Сам POINTER становится маской.
      *
-     * Иконка:
-     * icons/1.png ...
-     * icons/10.png
+     * Это проще и стабильнее на iOS,
+     * чем отдельный img внутри.
      */
 
     pointer.style.webkitMaskImage =
         `url("icons/${icon}.png")`;
+
 
     pointer.style.maskImage =
         `url("icons/${icon}.png")`;
@@ -1060,12 +1129,14 @@ function renderPointer() {
     pointer.style.webkitMaskRepeat =
         "no-repeat";
 
+
     pointer.style.maskRepeat =
         "no-repeat";
 
 
     pointer.style.webkitMaskPosition =
         "center";
+
 
     pointer.style.maskPosition =
         "center";
@@ -1074,20 +1145,13 @@ function renderPointer() {
     pointer.style.webkitMaskSize =
         "contain";
 
+
     pointer.style.maskSize =
         "contain";
 
 
     /*
-     * Цвет выбранный в EDITOR.
-     */
-
-    pointer.style.backgroundColor =
-        color;
-
-
-    /*
-     * pointerSymbol вообще не нужен.
+     * Старый span полностью отключаем.
      */
 
     if (pointerSymbol) {
@@ -1099,6 +1163,15 @@ function renderPointer() {
             "none";
 
     }
+
+
+    /*
+     * Показываем только когда
+     * действительно нашли строку.
+     */
+
+    pointer.style.display =
+        "none";
 
 
     updatePointerPosition();
@@ -1117,8 +1190,7 @@ function updatePointerPosition() {
 
 
     /*
-     * Pointer показывается
-     * только для сегодняшнего дня.
+     * Pointer нужен только сегодня.
      */
 
     if (
@@ -1150,42 +1222,47 @@ function updatePointerPosition() {
     }
 
 
+    /*
+     * Current time.
+     */
+
     const now =
         getAlmatyTime();
 
 
-    const nowSeconds =
+    const currentSeconds =
         now.hour * 3600 +
         now.minute * 60 +
         now.second;
 
 
     /*
-     * Ближайшая задача.
+     * Ближайший task.
      */
 
-    let nearest = null;
+    let nearest =
+        null;
 
-    let difference =
+    let nearestDifference =
         Infinity;
 
 
     items.forEach(item => {
 
-        const currentDifference =
+        const difference =
             Math.abs(
                 seconds(item.time) -
-                nowSeconds
+                currentSeconds
             );
 
 
         if (
-            currentDifference <
-            difference
+            difference <
+            nearestDifference
         ) {
 
-            difference =
-                currentDifference;
+            nearestDifference =
+                difference;
 
             nearest =
                 item;
@@ -1208,7 +1285,8 @@ function updatePointerPosition() {
      * Ищем строку.
      */
 
-    let targetRow = null;
+    let targetRow =
+        null;
 
 
     board
@@ -1240,12 +1318,10 @@ function updatePointerPosition() {
 
 
     /*
-     * КЛЮЧЕВОЙ МОМЕНТ:
+     * Координаты.
      *
-     * pointer находится внутри
-     * .schedule, поэтому координаты
-     * считаем относительно .schedule,
-     * а не board.
+     * Считаем относительно schedule,
+     * который является родителем pointer.
      */
 
     const rowRect =
@@ -1255,28 +1331,6 @@ function updatePointerPosition() {
     const scheduleRect =
         schedule.getBoundingClientRect();
 
-
-    /*
-     * Y с учетом scrollTop.
-     */
-
-    const y =
-        rowRect.top -
-        scheduleRect.top +
-        schedule.scrollTop +
-        (
-            rowRect.height /
-            2
-        );
-
-
-    /*
-     * X:
-     *
-     * board находится внутри schedule.
-     * Ставим pointer в левую область
-     * board.
-     */
 
     const boardRect =
         board.getBoundingClientRect();
@@ -1288,11 +1342,43 @@ function updatePointerPosition() {
         ) || 28;
 
 
+    /*
+     * Y.
+     */
+
+    const y =
+        rowRect.top
+        -
+        scheduleRect.top
+        +
+        schedule.scrollTop
+        +
+        (
+            rowRect.height /
+            2
+        );
+
+
+    /*
+     * X.
+     *
+     * Pointer ставим внутри
+     * левой части board.
+     *
+     * Благодаря большому padding-left
+     * он не обрезается iPhone Safari.
+     */
+
     const x =
-        boardRect.left -
-        scheduleRect.left -
-        pointerSize -
-        7;
+        boardRect.left
+        -
+        scheduleRect.left
+        +
+        (
+            scheduleData.pointer.size / 2
+        )
+        +
+        4;
 
 
     pointer.style.left =
@@ -1307,7 +1393,7 @@ function updatePointerPosition() {
 
 
     pointer.style.display =
-        "block";
+        "flex";
 }
 
 
@@ -1322,8 +1408,7 @@ function updateDayUI() {
 
 
     /*
-     * Верхний старый DAY/TIME
-     * полностью убираем.
+     * Удаляем верхний DAY/TIME.
      */
 
     if (dayName) {
@@ -1449,6 +1534,7 @@ if (prevDay) {
 
         }
     );
+
 }
 
 
@@ -1475,6 +1561,7 @@ if (nextDay) {
 
         }
     );
+
 }
 
 
@@ -1490,6 +1577,7 @@ if (selectedDayButton) {
 
         }
     );
+
 }
 
 
@@ -1516,6 +1604,7 @@ dayButtons.forEach(
 ========================================================= */
 
 let startX = 0;
+
 let startY = 0;
 
 
@@ -1567,6 +1656,7 @@ schedule.addEventListener(
         ) {
 
             return;
+
         }
 
 
