@@ -1,8 +1,14 @@
+/* =========================================
+   RESET
+========================================= */
+
 * {
     margin: 0;
     padding: 0;
+
     box-sizing: border-box;
 }
+
 
 html,
 body {
@@ -10,11 +16,15 @@ body {
     height: 100%;
 }
 
+
 body {
     background: #ffffff;
     color: #111111;
 
-    font-family: Arial, Helvetica, sans-serif;
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
 
     overflow: hidden;
 
@@ -27,12 +37,13 @@ body {
 ========================================= */
 
 .app {
+    position: relative;
+
     width: 100vw;
     height: 100vh;
 
-    position: relative;
-
     display: flex;
+
     justify-content: center;
     align-items: center;
 }
@@ -53,6 +64,7 @@ body {
     pointer-events: none;
 }
 
+
 .day {
     font-size: 16px;
     font-weight: 600;
@@ -63,6 +75,7 @@ body {
 
     color: #111111;
 }
+
 
 .time {
     margin-top: 7px;
@@ -75,7 +88,301 @@ body {
 
     color: #111111;
 
-    font-variant-numeric: tabular-nums;
+    font-variant-numeric:
+        tabular-nums;
+}
+
+
+/* =========================================
+   DAY NAVIGATION
+========================================= */
+
+.day-navigation {
+    position: fixed;
+
+    top: 20px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    z-index: 100;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+
+    padding:
+        8px
+        10px;
+
+    background:
+        rgba(255, 255, 255, 0.82);
+
+    border:
+        1px solid
+        rgba(17, 17, 17, 0.10);
+
+    backdrop-filter:
+        blur(12px);
+
+    -webkit-backdrop-filter:
+        blur(12px);
+
+    border-radius: 999px;
+}
+
+
+/* =========================================
+   DAYS
+========================================= */
+
+.days {
+    display: flex;
+
+    align-items: center;
+
+    gap: 3px;
+}
+
+
+/* =========================================
+   DAY BUTTON
+========================================= */
+
+.day-button {
+    position: relative;
+
+    width: 36px;
+    height: 30px;
+
+    border: none;
+
+    border-radius: 999px;
+
+    background:
+        transparent;
+
+    color:
+        rgba(17, 17, 17, 0.35);
+
+    font-family: inherit;
+
+    font-size: 10px;
+    font-weight: 600;
+
+    letter-spacing: 0.5px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.day-button:hover {
+    color: #111111;
+
+    background:
+        rgba(17, 17, 17, 0.06);
+}
+
+
+.day-button:active {
+    transform:
+        scale(0.92);
+}
+
+
+/* =========================================
+   TODAY DOT
+========================================= */
+
+.day-button.today::after {
+    content: "";
+
+    position: absolute;
+
+    bottom: 3px;
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+    width: 3px;
+    height: 3px;
+
+    border-radius: 50%;
+
+    background:
+        #111111;
+
+    opacity: 0.35;
+}
+
+
+/* =========================================
+   ACTIVE DAY
+========================================= */
+
+.day-button.active {
+    background: #111111;
+
+    color: #ffffff;
+}
+
+
+.day-button.active::after {
+    display: none;
+}
+
+
+/* =========================================
+   NAV ARROWS
+========================================= */
+
+.nav-arrow {
+    width: 26px;
+    height: 30px;
+
+    border: none;
+
+    background:
+        transparent;
+
+    color:
+        rgba(17, 17, 17, 0.45);
+
+    font-family: Arial, sans-serif;
+
+    font-size: 24px;
+    font-weight: 300;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.nav-arrow:hover {
+    color: #111111;
+}
+
+
+.nav-arrow:active {
+    transform:
+        scale(0.85);
+}
+
+
+/* =========================================
+   VIEWING LABEL
+========================================= */
+
+.viewing {
+    position: fixed;
+
+    top: 68px;
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+    z-index: 100;
+
+    font-size: 9px;
+    font-weight: 600;
+
+    letter-spacing: 2px;
+
+    color:
+        rgba(17, 17, 17, 0.30);
+
+    white-space: nowrap;
+
+    pointer-events: none;
+
+    transition:
+        opacity 0.2s ease;
+}
+
+
+.viewing.future {
+    color:
+        rgba(17, 17, 17, 0.55);
+}
+
+
+/* =========================================
+   TODAY BUTTON
+========================================= */
+
+.today-button {
+    position: fixed;
+
+    top: 20px;
+    right: 15px;
+
+    z-index: 100;
+
+    height: 30px;
+
+    padding:
+        0
+        13px;
+
+    border:
+        1px solid
+        rgba(17, 17, 17, 0.12);
+
+    border-radius: 999px;
+
+    background:
+        rgba(255, 255, 255, 0.75);
+
+    color:
+        rgba(17, 17, 17, 0.65);
+
+    font-family: inherit;
+
+    font-size: 9px;
+    font-weight: 600;
+
+    letter-spacing: 1.5px;
+
+    cursor: pointer;
+
+    backdrop-filter:
+        blur(10px);
+
+    -webkit-backdrop-filter:
+        blur(10px);
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.today-button:hover {
+    background: #111111;
+
+    color: #ffffff;
+}
+
+
+.today-button:active {
+    transform:
+        scale(0.94);
 }
 
 
@@ -108,9 +415,14 @@ body {
         1080 × 1920
     */
 
-    width: min(90vw, calc(100vh * 1080 / 1920));
+    width:
+        min(
+            90vw,
+            calc(100vh * 1080 / 1920)
+        );
 
-    aspect-ratio: 1080 / 1920;
+    aspect-ratio:
+        1080 / 1920;
 
     flex-shrink: 0;
 }
@@ -134,6 +446,7 @@ body {
     object-fit: fill;
 
     user-select: none;
+
     -webkit-user-drag: none;
 }
 
@@ -173,14 +486,78 @@ body {
     width: 0;
     height: 0;
 
-    border-top: 7px solid transparent;
-    border-bottom: 7px solid transparent;
+    border-top:
+        7px solid transparent;
 
-    border-left: 11px solid #111111;
+    border-bottom:
+        7px solid transparent;
 
-    transform: translateY(-50%);
+    border-left:
+        11px solid #111111;
+
+    transform:
+        translateY(-50%);
 
     z-index: 20;
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 599px) {
+
+    .day-navigation {
+        gap: 4px;
+
+        padding:
+            6px
+            7px;
+
+        max-width: calc(100vw - 110px);
+    }
+
+
+    .days {
+        gap: 1px;
+    }
+
+
+    .day-button {
+        width: 29px;
+        height: 28px;
+
+        font-size: 8px;
+    }
+
+
+    .nav-arrow {
+        width: 18px;
+
+        font-size: 20px;
+    }
+
+
+    .viewing {
+        top: 62px;
+
+        font-size: 8px;
+
+        letter-spacing: 1.5px;
+    }
+
+
+    .today-button {
+        right: 10px;
+
+        padding:
+            0
+            9px;
+
+        font-size: 8px;
+    }
+
 }
 
 
@@ -195,21 +572,42 @@ body {
         left: 30px;
     }
 
+
     .day {
         font-size: 20px;
     }
 
+
     .time {
         font-size: 16px;
     }
+
+
+    .day-navigation {
+        top: 25px;
+    }
+
+
+    .today-button {
+        top: 25px;
+        right: 30px;
+    }
+
+
+    .viewing {
+        top: 73px;
+    }
+
 
     .triangle {
         left: -22px;
 
         border-top-width: 9px;
         border-bottom-width: 9px;
+
         border-left-width: 14px;
     }
+
 }
 
 
@@ -224,19 +622,54 @@ body {
         left: 40px;
     }
 
+
     .day {
         font-size: 24px;
     }
 
+
     .time {
         font-size: 17px;
     }
+
+
+    .day-navigation {
+        top: 30px;
+
+        padding:
+            9px
+            12px;
+
+        gap: 12px;
+    }
+
+
+    .day-button {
+        width: 40px;
+        height: 32px;
+
+        font-size: 10px;
+    }
+
+
+    .today-button {
+        top: 35px;
+        right: 40px;
+    }
+
+
+    .viewing {
+        top: 82px;
+    }
+
 
     .triangle {
         left: -25px;
 
         border-top-width: 10px;
         border-bottom-width: 10px;
+
         border-left-width: 16px;
     }
+
 }

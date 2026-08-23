@@ -4,6 +4,16 @@ const triangle = document.querySelector(".triangle");
 const dayName = document.getElementById("dayName");
 const currentTime = document.getElementById("currentTime");
 
+const prevDayButton = document.getElementById("prevDay");
+const nextDayButton = document.getElementById("nextDay");
+
+const todayButton = document.getElementById("todayButton");
+
+const viewingLabel = document.getElementById("viewingLabel");
+
+const dayButtons =
+    document.querySelectorAll(".day-button");
+
 
 /* =====================================================
    РАСПИСАНИЕ
@@ -133,22 +143,59 @@ const DAYS = {
 
 
 /* =====================================================
+   ПОРЯДОК ДНЕЙ
+===================================================== */
+
+const WEEK = [
+    "MONDAY",
+    "TUESDAY",
+    "WEDNESDAY",
+    "THURSDAY",
+    "FRIDAY",
+    "SATURDAY",
+    "SUNDAY"
+];
+
+
+const SHORT_NAMES = {
+
+    MONDAY: "MON",
+    TUESDAY: "TUE",
+    WEDNESDAY: "WED",
+    THURSDAY: "THU",
+    FRIDAY: "FRI",
+    SATURDAY: "SAT",
+    SUNDAY: "SUN"
+
+};
+
+
+/* =====================================================
+   КАКОЙ ДЕНЬ МЫ СЕЙЧАС СМОТРИМ
+===================================================== */
+
+let selectedDay = null;
+
+
+/* =====================================================
    ВРЕМЯ АЛМАТЫ
 ===================================================== */
 
 function getAlmatyTime() {
 
-    const parts = new Intl.DateTimeFormat("en-US", {
+    const parts = new Intl.DateTimeFormat(
+        "en-US",
+        {
+            timeZone: "Asia/Almaty",
 
-        timeZone: "Asia/Almaty",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
 
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-
-        hour12: false
-
-    }).formatToParts(new Date());
+            hour12: false
+        }
+    )
+    .formatToParts(new Date());
 
 
     let hour = Number(
@@ -214,7 +261,10 @@ function timeToSeconds(time) {
     const [
         hours,
         minutes
-    ] = time.split(":").map(Number);
+    ] =
+        time
+        .split(":")
+        .map(Number);
 
 
     return (
@@ -250,23 +300,8 @@ function calculatePosition(
     currentSeconds
 ) {
 
-    /*
-        ЛОГИКА:
-
-        14:00 → позиция 14:00
-        14:01 → позиция 14:00
-        14:30 → позиция 14:00
-        14:59 → позиция 14:00
-
-        15:00 → позиция 15:00
-        15:01 → позиция 15:00
-
-        То есть стрелка НЕ движется между
-        пунктами расписания.
-    */
-
-
-    let currentPosition = positions[0];
+    let currentPosition =
+        positions[0];
 
 
     for (
@@ -276,15 +311,21 @@ function calculatePosition(
     ) {
 
         const scheduleTime =
-            timeToSeconds(times[i]);
+            timeToSeconds(
+                times[i]
+            );
 
 
-        if (currentSeconds >= scheduleTime) {
+        if (
+            currentSeconds >= scheduleTime
+        ) {
 
             currentPosition =
                 positions[i];
 
-        } else {
+        }
+
+        else {
 
             break;
 
@@ -302,7 +343,9 @@ function calculatePosition(
    PHOTOSHOP → PIXELS
 ===================================================== */
 
-function inchesToOriginalPixels(inches) {
+function inchesToOriginalPixels(
+    inches
+) {
 
     return (
         inches / 25.51
@@ -315,10 +358,14 @@ function inchesToOriginalPixels(inches) {
    ПОСТАВИТЬ ТРЕУГОЛЬНИК
 ===================================================== */
 
-function updateTriangle(yInches) {
+function updateTriangle(
+    yInches
+) {
 
     const renderedHeight =
-        image.getBoundingClientRect().height;
+        image
+        .getBoundingClientRect()
+        .height;
 
 
     if (!renderedHeight) {
@@ -331,7 +378,9 @@ function updateTriangle(yInches) {
 
 
     const originalY =
-        inchesToOriginalPixels(yInches);
+        inchesToOriginalPixels(
+            yInches
+        );
 
 
     const renderedY =
@@ -364,8 +413,11 @@ function loadDay(day) {
 
 
     if (
-        image.getAttribute("src") === imagePath
+        image.getAttribute("src") ===
+        imagePath
     ) {
+
+        updateTriangleForSelectedDay();
 
         return;
 
@@ -378,9 +430,303 @@ function loadDay(day) {
 
     image.onload = () => {
 
-        update();
+        updateTriangleForSelectedDay();
 
     };
+
+}
+
+
+/* =====================================================
+   ОБНОВИТЬ СТРЕЛКУ
+===================================================== */
+
+function updateTriangleForSelectedDay() {
+
+    const today =
+        getAlmatyDay();
+
+
+    /*
+        Если смотрим не сегодняшний день,
+        стрелку скрываем.
+    */
+
+    if (
+        selectedDay !== today
+    ) {
+
+        triangle.style.display =
+            "none";
+
+        return;
+
+    }
+
+
+    triangle.style.display =
+        "block";
+
+
+    const schedule =
+        DAYS[selectedDay];
+
+
+    const time =
+        getAlmatyTime();
+
+
+    const currentSeconds =
+        getCurrentSeconds(
+            time
+        );
+
+
+    const y =
+        calculatePosition(
+            schedule.times,
+            schedule.positions,
+            currentSeconds
+        );
+
+
+    updateTriangle(y);
+
+}
+
+
+/* =====================================================
+   ОБНОВИТЬ КНОПКИ ДНЕЙ
+===================================================== */
+
+function updateDayButtons() {
+
+    const today =
+        getAlmatyDay();
+
+
+    dayButtons.forEach(
+        button => {
+
+            const buttonDay =
+                button.dataset.day;
+
+
+            button.classList.remove(
+                "active",
+                "today"
+            );
+
+
+            if (
+                buttonDay === selectedDay
+            ) {
+
+                button.classList.add(
+                    "active"
+                );
+
+            }
+
+
+            if (
+                buttonDay === today
+            ) {
+
+                button.classList.add(
+                    "today"
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   ОБНОВИТЬ VIEWING LABEL
+===================================================== */
+
+function updateViewingLabel() {
+
+    const today =
+        getAlmatyDay();
+
+
+    if (
+        selectedDay === today
+    ) {
+
+        viewingLabel.textContent =
+            "TODAY";
+
+        viewingLabel.classList.remove(
+            "future"
+        );
+
+    }
+
+    else {
+
+        const todayIndex =
+            WEEK.indexOf(today);
+
+
+        const selectedIndex =
+            WEEK.indexOf(selectedDay);
+
+
+        let difference =
+            selectedIndex -
+            todayIndex;
+
+
+        if (difference < 0) {
+
+            difference += 7;
+
+        }
+
+
+        viewingLabel.classList.add(
+            "future"
+        );
+
+
+        if (
+            difference === 1
+        ) {
+
+            viewingLabel.textContent =
+                "TOMORROW";
+
+        }
+
+        else if (
+            difference === 2
+        ) {
+
+            viewingLabel.textContent =
+                "DAY AFTER TOMORROW";
+
+        }
+
+        else {
+
+            viewingLabel.textContent =
+                SHORT_NAMES[selectedDay];
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   ВЫБРАТЬ ДЕНЬ
+===================================================== */
+
+function selectDay(day) {
+
+    if (!DAYS[day]) {
+        return;
+    }
+
+
+    selectedDay =
+        day;
+
+
+    dayName.textContent =
+        day;
+
+
+    updateDayButtons();
+
+
+    updateViewingLabel();
+
+
+    loadDay(day);
+
+}
+
+
+/* =====================================================
+   ПРЕДЫДУЩИЙ ДЕНЬ
+===================================================== */
+
+function previousDay() {
+
+    const currentIndex =
+        WEEK.indexOf(
+            selectedDay
+        );
+
+
+    const previousIndex =
+        (
+            currentIndex - 1 + WEEK.length
+        )
+        %
+        WEEK.length;
+
+
+    selectDay(
+        WEEK[previousIndex]
+    );
+
+}
+
+
+/* =====================================================
+   СЛЕДУЮЩИЙ ДЕНЬ
+===================================================== */
+
+function nextDay() {
+
+    const currentIndex =
+        WEEK.indexOf(
+            selectedDay
+        );
+
+
+    const nextIndex =
+        (
+            currentIndex + 1
+        )
+        %
+        WEEK.length;
+
+
+    selectDay(
+        WEEK[nextIndex]
+    );
+
+}
+
+
+/* =====================================================
+   ОБНОВИТЬ ВРЕМЯ
+===================================================== */
+
+function updateClock() {
+
+    const time =
+        getAlmatyTime();
+
+
+    currentTime.textContent =
+        String(time.hour)
+        .padStart(2, "0")
+        +
+        ":"
+        +
+        String(time.minute)
+        .padStart(2, "0");
 
 }
 
@@ -391,76 +737,99 @@ function loadDay(day) {
 
 function update() {
 
-    const day =
+    const today =
         getAlmatyDay();
 
 
-    const schedule =
-        DAYS[day];
+    /*
+        Если день изменился, но пользователь
+        смотрел сегодняшний день — автоматически
+        переключаемся на новый день.
+    */
 
+    if (!selectedDay) {
 
-    if (!schedule) {
-        return;
+        selectedDay =
+            today;
+
     }
 
 
-    const time =
-        getAlmatyTime();
+    updateClock();
 
 
     /*
-        День
+        Если selectedDay больше не соответствует
+        сегодняшнему дню, мы НЕ переключаем
+        пользователя принудительно.
+
+        Он может спокойно смотреть завтра,
+        послезавтра и другие дни.
     */
 
-    dayName.textContent =
-        day;
+    updateDayButtons();
 
 
-    /*
-        Текущее время
-    */
-
-    currentTime.textContent =
-        String(time.hour).padStart(2, "0") +
-        ":" +
-        String(time.minute).padStart(2, "0");
+    updateViewingLabel();
 
 
-    /*
-        Загружаем картинку нужного дня
-    */
-
-    loadDay(day);
-
-
-    /*
-        Получаем текущее время
-        в секундах
-    */
-
-    const currentSeconds =
-        getCurrentSeconds(time);
-
-
-    /*
-        Получаем позицию стрелки
-    */
-
-    const y =
-        calculatePosition(
-            schedule.times,
-            schedule.positions,
-            currentSeconds
-        );
-
-
-    /*
-        Ставим стрелку
-    */
-
-    updateTriangle(y);
+    updateTriangleForSelectedDay();
 
 }
+
+
+/* =====================================================
+   КЛИК ПО ДНЯМ
+===================================================== */
+
+dayButtons.forEach(
+    button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                selectDay(
+                    button.dataset.day
+                );
+
+            }
+        );
+
+    }
+);
+
+
+/* =====================================================
+   СТРЕЛКИ
+===================================================== */
+
+prevDayButton.addEventListener(
+    "click",
+    previousDay
+);
+
+
+nextDayButton.addEventListener(
+    "click",
+    nextDay
+);
+
+
+/* =====================================================
+   КНОПКА TODAY
+===================================================== */
+
+todayButton.addEventListener(
+    "click",
+    () => {
+
+        selectDay(
+            getAlmatyDay()
+        );
+
+    }
+);
 
 
 /* =====================================================
@@ -471,14 +840,14 @@ window.addEventListener(
     "resize",
     () => {
 
-        update();
+        updateTriangleForSelectedDay();
 
     }
 );
 
 
 /* =====================================================
-   ОБНОВЛЕНИЕ КАЖДУЮ СЕКУНДУ
+   ОБНОВЛЕНИЕ
 ===================================================== */
 
 setInterval(
@@ -494,5 +863,10 @@ setInterval(
 /* =====================================================
    START
 ===================================================== */
+
+selectDay(
+    getAlmatyDay()
+);
+
 
 update();

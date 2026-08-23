@@ -24,6 +24,10 @@
 
     <main class="app">
 
+        <!-- =========================================
+             HEADER
+        ========================================== -->
+
         <header class="header">
 
             <div
@@ -43,6 +47,130 @@
         </header>
 
 
+        <!-- =========================================
+             DAY NAVIGATION
+        ========================================== -->
+
+        <nav
+            class="day-navigation"
+            aria-label="Schedule navigation"
+        >
+
+            <button
+                class="nav-arrow"
+                id="prevDay"
+                type="button"
+                aria-label="Previous day"
+            >
+                ‹
+            </button>
+
+
+            <div
+                class="days"
+                id="daysList"
+            >
+
+                <button
+                    class="day-button"
+                    data-day="MONDAY"
+                    type="button"
+                >
+                    <span>MON</span>
+                </button>
+
+                <button
+                    class="day-button"
+                    data-day="TUESDAY"
+                    type="button"
+                >
+                    <span>TUE</span>
+                </button>
+
+                <button
+                    class="day-button"
+                    data-day="WEDNESDAY"
+                    type="button"
+                >
+                    <span>WED</span>
+                </button>
+
+                <button
+                    class="day-button"
+                    data-day="THURSDAY"
+                    type="button"
+                >
+                    <span>THU</span>
+                </button>
+
+                <button
+                    class="day-button"
+                    data-day="FRIDAY"
+                    type="button"
+                >
+                    <span>FRI</span>
+                </button>
+
+                <button
+                    class="day-button"
+                    data-day="SATURDAY"
+                    type="button"
+                >
+                    <span>SAT</span>
+                </button>
+
+                <button
+                    class="day-button"
+                    data-day="SUNDAY"
+                    type="button"
+                >
+                    <span>SUN</span>
+                </button>
+
+            </div>
+
+
+            <button
+                class="nav-arrow"
+                id="nextDay"
+                type="button"
+                aria-label="Next day"
+            >
+                ›
+            </button>
+
+        </nav>
+
+
+        <!-- =========================================
+             VIEWING LABEL
+        ========================================== -->
+
+        <div
+            class="viewing"
+            id="viewingLabel"
+        >
+            TODAY
+        </div>
+
+
+        <!-- =========================================
+             TODAY BUTTON
+        ========================================== -->
+
+        <button
+            class="today-button"
+            id="todayButton"
+            type="button"
+        >
+            TODAY
+        </button>
+
+
+        <!-- =========================================
+             SCHEDULE
+        ========================================== -->
+
         <section class="schedule">
 
             <div class="image-wrapper">
@@ -50,8 +178,9 @@
                 <img
                     id="scheduleImage"
                     src=""
-                    alt="Today's schedule"
+                    alt="Schedule"
                 >
+
 
                 <div class="pointer">
 
