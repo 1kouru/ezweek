@@ -4,6 +4,7 @@
 
 * {
     box-sizing: border-box;
+
     margin: 0;
     padding: 0;
 
@@ -19,7 +20,7 @@ body {
     min-width: 0;
     min-height: 100%;
 
-    background: #f8f8f8;
+    background: #f7f7f7;
 
     color: #111;
 
@@ -98,7 +99,7 @@ body {
         );
 
     box-shadow:
-        0 5px 25px
+        0 6px 24px
         rgba(
             0,
             0,
@@ -115,8 +116,6 @@ body {
     align-items: center;
 
     gap: 5px;
-
-    cursor: pointer;
 }
 
 
@@ -126,14 +125,14 @@ body {
     width: 18px;
     height: 2px;
 
-    border-radius: 2px;
+    border-radius: 10px;
 
     background: #111;
 }
 
 
 /* =========================================================
-   DAY NAVIGATION
+   TOP NAV
 ========================================================= */
 
 .day-navigation {
@@ -170,15 +169,18 @@ body {
 
     border-radius: 50%;
 
-    background: #fff;
+    background: rgba(
+        255,
+        255,
+        255,
+        .95
+    );
 
     color: #111;
 
     font-size: 25px;
 
     line-height: 1;
-
-    cursor: pointer;
 
     box-shadow:
         0 5px 20px
@@ -212,6 +214,15 @@ body {
     align-items: center;
 
     justify-content: center;
+
+    box-shadow:
+        0 7px 24px
+        rgba(
+            0,
+            0,
+            0,
+            .10
+        );
 }
 
 
@@ -250,13 +261,13 @@ body {
 
     padding-top:
         calc(
-            68px +
+            70px +
             env(safe-area-inset-top)
         );
 
     padding-bottom:
         calc(
-            74px +
+            76px +
             env(safe-area-inset-bottom)
         );
 
@@ -280,21 +291,34 @@ body {
 ========================================================= */
 
 .schedule-board {
+
     position: relative;
 
     width:
         min(
             94vw,
-            700px
+            720px
         );
 
     margin:
         0 auto;
 
+    padding-top: 30px;
+
+    padding-right: 18px;
+
+    padding-bottom: 110px;
+
     /*
-     * Никогда не используем
-     * фоновые grid-изображения.
+     * Это динамически увеличивается
+     * в зависимости от pointer.
      */
+
+    padding-left:
+        max(
+            76px,
+            var(--pointer-space, 58px)
+        );
 
     background:
         transparent !important;
@@ -302,34 +326,18 @@ body {
     background-image:
         none !important;
 
-    /*
-     * Левая безопасная область
-     * для большого pointer.
-     */
-
-    padding-top:
-        25px;
-
-    padding-right:
-        18px;
-
-    padding-bottom:
-        100px;
-
-    padding-left:
-        max(
-            48px,
-            var(--pointer-space, 46px)
-        );
-
     --grid-color:
         #e8e8e8;
 
     --grid-thickness:
         1px;
 
+    --time-column-width:
+        52px;
+
     --pointer-space:
-        46px;
+        58px;
+
 }
 
 
@@ -338,26 +346,72 @@ body {
 ========================================================= */
 
 .schedule-row {
+
     position: relative;
 
     min-height: 66px;
 
     display: grid;
 
+    /*
+     * Ширина TIME теперь ДИНАМИЧЕСКАЯ.
+     */
+
     grid-template-columns:
-        58px
+        var(--time-column-width)
         minmax(0, 1fr);
 
-    gap: 13px;
+    /*
+     * Вместо большого gap используем
+     * небольшое пространство непосредственно
+     * перед текстом.
+     */
+
+    gap: 14px;
 
     align-items: center;
 
-    padding: 8px 0;
+    padding:
+        9px 0;
 
     border-bottom:
         var(--grid-thickness)
         solid
         var(--grid-color);
+
+    transition:
+        background
+        .2s ease,
+        border-color
+        .2s ease;
+}
+
+
+/* =========================================================
+   CURRENT ROW
+========================================================= */
+
+.schedule-row.current-row {
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(
+                0,
+                0,
+                0,
+                .018
+            ),
+            rgba(
+                0,
+                0,
+                0,
+                .035
+            )
+        );
+
+    border-radius:
+        12px;
 }
 
 
@@ -366,29 +420,39 @@ body {
 ========================================================= */
 
 .schedule-time {
+
     min-width: 0;
 
     width: 100%;
 
     text-align: right;
 
-    white-space: nowrap;
+    white-space:
+        nowrap;
 
-    overflow: visible;
+    overflow:
+        visible;
 
-    line-height: 1.1;
+    line-height:
+        1.1;
 
     font-size:
-        var(--time-size, 11px)
-        !important;
+        var(
+            --time-size,
+            11px
+        ) !important;
 
     font-weight:
-        var(--time-weight, 600)
-        !important;
+        var(
+            --time-weight,
+            600
+        ) !important;
 
     color:
-        var(--time-color, #999999)
-        !important;
+        var(
+            --time-color,
+            #999
+        ) !important;
 
     font-family:
         Arial,
@@ -400,6 +464,7 @@ body {
 
     text-size-adjust:
         none;
+
 }
 
 
@@ -408,24 +473,40 @@ body {
 ========================================================= */
 
 .schedule-task {
+
     min-width: 0;
 
     max-width: 100%;
 
+    padding:
+        8px 10px;
+
+    border-radius:
+        10px;
+
     font-size:
-        var(--task-size, 15px)
-        !important;
+        var(
+            --task-size,
+            15px
+        ) !important;
 
     font-family:
-        var(--task-font, Arial)
-        !important;
+        var(
+            --task-font,
+            Arial
+        ) !important;
 
     font-weight:
-        var(--task-weight, 500)
-        !important;
+        var(
+            --task-weight,
+            500
+        ) !important;
 
     color:
-        var(--task-color, #111111);
+        var(
+            --task-color,
+            #111
+        );
 
     overflow-wrap:
         anywhere;
@@ -434,31 +515,14 @@ body {
         break-word;
 
     line-height:
-        1.2;
+        1.22;
 
     -webkit-text-size-adjust:
         none;
 
     text-size-adjust:
         none;
-}
 
-
-/* =========================================================
-   EMPTY
-========================================================= */
-
-.empty-state {
-    text-align: center;
-
-    padding:
-        80px 20px;
-
-    color: #aaa;
-
-    font-size: 13px;
-
-    letter-spacing: .5px;
 }
 
 
@@ -467,11 +531,13 @@ body {
 ========================================================= */
 
 .schedule-board.grid-rows {
+
     background:
         transparent !important;
 
     background-image:
         none !important;
+
 }
 
 
@@ -497,6 +563,7 @@ body {
 
     background-image:
         none !important;
+
 }
 
 
@@ -513,15 +580,6 @@ body {
    GRID — GRID
 ========================================================= */
 
-/*
- * В GRID нет никакого background-image.
- *
- * Только:
- *
- * 1. горизонтальная линия
- * 2. вертикальная линия между TIME и TEXT
- */
-
 .schedule-board.grid-grid {
 
     background:
@@ -529,8 +587,19 @@ body {
 
     background-image:
         none !important;
+
 }
 
+
+/*
+ * Здесь только ОДНА вертикальная линия.
+ *
+ * Она строится относительно
+ * реальной ширины TIME.
+ *
+ * Поэтому если timeSize меняется,
+ * линия автоматически едет.
+ */
 
 .schedule-board.grid-grid
 .schedule-row {
@@ -543,10 +612,6 @@ body {
 }
 
 
-/*
- * Единственная вертикальная линия.
- */
-
 .schedule-board.grid-grid
 .schedule-row::before {
 
@@ -555,9 +620,19 @@ body {
     position: absolute;
 
     top: 0;
+
     bottom: 0;
 
-    left: 58px;
+    /*
+     * Центр gap.
+     */
+
+    left:
+        calc(
+            var(--time-column-width)
+            +
+            7px
+        );
 
     width:
         var(--grid-thickness);
@@ -565,7 +640,22 @@ body {
     background:
         var(--grid-color);
 
+    opacity: .9;
+
     pointer-events: none;
+
+}
+
+
+/*
+ * Никаких других псевдосеток.
+ */
+
+.schedule-board::before,
+.schedule-board::after {
+
+    content: none !important;
+
 }
 
 
@@ -577,21 +667,21 @@ body {
 
     position: absolute;
 
-    z-index: 200;
+    z-index: 250;
 
     display: none;
-
-    pointer-events: none;
 
     align-items: center;
 
     justify-content: center;
 
+    pointer-events: none;
+
     transform:
         translateY(-50%);
 
     background-color:
-        #111111;
+        #111;
 
     background-image:
         none !important;
@@ -607,7 +697,21 @@ body {
         none !important;
 
     /*
-     * iOS Safari mask.
+     * Лёгкая визуальная тень делает
+     * pointer заметнее на светлом фоне.
+     */
+
+    box-shadow:
+        0 4px 12px
+        rgba(
+            0,
+            0,
+            0,
+            .10
+        );
+
+    /*
+     * Mask.
      */
 
     -webkit-mask-repeat:
@@ -627,13 +731,12 @@ body {
 
     mask-size:
         contain;
+
 }
 
 
 /*
- * Даже если старый JS/CSS
- * добавит .gradient,
- * градиента не будет.
+ * Никакого pointer gradient.
  */
 
 .time-pointer.gradient {
@@ -643,8 +746,14 @@ body {
 
     filter:
         none !important;
+
 }
 
+
+/*
+ * Старый символ больше
+ * не используется.
+ */
 
 #pointerSymbol {
 
@@ -655,7 +764,53 @@ body {
 
 
 /* =========================================================
-   BOTTOM NAVIGATION
+   POINTER — CURRENT ROW ACCENT
+========================================================= */
+
+.schedule-board.grid-none
+.schedule-row.current-row {
+
+    border-left:
+        2px solid
+        rgba(
+            0,
+            0,
+            0,
+            .08
+        );
+
+    padding-left:
+        8px;
+
+}
+
+
+/* =========================================================
+   EMPTY
+========================================================= */
+
+.empty-state {
+
+    padding:
+        90px 20px;
+
+    text-align:
+        center;
+
+    color:
+        #aaa;
+
+    font-size:
+        13px;
+
+    letter-spacing:
+        .5px;
+
+}
+
+
+/* =========================================================
+   BOTTOM NAV
 ========================================================= */
 
 .bottom-navigation {
@@ -663,10 +818,12 @@ body {
     position: fixed;
 
     left: 0;
+
     right: 0;
+
     bottom: 0;
 
-    z-index: 200;
+    z-index: 300;
 
     padding:
         7px
@@ -681,14 +838,14 @@ body {
             255,
             255,
             255,
-            .97
+            .96
         );
 
     -webkit-backdrop-filter:
-        blur(15px);
+        blur(18px);
 
     backdrop-filter:
-        blur(15px);
+        blur(18px);
 
     border-top:
         1px solid
@@ -696,8 +853,9 @@ body {
             0,
             0,
             0,
-            .06
+            .055
         );
+
 }
 
 
@@ -722,18 +880,21 @@ body {
 
     gap: 5px;
 
-    padding: 0;
-
     overflow:
         hidden !important;
 
+    padding: 0;
+
     scrollbar-width:
         none;
+
 }
 
 
 .days-scroll::-webkit-scrollbar {
+
     display: none;
+
 }
 
 
@@ -745,43 +906,64 @@ body {
 
     height: 40px;
 
-    border: 0;
+    border:
+        0;
 
-    border-radius: 11px;
+    border-radius:
+        11px;
 
-    background: #f1f1f1;
+    background:
+        #f0f0f0;
 
-    color: #999;
+    color:
+        #999;
 
-    font-size: 8px;
+    font-size:
+        8px;
 
-    font-weight: 700;
+    font-weight:
+        700;
 
-    letter-spacing: .3px;
+    letter-spacing:
+        .3px;
 
-    display: flex;
+    display:
+        flex;
 
-    flex-direction: column;
+    flex-direction:
+        column;
 
-    align-items: center;
+    align-items:
+        center;
 
-    justify-content: center;
+    justify-content:
+        center;
 
-    gap: 3px;
+    gap:
+        3px;
 
     white-space:
         nowrap;
 
-    overflow:
-        hidden;
 }
 
 
 .day-button.active {
 
-    background: #111;
+    background:
+        #111;
 
-    color: #fff;
+    color:
+        #fff;
+
+    box-shadow:
+        0 4px 12px
+        rgba(
+            0,
+            0,
+            0,
+            .10
+        );
 
 }
 
@@ -789,27 +971,32 @@ body {
 .day-button span {
 
     width: 3px;
+
     height: 3px;
 
-    border-radius: 50%;
+    border-radius:
+        50%;
 
     background:
         currentColor;
 
-    opacity: 0;
+    opacity:
+        0;
+
 }
 
 
 .day-button.today:not(.active)
 span {
 
-    opacity: .5;
+    opacity:
+        .45;
 
 }
 
 
 /* =========================================================
-   MENU OVERLAY
+   MENU
 ========================================================= */
 
 .menu-overlay {
@@ -825,7 +1012,7 @@ span {
             0,
             0,
             0,
-            .3
+            .28
         );
 
     opacity: 0;
@@ -834,7 +1021,8 @@ span {
         none;
 
     transition:
-        opacity .25s;
+        opacity .25s ease;
+
 }
 
 
@@ -844,18 +1032,16 @@ span {
 
     pointer-events:
         auto;
+
 }
 
-
-/* =========================================================
-   SIDE MENU
-========================================================= */
 
 .side-menu {
 
     position: fixed;
 
     top: 0;
+
     left: 0;
 
     width:
@@ -884,7 +1070,8 @@ span {
             env(safe-area-inset-bottom)
         );
 
-    background: #fff;
+    background:
+        #fff;
 
     transform:
         translate3d(
@@ -903,7 +1090,8 @@ span {
             1
         );
 
-    display: flex;
+    display:
+        flex;
 
     flex-direction:
         column;
@@ -913,6 +1101,7 @@ span {
 
     -webkit-overflow-scrolling:
         touch;
+
 }
 
 
@@ -930,56 +1119,74 @@ span {
 
 .menu-top {
 
-    display: flex;
+    display:
+        flex;
 
     justify-content:
         flex-end;
+
 }
 
 
 .close-menu {
 
-    width: 42px;
-    height: 42px;
+    width:
+        42px;
 
-    border: 0;
+    height:
+        42px;
+
+    border:
+        0;
 
     border-radius:
         50%;
 
-    background: #f2f2f2;
+    background:
+        #f2f2f2;
 
-    font-size: 27px;
+    font-size:
+        27px;
+
 }
 
 
 .menu-profile {
 
-    margin-top: 40px;
+    margin-top:
+        40px;
 
-    display: flex;
+    display:
+        flex;
 
     align-items:
         center;
 
-    gap: 14px;
+    gap:
+        14px;
+
 }
 
 
 .menu-avatar {
 
-    width: 55px;
-    height: 55px;
+    width:
+        55px;
 
-    flex: 0 0 55px;
+    height:
+        55px;
 
-    border-radius: 50%;
+    border-radius:
+        50%;
 
-    background: #111;
+    background:
+        #111;
 
-    color: #fff;
+    color:
+        #fff;
 
-    display: flex;
+    display:
+        flex;
 
     justify-content:
         center;
@@ -987,57 +1194,72 @@ span {
     align-items:
         center;
 
-    font-weight: 700;
+    font-weight:
+        700;
+
 }
 
 
 .menu-username {
 
-    font-size: 15px;
+    font-size:
+        15px;
 
-    font-weight: 700;
+    font-weight:
+        700;
+
 }
 
 
 .menu-email {
 
-    margin-top: 5px;
+    margin-top:
+        5px;
 
-    font-size: 11px;
+    font-size:
+        11px;
 
-    color: #999;
+    color:
+        #999;
 
-    max-width: 220px;
+    max-width:
+        220px;
 
-    overflow: hidden;
+    overflow:
+        hidden;
 
     text-overflow:
         ellipsis;
 
     white-space:
         nowrap;
+
 }
 
 
 .menu-links {
 
-    margin-top: 40px;
+    margin-top:
+        40px;
 
     border-top:
         1px solid
         #eee;
+
 }
 
 
 .menu-link {
 
-    height: 62px;
+    height:
+        62px;
 
     border-bottom:
         1px solid
         #eee;
 
-    display: flex;
+    display:
+        flex;
 
     align-items:
         center;
@@ -1048,13 +1270,18 @@ span {
     text-decoration:
         none;
 
-    color: #777;
+    color:
+        #777;
 
-    font-size: 10px;
+    font-size:
+        10px;
 
-    font-weight: 700;
+    font-weight:
+        700;
 
-    letter-spacing: 1.5px;
+    letter-spacing:
+        1.5px;
+
 }
 
 
@@ -1063,32 +1290,41 @@ span {
     margin-top:
         auto;
 
-    width: 100%;
-    height: 52px;
+    width:
+        100%;
 
-    background: #fff;
+    height:
+        52px;
+
+    background:
+        #fff;
 
     border:
         1px solid
         #ddd;
 
-    font-size: 10px;
+    font-size:
+        10px;
 
-    font-weight: 700;
+    font-weight:
+        700;
 
-    letter-spacing: 1.5px;
+    letter-spacing:
+        1.5px;
+
 }
 
 
 /* =========================================================
-   IPHONE
+   MOBILE / iPHONE
 ========================================================= */
 
 @media (max-width: 767px) {
 
     .menu-button {
 
-        left: 10px;
+        left:
+            10px;
 
         top:
             max(
@@ -1096,8 +1332,12 @@ span {
                 env(safe-area-inset-top)
             );
 
-        width: 42px;
-        height: 42px;
+        width:
+            42px;
+
+        height:
+            42px;
+
     }
 
 
@@ -1109,28 +1349,40 @@ span {
                 env(safe-area-inset-top)
             );
 
-        gap: 4px;
+        gap:
+            4px;
+
     }
 
 
     .nav-button {
 
-        width: 39px;
-        height: 39px;
+        width:
+            39px;
 
-        flex-basis: 39px;
+        height:
+            39px;
 
-        font-size: 23px;
+        flex-basis:
+            39px;
+
+        font-size:
+            23px;
+
     }
 
 
     .selected-day {
 
-        width: 106px;
+        width:
+            106px;
 
-        min-width: 106px;
+        min-width:
+            106px;
 
-        height: 39px;
+        height:
+            39px;
+
     }
 
 
@@ -1147,16 +1399,20 @@ span {
                 70px +
                 env(safe-area-inset-bottom)
             );
+
     }
 
 
     .schedule-board {
 
-        width: 100%;
+        width:
+            100%;
 
-        max-width: none;
+        max-width:
+            none;
 
-        margin: 0;
+        margin:
+            0;
 
         padding-top:
             18px;
@@ -1167,22 +1423,12 @@ span {
         padding-bottom:
             90px;
 
-        /*
-         * Указатель всегда имеет
-         * физическое место слева.
-         */
-
         padding-left:
             max(
-                55px,
+                70px,
                 var(--pointer-space)
             );
 
-        background:
-            transparent !important;
-
-        background-image:
-            none !important;
     }
 
 
@@ -1191,46 +1437,69 @@ span {
         min-height:
             62px;
 
-        grid-template-columns:
-            58px
-            minmax(0, 1fr);
+        gap:
+            12px;
 
-        gap: 9px;
+        grid-template-columns:
+            var(--time-column-width)
+            minmax(
+                0,
+                1fr
+            );
+
+        border-bottom-width:
+            var(--grid-thickness);
+
     }
 
 
     .schedule-board.grid-grid
     .schedule-row::before {
 
-        left: 58px;
+        left:
+            calc(
+                var(--time-column-width)
+                +
+                6px
+            );
+
+    }
+
+
+    .schedule-task {
+
+        padding:
+            7px
+            9px;
+
+        border-radius:
+            9px;
+
     }
 
 
     .days-scroll {
 
-        grid-template-columns:
-            repeat(
-                7,
-                minmax(
-                    0,
-                    1fr
-                )
-            ) !important;
-
-        gap: 3px;
+        gap:
+            3px;
 
         padding:
             0 3px;
+
     }
 
 
     .day-button {
 
-        height: 38px;
+        height:
+            38px;
 
-        border-radius: 9px;
+        border-radius:
+            9px;
 
-        font-size: 7px;
+        font-size:
+            7px;
+
     }
 
 
@@ -1238,13 +1507,14 @@ span {
 
         z-index:
             250;
+
     }
 
 }
 
 
 /* =========================================================
-   IPHONE 14+
+   iPHONE 14+
 ========================================================= */
 
 @media (
@@ -1257,6 +1527,7 @@ span {
 
         font-size:
             8px;
+
     }
 
 }
@@ -1272,6 +1543,7 @@ span {
 
         font-size:
             7px;
+
     }
 
 }
@@ -1285,15 +1557,20 @@ span {
 
     .menu-button {
 
-        left: 25px;
+        left:
+            25px;
 
-        top: 25px;
+        top:
+            25px;
+
     }
 
 
     .day-navigation {
 
-        top: 25px;
+        top:
+            25px;
+
     }
 
 
@@ -1301,13 +1578,15 @@ span {
 
         padding-top:
             78px;
+
     }
 
 
     .schedule-board {
 
         width:
-            700px;
+            720px;
+
     }
 
 }
