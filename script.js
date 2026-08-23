@@ -168,9 +168,7 @@ async function loadUser() {
             data,
             error
         } =
-            await supabase
-                .auth
-                .getSession();
+            await supabase.auth.getSession();
 
 
         if (error) {
@@ -229,14 +227,21 @@ async function loadSchedule() {
         }
 
 
-        scheduleData =
-            row?.data
-                ? normalizeSchedule(row.data)
-                : defaultSchedule();
+        if (row?.data) {
 
+            scheduleData =
+                normalizeSchedule(
+                    row.data
+                );
 
-        if (!row?.data) {
+        }
+        else {
+
+            scheduleData =
+                defaultSchedule();
+
             await saveSchedule();
+
         }
 
     }
@@ -299,9 +304,7 @@ function normalizeSchedule(input) {
     };
 
 
-    /*
-     * Compatibility with old data.
-     */
+    /* Old versions */
 
     if (
         !source.global?.gridMode &&
@@ -360,9 +363,7 @@ function normalizeSchedule(input) {
     }
 
 
-    /*
-     * Pointer.
-     */
+    /* Pointer */
 
     result.pointer.icon =
         Math.max(
@@ -398,9 +399,7 @@ function normalizeSchedule(input) {
     }
 
 
-    /*
-     * Tasks.
-     */
+    /* Tasks */
 
     DAYS.forEach(day => {
 
@@ -666,24 +665,84 @@ function getCurrentTask() {
 
     items.forEach(item => {
 
-        const d =
+        const currentDifference =
             Math.abs(
                 seconds(item.time) -
                 nowSeconds
             );
 
 
-        if (d < difference) {
+        if (
+            currentDifference <
+            difference
+        ) {
 
-            difference = d;
+            difference =
+                currentDifference;
 
-            closest = item;
+            closest =
+                item;
         }
 
     });
 
 
     return closest;
+}
+
+
+/* =========================================================
+   POINTER GUTTER
+========================================================= */
+
+function updatePointerGutter() {
+
+    if (!board) {
+        return;
+    }
+
+
+    const pointerSize =
+        Math.max(
+            10,
+            Math.min(
+                70,
+                Number(
+                    scheduleData.pointer?.size
+                ) || 28
+            )
+        );
+
+
+    /*
+     * Отступ небольшой,
+     * но достаточно большой,
+     * чтобы pointer не пересекал TIME.
+     *
+     * Вся таблица смещается только на
+     * величину левого gutter.
+     */
+
+    const gutter =
+        Math.max(
+            62,
+            Math.min(
+                92,
+                pointerSize + 34
+            )
+        );
+
+
+    board.style.setProperty(
+        "--pointer-gutter",
+        `${gutter}px`
+    );
+
+
+    board.style.setProperty(
+        "--pointer-size",
+        `${pointerSize}px`
+    );
 }
 
 
@@ -698,11 +757,29 @@ function render() {
     }
 
 
-    board.innerHTML = "";
+    board.innerHTML =
+        "";
 
 
     /*
-     * No background grid.
+     * Уничтожаем старые классы,
+     * которые могли остаться из старых
+     * версий CSS.
+     */
+
+    board.classList.remove(
+        "grid-rows",
+        "grid-grid",
+        "grid-none",
+        "grid-dots",
+        "grid-double",
+        "grid-soft",
+        "grid-wave"
+    );
+
+
+    /*
+     * Никаких фоновых сеток.
      */
 
     board.style.background =
@@ -724,11 +801,7 @@ function render() {
     );
 
 
-    board.style.setProperty(
-        "--pointer-size",
-        `${scheduleData.pointer.size}px`
-    );
-
+    updatePointerGutter();
 
     applyGrid();
 
@@ -766,7 +839,7 @@ function render() {
 
 
     requestAnimationFrame(
-        updatePointer
+        renderPointer
     );
 }
 
@@ -792,7 +865,7 @@ function createRow(item) {
 
 
     /*
-     * TIME SETTINGS
+     * TIME
      */
 
     row.style.setProperty(
@@ -818,7 +891,7 @@ function createRow(item) {
 
 
     /*
-     * TEXT SETTINGS
+     * TEXT
      */
 
     row.style.setProperty(
@@ -886,7 +959,7 @@ function createRow(item) {
 
 
     /*
-     * TEXT GRADIENT.
+     * Gradient только для текста.
      */
 
     if (
@@ -958,13 +1031,6 @@ function createRow(item) {
 
 function applyGrid() {
 
-    board.classList.remove(
-        "grid-rows",
-        "grid-grid",
-        "grid-none"
-    );
-
-
     if (
         scheduleData.global.gridMode ===
         "grid"
@@ -998,7 +1064,7 @@ function applyGrid() {
 
 
 /* =========================================================
-   POINTER
+   POINTER STYLE
 ========================================================= */
 
 function renderPointer() {
@@ -1055,42 +1121,6 @@ function renderPointer() {
         `${size}px`;
 
 
-    /*
-     * PNG -> MASK.
-     */
-
-    const iconUrl =
-        `url("icons/${icon}.png")`;
-
-
-    pointer.style.webkitMaskImage =
-        iconUrl;
-
-    pointer.style.maskImage =
-        iconUrl;
-
-
-    pointer.style.webkitMaskRepeat =
-        "no-repeat";
-
-    pointer.style.maskRepeat =
-        "no-repeat";
-
-
-    pointer.style.webkitMaskPosition =
-        "center";
-
-    pointer.style.maskPosition =
-        "center";
-
-
-    pointer.style.webkitMaskSize =
-        "contain";
-
-    pointer.style.maskSize =
-        "contain";
-
-
     pointer.style.backgroundColor =
         color;
 
@@ -1101,6 +1131,46 @@ function renderPointer() {
 
     pointer.style.filter =
         "none";
+
+
+    /*
+     * PNG -> mask.
+     */
+
+    const iconUrl =
+        `url("icons/${icon}.png")`;
+
+
+    pointer.style.webkitMaskImage =
+        iconUrl;
+
+
+    pointer.style.maskImage =
+        iconUrl;
+
+
+    pointer.style.webkitMaskRepeat =
+        "no-repeat";
+
+
+    pointer.style.maskRepeat =
+        "no-repeat";
+
+
+    pointer.style.webkitMaskPosition =
+        "center";
+
+
+    pointer.style.maskPosition =
+        "center";
+
+
+    pointer.style.webkitMaskSize =
+        "contain";
+
+
+    pointer.style.maskSize =
+        "contain";
 
 
     if (pointerSymbol) {
@@ -1167,7 +1237,7 @@ function updatePointerPosition() {
 
 
     /*
-     * Центр текущей строки.
+     * Вертикально всегда по центру строки.
      */
 
     const y =
@@ -1181,11 +1251,11 @@ function updatePointerPosition() {
 
 
     /*
-     * Небольшой динамический
-     * отступ от края.
+     * Pointer стоит в центре
+     * отдельного gutter.
      *
-     * Маленький pointer -> маленький gap.
-     * Большой pointer -> немного больший gap.
+     * Важно:
+     * он НЕ залезает в колонку TIME.
      */
 
     const pointerSize =
@@ -1197,18 +1267,25 @@ function updatePointerPosition() {
         );
 
 
-    const sidePadding =
+    const gutter =
         Math.max(
-            8,
+            62,
             Math.min(
-                18,
-                pointerSize * 0.28
+                92,
+                pointerSize + 34
             )
         );
 
 
+    const x =
+        (
+            gutter -
+            pointerSize
+        ) / 2;
+
+
     pointer.style.left =
-        `${sidePadding}px`;
+        `${x}px`;
 
 
     pointer.style.top =
@@ -1231,7 +1308,7 @@ function updateDayUI() {
 
 
     /*
-     * Старые DAY/TIME скрываем.
+     * Старые DAY/TIME скрыты.
      */
 
     if (dayName) {
@@ -1279,7 +1356,6 @@ function updateDayUI() {
                 button.dataset.day ===
                 today
             );
-
         }
     );
 }
@@ -1293,6 +1369,7 @@ function selectDay(day) {
 
     selectedDay =
         day;
+
 
     updateDayUI();
 
@@ -1315,7 +1392,7 @@ function updateClock() {
 
 
 /* =========================================================
-   DAY EVENTS
+   DAY BUTTONS
 ========================================================= */
 
 if (prevDay) {
@@ -1522,9 +1599,14 @@ window.addEventListener(
     () => {
 
         requestAnimationFrame(
-            updatePointerPosition
-        );
+            () => {
 
+                updatePointerGutter();
+
+                updatePointerPosition();
+
+            }
+        );
     }
 );
 
