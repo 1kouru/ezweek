@@ -1,9 +1,9 @@
 import { supabase } from "./supabase.js";
 
 
-/* =====================================================
+/* =========================================================
    CONSTANTS
-===================================================== */
+========================================================= */
 
 const DAYS = [
     "MONDAY",
@@ -16,22 +16,52 @@ const DAYS = [
 ];
 
 
+const BASIC_COLORS = [
+    "#111111",
+    "#333333",
+    "#666666",
+    "#999999",
+    "#CCCCCC",
+    "#FFFFFF",
+
+    "#FF3B30",
+    "#FF6B6B",
+    "#FF9500",
+    "#FFCC00",
+    "#34C759",
+    "#30D158",
+    "#00C7BE",
+    "#32ADE6",
+    "#007AFF",
+    "#5856D6",
+    "#AF52DE",
+    "#FF2D55",
+
+    "#7C5CFF",
+    "#FF4ECD",
+    "#FF7A59",
+    "#6C63FF",
+    "#2DD4BF",
+    "#F59E0B"
+];
+
+
 const FONTS = [
     ["Arial", "Arial"],
     ["Helvetica", "Helvetica"],
-    ["Trebuchet MS", "Trebuchet"],
     ["Verdana", "Verdana"],
+    ["Trebuchet MS", "Trebuchet"],
+    ["Tahoma", "Tahoma"],
     ["Georgia", "Georgia"],
     ["Times New Roman", "Times"],
-    ["Courier New", "Mono"],
-    ["Impact", "Impact"],
-    ["Tahoma", "Tahoma"],
-    ["Palatino Linotype", "Palatino"],
     ["Garamond", "Garamond"],
+    ["Palatino Linotype", "Palatino"],
+    ["Courier New", "Courier"],
     ["Lucida Console", "Console"],
-    ["Comic Sans MS", "Comic"],
-    ["Brush Script MT", "Script"],
-    ["Copperplate", "Copperplate"]
+    ["Impact", "Impact"],
+    ["Arial Black", "Arial Black"],
+    ["Brush Script MT", "Brush Script"],
+    ["Comic Sans MS", "Comic Sans"]
 ];
 
 
@@ -40,13 +70,16 @@ let user = null;
 let data = null;
 let saveTimer = null;
 
-let currentColorTarget = null;
-let recentColors = [];
+let openTaskId = null;
+
+let colorTarget = null;
+
+let currentColor = "#111111";
 
 
-/* =====================================================
+/* =========================================================
    ELEMENTS
-===================================================== */
+========================================================= */
 
 const tasks =
     document.getElementById("tasks");
@@ -72,14 +105,14 @@ const gridPanel =
 const pointerPanel =
     document.getElementById("pointerPanel");
 
+const gridColor =
+    document.getElementById("gridColor");
+
 const gridThickness =
     document.getElementById("gridThickness");
 
 const gridThicknessValue =
     document.getElementById("gridThicknessValue");
-
-const gridPreviewArea =
-    document.getElementById("gridPreviewArea");
 
 const pointerSize =
     document.getElementById("pointerSize");
@@ -90,43 +123,25 @@ const pointerSizeValue =
 const pointerGradient =
     document.getElementById("pointerGradient");
 
-const pointerGradientBox =
-    document.getElementById("pointerGradientBox");
+const pointerGradientOptions =
+    document.getElementById("pointerGradientOptions");
 
-const pointerPreviewIcon =
-    document.getElementById("pointerPreviewIcon");
+const colorModal =
+    document.getElementById("colorModal");
 
-const iconPickerButton =
-    document.getElementById("iconPickerButton");
+const fontModal =
+    document.getElementById("fontModal");
 
-const iconPicker =
-    document.getElementById("iconPicker");
-
-const selectedIconPreview =
-    document.getElementById("selectedIconPreview");
-
-const colorOverlay =
-    document.getElementById("colorOverlay");
+const iconModal =
+    document.getElementById("iconModal");
 
 const systemColorInput =
     document.getElementById("systemColorInput");
 
-const systemColorButton =
-    document.getElementById("systemColorButton");
 
-const recentColorsContainer =
-    document.getElementById("recentColors");
-
-const fontOverlay =
-    document.getElementById("fontOverlay");
-
-const fontList =
-    document.getElementById("fontList");
-
-
-/* =====================================================
+/* =========================================================
    DEFAULT DATA
-===================================================== */
+========================================================= */
 
 function defaultData() {
 
@@ -142,9 +157,13 @@ function defaultData() {
         days,
 
         global: {
+
             gridMode: "rows",
-            gridThickness: 1,
-            gridColor: "#e5e5e5"
+
+            gridColor: "#E8E8E8",
+
+            gridThickness: 1
+
         },
 
         pointer: {
@@ -153,88 +172,113 @@ function defaultData() {
 
             color: "#111111",
 
-            size: 28,
+            size: 24,
 
             gradient: false,
 
-            gradientStart: "#ff4ecd",
+            gradientStart: "#FF4ECD",
 
-            gradientEnd: "#7c5cff"
+            gradientEnd: "#7C5CFF"
 
         }
 
     };
+
 }
 
 
-/* =====================================================
-   DEFAULT TASK
-===================================================== */
+/* =========================================================
+   TASK
+========================================================= */
 
 function createDefaultTask(copy = null) {
 
     if (copy) {
 
-        return {
-            ...JSON.parse(
+        const cloned =
+            JSON.parse(
                 JSON.stringify(copy)
-            ),
-            id: crypto.randomUUID()
-        };
+            );
+
+        cloned.id =
+            crypto.randomUUID();
+
+        return cloned;
 
     }
 
 
     return {
 
-        id: crypto.randomUUID(),
+        id:
+            crypto.randomUUID(),
 
-        time: "08:00",
+        time:
+            "08:00",
 
-        text: "NEW TASK",
-
-
-        timeColor: "#999999",
-
-        timeSize: 11,
-
-        timeWeight: 600,
+        text:
+            "NEW TASK",
 
 
-        color: "#111111",
+        timeColor:
+            "#999999",
 
-        fontSize: 15,
+        timeSize:
+            11,
 
-        fontFamily: "Arial",
+        timeWeight:
+            600,
 
-        fontWeight: 500,
+
+        color:
+            "#111111",
+
+        fontSize:
+            15,
+
+        fontFamily:
+            "Arial",
+
+        fontWeight:
+            500,
+
+        gradient:
+            false,
+
+        gradientStart:
+            "#FF4ECD",
+
+        gradientEnd:
+            "#7C5CFF",
 
 
-        gradient: false,
+        icon:
+            1,
 
-        gradientStart: "#ff4ecd",
-
-        gradientEnd: "#7c5cff"
+        iconColor:
+            "#111111"
 
     };
 
 }
 
 
-/* =====================================================
+/* =========================================================
    AUTH
-===================================================== */
+========================================================= */
 
 async function initUser() {
 
     const {
         data: sessionData
-    } = await supabase.auth.getSession();
+    } =
+        await supabase.auth.getSession();
 
 
     if (!sessionData.session) {
 
-        window.location.href = "auth.html";
+        window.location.href =
+            "auth.html";
 
         return false;
 
@@ -249,9 +293,9 @@ async function initUser() {
 }
 
 
-/* =====================================================
+/* =========================================================
    LOAD
-===================================================== */
+========================================================= */
 
 async function loadData() {
 
@@ -263,9 +307,16 @@ async function loadData() {
         error
     } =
         await supabase
+
             .from("schedules")
+
             .select("data")
-            .eq("user_id", user.id)
+
+            .eq(
+                "user_id",
+                user.id
+            )
+
             .maybeSingle();
 
 
@@ -297,9 +348,9 @@ async function loadData() {
 }
 
 
-/* =====================================================
+/* =========================================================
    NORMALIZE
-===================================================== */
+========================================================= */
 
 function normalize() {
 
@@ -331,27 +382,50 @@ function normalize() {
     };
 
 
+    /*
+     * Старый формат grid
+     */
+
+    if (
+        data.global.grid &&
+        !data.global.gridMode
+    ) {
+
+        data.global.gridMode =
+            "rows";
+
+    }
+
+
     DAYS.forEach(day => {
 
-        if (!Array.isArray(data.days[day])) {
+        if (
+            !Array.isArray(
+                data.days[day]
+            )
+        ) {
             data.days[day] = [];
         }
 
 
         data.days[day] =
-            data.days[day].map(task => ({
-                ...createDefaultTask(),
-                ...task
-            }));
+            data.days[day].map(task => {
+
+                return {
+                    ...createDefaultTask(),
+                    ...task
+                };
+
+            });
 
     });
 
 }
 
 
-/* =====================================================
+/* =========================================================
    SAVE
-===================================================== */
+========================================================= */
 
 async function save() {
 
@@ -369,17 +443,30 @@ async function save() {
         error
     } =
         await supabase
+
             .from("schedules")
+
             .upsert(
+
                 {
-                    user_id: user.id,
-                    data,
+
+                    user_id:
+                        user.id,
+
+                    data:
+                        data,
+
                     updated_at:
-                        new Date().toISOString()
+                        new Date()
+                            .toISOString()
+
                 },
+
                 {
-                    onConflict: "user_id"
+                    onConflict:
+                        "user_id"
                 }
+
             );
 
 
@@ -391,6 +478,11 @@ async function save() {
         console.error(error);
 
         setStatus("ERROR");
+
+        alert(
+            "Ошибка сохранения:\n\n" +
+            error.message
+        );
 
         return false;
 
@@ -406,7 +498,9 @@ async function save() {
             saveStatus.textContent ===
             "SAVED ✓"
         ) {
+
             setStatus("READY");
+
         }
 
     }, 1200);
@@ -416,10 +510,6 @@ async function save() {
 
 }
 
-
-/* =====================================================
-   AUTOSAVE
-===================================================== */
 
 function queueSave() {
 
@@ -436,18 +526,32 @@ function queueSave() {
 }
 
 
-/* =====================================================
-   STATUS
-===================================================== */
-
 function setStatus(text) {
-    saveStatus.textContent = text;
+
+    saveStatus.textContent =
+        text;
+
 }
 
 
-/* =====================================================
+/* =========================================================
    GLOBAL PANELS
-===================================================== */
+========================================================= */
+
+function closeTasks() {
+
+    openTaskId = null;
+
+    document
+        .querySelectorAll(".task-card.open")
+        .forEach(card => {
+
+            card.classList.remove("open");
+
+        });
+
+}
+
 
 function closeGlobalPanels() {
 
@@ -457,41 +561,33 @@ function closeGlobalPanels() {
     gridButton.classList.remove("active");
     pointerButton.classList.remove("active");
 
-    tasks.classList.remove("hidden");
-
 }
 
 
-/*
-    GRID / POINTER are mutually exclusive.
-    When either is open, tasks disappear.
-*/
+function openGlobalPanel(panel) {
 
-function toggleGlobalPanel(panel, button) {
-
-    const isOpen =
+    const alreadyOpen =
         !panel.classList.contains("hidden");
 
 
-    gridPanel.classList.add("hidden");
-    pointerPanel.classList.add("hidden");
+    closeGlobalPanels();
 
-    gridButton.classList.remove("active");
-    pointerButton.classList.remove("active");
+    closeTasks();
 
-    if (isOpen) {
 
-        tasks.classList.remove("hidden");
+    if (!alreadyOpen) {
 
-        return;
+        panel.classList.remove("hidden");
+
+        if (panel === gridPanel) {
+            gridButton.classList.add("active");
+        }
+
+        if (panel === pointerPanel) {
+            pointerButton.classList.add("active");
+        }
 
     }
-
-
-    panel.classList.remove("hidden");
-    button.classList.add("active");
-
-    tasks.classList.add("hidden");
 
 }
 
@@ -499,10 +595,9 @@ function toggleGlobalPanel(panel, button) {
 gridButton.addEventListener(
     "click",
     () => {
-        toggleGlobalPanel(
-            gridPanel,
-            gridButton
-        );
+
+        openGlobalPanel(gridPanel);
+
     }
 );
 
@@ -510,16 +605,17 @@ gridButton.addEventListener(
 pointerButton.addEventListener(
     "click",
     () => {
-        toggleGlobalPanel(
-            pointerPanel,
-            pointerButton
-        );
+
+        openGlobalPanel(pointerPanel);
+
     }
 );
 
 
 document
-    .querySelectorAll("[data-close]")
+    .querySelectorAll(
+        "[data-close-panel]"
+    )
     .forEach(button => {
 
         button.addEventListener(
@@ -528,18 +624,22 @@ document
 
                 closeGlobalPanels();
 
+                renderTasks();
+
             }
         );
 
     });
 
 
-/* =====================================================
+/* =========================================================
    DAYS
-===================================================== */
+========================================================= */
 
 document
-    .querySelectorAll(".day-tabs button")
+    .querySelectorAll(
+        ".day-tabs button"
+    )
     .forEach(button => {
 
         button.addEventListener(
@@ -549,9 +649,9 @@ document
                 selectedDay =
                     button.dataset.day;
 
-                updateTabs();
+                openTaskId = null;
 
-                closeAllTaskEditors();
+                updateTabs();
 
                 renderTasks();
 
@@ -564,7 +664,9 @@ document
 function updateTabs() {
 
     document
-        .querySelectorAll(".day-tabs button")
+        .querySelectorAll(
+            ".day-tabs button"
+        )
         .forEach(button => {
 
             button.classList.toggle(
@@ -578,9 +680,9 @@ function updateTabs() {
 }
 
 
-/* =====================================================
+/* =========================================================
    ADD TASK
-===================================================== */
+========================================================= */
 
 addTaskButton.addEventListener(
     "click",
@@ -588,7 +690,11 @@ addTaskButton.addEventListener(
 
         closeGlobalPanels();
 
-        closeAllTaskEditors();
+        /*
+         * Предыдущая задача закрывается.
+         */
+
+        openTaskId = null;
 
 
         const current =
@@ -605,6 +711,11 @@ addTaskButton.addEventListener(
             createDefaultTask(last);
 
 
+        /*
+         * Настройки последней задачи
+         * копируются.
+         */
+
         if (last) {
 
             task.time =
@@ -618,48 +729,40 @@ addTaskButton.addEventListener(
 
         current.push(task);
 
+        openTaskId =
+            task.id;
+
 
         renderTasks();
 
         queueSave();
 
 
-        requestAnimationFrame(() => {
+        setTimeout(() => {
 
-            const cards =
-                tasks.querySelectorAll(
-                    ".task-card"
+            const card =
+                document.querySelector(
+                    `[data-task-id="${task.id}"]`
                 );
 
-            const lastCard =
-                cards[cards.length - 1];
+            if (card) {
 
-
-            if (lastCard) {
-
-                lastCard.scrollIntoView({
+                card.scrollIntoView({
                     behavior: "smooth",
                     block: "center"
                 });
 
-                const expand =
-                    lastCard.querySelector(
-                        ".expand-task"
-                    );
-
-                expand?.click();
-
             }
 
-        });
+        }, 80);
 
     }
 );
 
 
-/* =====================================================
+/* =========================================================
    DUPLICATE
-===================================================== */
+========================================================= */
 
 function duplicateTask(item) {
 
@@ -674,58 +777,55 @@ function duplicateTask(item) {
         );
 
 
-    data.days[selectedDay].push(copy);
+    data.days[selectedDay]
+        .push(copy);
 
 
-    closeAllTaskEditors();
+    openTaskId =
+        copy.id;
+
 
     renderTasks();
 
     queueSave();
 
 
-    requestAnimationFrame(() => {
+    setTimeout(() => {
 
-        const cards =
-            tasks.querySelectorAll(
-                ".task-card"
+        const card =
+            document.querySelector(
+                `[data-task-id="${copy.id}"]`
             );
 
-        const last =
-            cards[cards.length - 1];
+        if (card) {
 
-
-        if (last) {
-
-            last.scrollIntoView({
+            card.scrollIntoView({
                 behavior: "smooth",
                 block: "center"
             });
 
-            last.querySelector(
-                ".expand-task"
-            )?.click();
-
         }
 
-    });
+    }, 80);
 
 }
 
 
-/* =====================================================
-   ADD MINUTES
-===================================================== */
+/* =========================================================
+   TIME
+========================================================= */
 
 function addMinutes(time, minutes) {
 
-    const [h, m] =
-        time.split(":").map(Number);
+    const parts =
+        time
+            .split(":")
+            .map(Number);
 
 
     let total =
-        h * 60 +
-        m +
+        parts[0] * 60 +
+        parts[1] +
         minutes;
 
 
@@ -739,50 +839,26 @@ function addMinutes(time, minutes) {
         );
 
 
-    const hh =
+    const h =
         String(
             Math.floor(total / 60)
         ).padStart(2, "0");
 
 
-    const mm =
+    const m =
         String(
             total % 60
         ).padStart(2, "0");
 
 
-    return `${hh}:${mm}`;
+    return `${h}:${m}`;
 
 }
 
 
-/* =====================================================
-   TASK EDITOR STATE
-===================================================== */
-
-function closeAllTaskEditors() {
-
-    document
-        .querySelectorAll(".task-card")
-        .forEach(card => {
-
-            card.classList.remove("open");
-
-            const body =
-                card.querySelector(".task-body");
-
-            if (body) {
-                body.classList.add("hidden");
-            }
-
-        });
-
-}
-
-
-/* =====================================================
-   RENDER TASKS
-===================================================== */
+/* =========================================================
+   RENDER
+========================================================= */
 
 function renderTasks() {
 
@@ -802,14 +878,19 @@ function renderTasks() {
     if (!items.length) {
 
         const empty =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
-        empty.className = "empty";
+        empty.className =
+            "empty";
 
         empty.textContent =
-            "Tap + ADD TASK to create a task";
+            "Нажми + ADD TASK";
 
-        tasks.appendChild(empty);
+        tasks.appendChild(
+            empty
+        );
 
         return;
 
@@ -827,21 +908,36 @@ function renderTasks() {
 }
 
 
-/* =====================================================
+/* =========================================================
    TASK CARD
-===================================================== */
+========================================================= */
 
 function createTaskCard(item) {
 
     const card =
-        document.createElement("article");
+        document.createElement(
+            "article"
+        );
 
-    card.className = "task-card";
+
+    card.className =
+        "task-card";
 
 
-    /* -------------------------------------------------
+    card.dataset.taskId =
+        item.id;
+
+
+    if (item.id === openTaskId) {
+
+        card.classList.add("open");
+
+    }
+
+
+    /* -----------------------------------------
        PREVIEW
-    ------------------------------------------------- */
+    ----------------------------------------- */
 
     const preview =
         document.createElement("div");
@@ -851,99 +947,103 @@ function createTaskCard(item) {
 
 
     const timePreview =
-        document.createElement("button");
-
-    timePreview.type = "button";
+        document.createElement("div");
 
     timePreview.className =
-        "task-preview-time";
+        "task-time-preview";
 
 
     const textPreview =
-        document.createElement("button");
-
-    textPreview.type = "button";
+        document.createElement("div");
 
     textPreview.className =
-        "task-preview-text";
+        "task-text-preview";
 
 
-    const expand =
+    const toggle =
         document.createElement("button");
 
-    expand.type = "button";
+    toggle.type = "button";
 
-    expand.className =
-        "expand-task";
+    toggle.className =
+        "task-preview-toggle";
 
-    expand.textContent = "⌄";
+    toggle.textContent = "⌄";
 
 
     preview.append(
         timePreview,
         textPreview,
-        expand
+        toggle
     );
 
 
-    card.appendChild(preview);
+    card.appendChild(
+        preview
+    );
 
 
-    /* -------------------------------------------------
-       BODY
-    ------------------------------------------------- */
+    /* -----------------------------------------
+       SETTINGS
+    ----------------------------------------- */
 
-    const body =
+    const settings =
         document.createElement("div");
 
-    body.className =
-        "task-body hidden";
+    settings.className =
+        "task-settings";
 
 
-    /* =================================================
+    card.appendChild(
+        settings
+    );
+
+
+    /* -----------------------------------------
        TIME
-    ================================================= */
+    ----------------------------------------- */
 
     const timeSection =
         document.createElement("section");
 
     timeSection.className =
-        "editor-section";
+        "task-section";
 
 
-    const timeHeader =
-        document.createElement("div");
-
-    timeHeader.className =
-        "section-header";
-
-
-    timeHeader.innerHTML = `
-        <span class="section-name">TIME</span>
+    timeSection.innerHTML = `
+        <div class="section-head">
+            <div class="section-title">TIME</div>
+        </div>
     `;
 
 
     const timeInput =
         document.createElement("input");
 
-    timeInput.type = "time";
+    timeInput.type =
+        "time";
 
     timeInput.className =
-        "task-time-input";
+        "time-editor";
 
     timeInput.value =
         item.time;
+
+
+    timeSection.appendChild(
+        timeInput
+    );
 
 
     const timeControls =
         document.createElement("div");
 
     timeControls.className =
-        "control-grid";
+        "time-controls";
 
 
-    timeControls.append(
-        createRangeControl(
+    timeControls.appendChild(
+        rangeControl(
             "SIZE",
             8,
             25,
@@ -960,9 +1060,8 @@ function createTaskCard(item) {
     );
 
 
-    timeControls.append(
-        createColorControl(
-            "COLOR",
+    timeControls.appendChild(
+        colorCompactControl(
             item.timeColor,
             value => {
 
@@ -976,8 +1075,11 @@ function createTaskCard(item) {
     );
 
 
-    timeControls.append(
-        createWeightControl(
+    timeControls.appendChild(
+        rangeControl(
+            "WEIGHT",
+            300,
+            900,
             item.timeWeight,
             value => {
 
@@ -986,55 +1088,36 @@ function createTaskCard(item) {
 
                 updatePreview();
 
-            }
+            },
+            100
         )
     );
 
 
-    timeSection.append(
-        timeHeader,
-        timeInput,
+    settings.appendChild(
+        timeSection
+    );
+
+    timeSection.appendChild(
         timeControls
     );
 
 
-    /* =================================================
-       TIME GRADIENT
-    ================================================= */
-
-    const timeGradient =
-        createGradientControls(
-            "TIME GRADIENT",
-            item,
-            updatePreview
-        );
-
-
-    timeSection.append(
-        timeGradient
-    );
-
-
-    /* =================================================
+    /* -----------------------------------------
        TEXT
-    ================================================= */
+    ----------------------------------------- */
 
     const textSection =
         document.createElement("section");
 
     textSection.className =
-        "editor-section";
+        "task-section";
 
 
-    const textHeader =
-        document.createElement("div");
-
-    textHeader.className =
-        "section-header";
-
-
-    textHeader.innerHTML = `
-        <span class="section-name">TEXT</span>
+    textSection.innerHTML = `
+        <div class="section-head">
+            <div class="section-title">TEXT</div>
+        </div>
     `;
 
 
@@ -1042,7 +1125,7 @@ function createTaskCard(item) {
         document.createElement("textarea");
 
     textInput.className =
-        "task-text-input";
+        "text-editor";
 
     textInput.rows = 1;
 
@@ -1050,15 +1133,20 @@ function createTaskCard(item) {
         item.text;
 
 
+    textSection.appendChild(
+        textInput
+    );
+
+
     const textControls =
         document.createElement("div");
 
     textControls.className =
-        "control-grid";
+        "text-controls";
 
 
-    textControls.append(
-        createRangeControl(
+    textControls.appendChild(
+        rangeControl(
             "SIZE",
             8,
             50,
@@ -1075,9 +1163,8 @@ function createTaskCard(item) {
     );
 
 
-    textControls.append(
-        createColorControl(
-            "COLOR",
+    textControls.appendChild(
+        colorCompactControl(
             item.color,
             value => {
 
@@ -1091,8 +1178,11 @@ function createTaskCard(item) {
     );
 
 
-    textControls.append(
-        createWeightControl(
+    textControls.appendChild(
+        rangeControl(
+            "WEIGHT",
+            300,
+            900,
             item.fontWeight,
             value => {
 
@@ -1101,24 +1191,20 @@ function createTaskCard(item) {
 
                 updatePreview();
 
-            }
+            },
+            100
         )
     );
 
 
-    const fontControl =
-        document.createElement("div");
-
-    fontControl.className =
-        "control";
+    textSection.appendChild(
+        textControls
+    );
 
 
-    fontControl.innerHTML = `
-        <div class="control-label">
-            <span>FONT</span>
-        </div>
-    `;
-
+    /* -----------------------------------------
+       FONT
+    ----------------------------------------- */
 
     const fontButton =
         document.createElement("button");
@@ -1128,12 +1214,31 @@ function createTaskCard(item) {
     fontButton.className =
         "font-button";
 
-    fontButton.textContent =
+
+    const fontPreview =
+        document.createElement("span");
+
+    fontPreview.className =
+        "font-button-preview";
+
+    fontPreview.textContent =
         item.fontFamily;
 
 
-    fontButton.style.fontFamily =
-        item.fontFamily;
+    const fontArrow =
+        document.createElement("span");
+
+    fontArrow.className =
+        "font-button-arrow";
+
+    fontArrow.textContent =
+        "›";
+
+
+    fontButton.append(
+        fontPreview,
+        fontArrow
+    );
 
 
     fontButton.addEventListener(
@@ -1142,7 +1247,6 @@ function createTaskCard(item) {
 
             openFontPicker(
                 item,
-                fontButton,
                 updatePreview
             );
 
@@ -1150,49 +1254,241 @@ function createTaskCard(item) {
     );
 
 
-    fontControl.appendChild(
+    textSection.appendChild(
         fontButton
     );
 
 
-    textControls.appendChild(
-        fontControl
+    /* -----------------------------------------
+       GRADIENT
+    ----------------------------------------- */
+
+    const gradientBox =
+        document.createElement("div");
+
+    gradientBox.className =
+        "gradient-box";
+
+
+    const gradientHeader =
+        document.createElement("div");
+
+    gradientHeader.className =
+        "gradient-header";
+
+
+    gradientHeader.innerHTML = `
+        <label>
+            <input
+                type="checkbox"
+                ${item.gradient ? "checked" : ""}
+            >
+            GRADIENT
+        </label>
+    `;
+
+
+    gradientBox.appendChild(
+        gradientHeader
     );
 
 
-    textSection.append(
-        textHeader,
-        textInput,
-        textControls
+    const gradientColors =
+        document.createElement("div");
+
+    gradientColors.className =
+        "gradient-colors";
+
+
+    if (!item.gradient) {
+
+        gradientColors.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+    gradientColors.append(
+        makeColorTrigger(
+            item.gradientStart,
+            value => {
+
+                item.gradientStart =
+                    value;
+
+                updatePreview();
+
+            }
+        ),
+
+        makeColorTrigger(
+            item.gradientEnd,
+            value => {
+
+                item.gradientEnd =
+                    value;
+
+                updatePreview();
+
+            }
+        )
     );
 
 
-    /* =================================================
-       TEXT GRADIENT
-    ================================================= */
+    gradientBox.appendChild(
+        gradientColors
+    );
 
-    const textGradient =
-        createGradientControls(
-            "TEXT GRADIENT",
-            item,
-            updatePreview
+
+    const gradientCheckbox =
+        gradientHeader.querySelector(
+            "input"
         );
 
 
-    textSection.append(
-        textGradient
+    gradientCheckbox.addEventListener(
+        "change",
+        () => {
+
+            item.gradient =
+                gradientCheckbox.checked;
+
+
+            gradientColors.classList.toggle(
+                "hidden",
+                !item.gradient
+            );
+
+
+            updatePreview();
+
+            queueSave();
+
+        }
     );
 
 
-    body.append(
-        timeSection,
+    textSection.appendChild(
+        gradientBox
+    );
+
+
+    settings.appendChild(
         textSection
     );
 
 
-    /* =================================================
+    /* -----------------------------------------
+       ICON
+    ----------------------------------------- */
+
+    const iconSection =
+        document.createElement("section");
+
+    iconSection.className =
+        "task-section";
+
+
+    const iconHead =
+        document.createElement("div");
+
+    iconHead.className =
+        "section-head";
+
+
+    iconHead.innerHTML = `
+        <div class="section-title">ICON</div>
+    `;
+
+
+    iconSection.appendChild(
+        iconHead
+    );
+
+
+    const iconButton =
+        document.createElement("button");
+
+    iconButton.type =
+        "button";
+
+    iconButton.className =
+        "setting-big-button";
+
+
+    const iconShape =
+        document.createElement("span");
+
+    iconShape.className =
+        "icon-display";
+
+
+    const iconInfo =
+        document.createElement("span");
+
+    iconInfo.innerHTML = `
+        <b>CHANGE ICON</b>
+        <small>your PNG icons</small>
+    `;
+
+
+    const iconArrow =
+        document.createElement("i");
+
+    iconArrow.textContent =
+        "›";
+
+
+    iconButton.append(
+        iconShape,
+        iconInfo,
+        iconArrow
+    );
+
+
+    iconButton.addEventListener(
+        "click",
+        () => {
+
+            openIconPicker(
+                item,
+                updatePreview
+            );
+
+        }
+    );
+
+
+    iconSection.appendChild(
+        iconButton
+    );
+
+
+    iconSection.appendChild(
+        makeColorSetting(
+            "ICON COLOR",
+            item.iconColor,
+            value => {
+
+                item.iconColor =
+                    value;
+
+                updatePreview();
+
+            }
+        )
+    );
+
+
+    settings.appendChild(
+        iconSection
+    );
+
+
+    /* -----------------------------------------
        ACTIONS
-    ================================================= */
+    ----------------------------------------- */
 
     const actions =
         document.createElement("div");
@@ -1204,114 +1500,77 @@ function createTaskCard(item) {
     const duplicate =
         document.createElement("button");
 
-    duplicate.type = "button";
+    duplicate.type =
+        "button";
 
     duplicate.className =
-        "action-button";
+        "duplicate-button";
 
     duplicate.textContent =
         "DUPLICATE";
 
 
-    const remove =
+    const deleteButton =
         document.createElement("button");
 
-    remove.type = "button";
+    deleteButton.type =
+        "button";
 
-    remove.className =
-        "action-button delete";
+    deleteButton.className =
+        "delete-button";
 
-    remove.textContent =
+    deleteButton.textContent =
         "DELETE";
 
 
     actions.append(
         duplicate,
-        remove
+        deleteButton
     );
 
 
-    body.appendChild(actions);
+    settings.appendChild(
+        actions
+    );
 
-    card.appendChild(body);
 
-
-    /* =================================================
+    /* -----------------------------------------
        EVENTS
-    ================================================= */
+    ----------------------------------------- */
 
-    expand.addEventListener(
+    toggle.addEventListener(
         "click",
         () => {
 
-            const isOpen =
-                card.classList.contains("open");
+            if (
+                openTaskId === item.id
+            ) {
 
-
-            closeAllTaskEditors();
-
-
-            if (!isOpen) {
-
-                card.classList.add("open");
-
-                body.classList.remove("hidden");
+                openTaskId = null;
 
             }
 
-        }
-    );
+            else {
 
-
-    timePreview.addEventListener(
-        "click",
-        () => {
-
-            const isOpen =
-                card.classList.contains("open");
-
-
-            closeAllTaskEditors();
-
-
-            if (!isOpen) {
-
-                card.classList.add("open");
-
-                body.classList.remove("hidden");
-
-                setTimeout(() => {
-                    timeInput.focus();
-                }, 50);
+                openTaskId =
+                    item.id;
 
             }
 
-        }
-    );
 
+            document
+                .querySelectorAll(
+                    ".task-card"
+                )
+                .forEach(other => {
 
-    textPreview.addEventListener(
-        "click",
-        () => {
+                    other.classList.toggle(
+                        "open",
+                        other.dataset.taskId ===
+                        openTaskId
+                    );
 
-            const isOpen =
-                card.classList.contains("open");
-
-
-            closeAllTaskEditors();
-
-
-            if (!isOpen) {
-
-                card.classList.add("open");
-
-                body.classList.remove("hidden");
-
-                setTimeout(() => {
-                    textInput.focus();
-                }, 50);
-
-            }
+                });
 
         }
     );
@@ -1328,8 +1587,6 @@ function createTaskCard(item) {
             updatePreview();
 
             queueSave();
-
-            renderTasks();
 
         }
     );
@@ -1360,7 +1617,7 @@ function createTaskCard(item) {
     );
 
 
-    remove.addEventListener(
+    deleteButton.addEventListener(
         "click",
         () => {
 
@@ -1372,6 +1629,9 @@ function createTaskCard(item) {
                             item.id
                     );
 
+
+            openTaskId = null;
+
             renderTasks();
 
             queueSave();
@@ -1380,29 +1640,31 @@ function createTaskCard(item) {
     );
 
 
-    /* =================================================
-       PREVIEW
-    ================================================= */
+    /* -----------------------------------------
+       PREVIEW UPDATE
+    ----------------------------------------- */
 
     function updatePreview() {
 
         timePreview.textContent =
-            item.time || "00:00";
+            item.time;
+
 
         textPreview.textContent =
-            item.text || "TASK";
+            item.text ||
+            "TASK";
 
 
         /* TIME */
+
+        timePreview.style.color =
+            item.timeColor;
 
         timePreview.style.fontSize =
             `${item.timeSize}px`;
 
         timePreview.style.fontWeight =
             item.timeWeight;
-
-        timePreview.style.color =
-            item.timeColor;
 
 
         /* TEXT */
@@ -1419,69 +1681,69 @@ function createTaskCard(item) {
 
         if (item.gradient) {
 
-            textPreview.style.background =
+            textPreview.style.backgroundImage =
                 `linear-gradient(
                     90deg,
                     ${item.gradientStart},
                     ${item.gradientEnd}
                 )`;
 
+            textPreview.style.backgroundClip =
+                "text";
+
             textPreview.style.webkitBackgroundClip =
                 "text";
 
-            textPreview.style.backgroundClip =
-                "text";
+            textPreview.style.color =
+                "transparent";
 
             textPreview.style.webkitTextFillColor =
                 "transparent";
 
-        } else {
+        }
 
-            textPreview.style.background =
-                "transparent";
+        else {
 
-            textPreview.style.webkitBackgroundClip =
-                "initial";
+            textPreview.style.backgroundImage =
+                "none";
 
             textPreview.style.backgroundClip =
                 "initial";
 
-            textPreview.style.webkitTextFillColor =
-                item.color;
+            textPreview.style.webkitBackgroundClip =
+                "initial";
 
             textPreview.style.color =
                 item.color;
 
-        }
-
-
-        /* TIME GRADIENT */
-
-        if (item.timeGradient) {
-
-            timePreview.style.background =
-                `linear-gradient(
-                    90deg,
-                    ${item.timeGradientStart},
-                    ${item.timeGradientEnd}
-                )`;
-
-            timePreview.style.webkitBackgroundClip =
-                "text";
-
-            timePreview.style.backgroundClip =
-                "text";
-
-            timePreview.style.webkitTextFillColor =
-                "transparent";
+            textPreview.style.webkitTextFillColor =
+                item.color;
 
         }
 
 
-        /* Keep buttons looking like previews */
+        /* ICON */
 
-        timePreview.style.borderRadius = "9px";
-        textPreview.style.borderRadius = "9px";
+        applyIcon(
+            iconShape,
+            item.icon,
+            item.iconColor
+        );
+
+        applyIcon(
+            document.querySelector(
+                ".real-preview-icon"
+            ),
+            1,
+            "#111"
+        );
+
+
+        fontPreview.textContent =
+            item.fontFamily;
+
+        fontPreview.style.fontFamily =
+            item.fontFamily;
 
     }
 
@@ -1494,35 +1756,34 @@ function createTaskCard(item) {
 }
 
 
-/* =====================================================
-   RANGE CONTROL
-===================================================== */
+/* =========================================================
+   RANGE
+========================================================= */
 
-function createRangeControl(
+function rangeControl(
     title,
     min,
     max,
     value,
-    callback
+    callback,
+    step = 1
 ) {
 
     const box =
         document.createElement("div");
 
-    box.className = "control";
+    box.className =
+        "compact-control";
 
 
     const label =
-        document.createElement("div");
-
-    label.className =
-        "control-label";
+        document.createElement("label");
 
 
-    const name =
+    const titleSpan =
         document.createElement("span");
 
-    name.textContent =
+    titleSpan.textContent =
         title;
 
 
@@ -1534,7 +1795,7 @@ function createRangeControl(
 
 
     label.append(
-        name,
+        titleSpan,
         output
     );
 
@@ -1542,11 +1803,21 @@ function createRangeControl(
     const input =
         document.createElement("input");
 
-    input.type = "range";
 
-    input.min = min;
-    input.max = max;
-    input.value = value;
+    input.type =
+        "range";
+
+    input.min =
+        min;
+
+    input.max =
+        max;
+
+    input.step =
+        step;
+
+    input.value =
+        value;
 
 
     input.addEventListener(
@@ -1577,32 +1848,11 @@ function createRangeControl(
 }
 
 
-/* =====================================================
-   WEIGHT
-===================================================== */
-
-function createWeightControl(
-    value,
-    callback
-) {
-
-    return createRangeControl(
-        "WEIGHT",
-        300,
-        900,
-        value,
-        callback
-    );
-
-}
-
-
-/* =====================================================
+/* =========================================================
    COLOR CONTROL
-===================================================== */
+========================================================= */
 
-function createColorControl(
-    title,
+function colorCompactControl(
     value,
     callback
 ) {
@@ -1610,68 +1860,27 @@ function createColorControl(
     const box =
         document.createElement("div");
 
-    box.className = "control";
+    box.className =
+        "compact-control";
 
 
     const label =
-        document.createElement("div");
+        document.createElement("label");
 
-    label.className =
-        "control-label";
-
-    label.textContent =
-        title;
+    label.innerHTML =
+        `<span>COLOR</span>`;
 
 
-    const button =
-        document.createElement("button");
-
-    button.type = "button";
-
-    button.className =
-        "color-trigger";
-
-
-    button.style.width = "100%";
-    button.style.height = "31px";
-
-
-    const dot =
-        document.createElement("span");
-
-    dot.className =
-        "color-dot";
-
-    dot.style.background =
-        value || "#111111";
-
-
-    button.appendChild(dot);
-
-
-    button.addEventListener(
-        "click",
-        () => {
-
-            openColorPicker(
-                value || "#111111",
-                newValue => {
-
-                    dot.style.background =
-                        newValue;
-
-                    callback(newValue);
-
-                }
-            );
-
-        }
-    );
+    const trigger =
+        makeColorTrigger(
+            value,
+            callback
+        );
 
 
     box.append(
         label,
-        button
+        trigger
     );
 
 
@@ -1680,186 +1889,45 @@ function createColorControl(
 }
 
 
-/* =====================================================
-   GRADIENT
-===================================================== */
-
-function createGradientControls(
+function makeColorSetting(
     title,
-    item,
-    update
+    value,
+    callback
 ) {
 
     const wrapper =
         document.createElement("div");
 
-
     wrapper.className =
-        "gradient-toggle";
+        "color-setting";
 
 
     const label =
-        document.createElement("label");
-
-
-    const checkbox =
-        document.createElement("input");
-
-    checkbox.type =
-        "checkbox";
-
-
-    /*
-       Text and time use different properties.
-    */
-
-    const isTime =
-        title.startsWith("TIME");
-
-
-    checkbox.checked =
-        isTime
-            ? !!item.timeGradient
-            : !!item.gradient;
-
-
-    const labelText =
         document.createElement("span");
 
-    labelText.textContent =
-        "Gradient";
+    label.textContent =
+        title;
 
 
-    label.append(
-        checkbox,
-        labelText
-    );
-
-
-    wrapper.appendChild(
-        label
-    );
-
-
-    const settings =
-        document.createElement("div");
-
-    settings.className =
-        "gradient-settings hidden";
-
-
-    const start =
-        createGradientColorButton(
-            isTime
-                ? item.timeGradientStart || "#ff4ecd"
-                : item.gradientStart || "#ff4ecd",
-            newValue => {
-
-                if (isTime) {
-
-                    item.timeGradientStart =
-                        newValue;
-
-                } else {
-
-                    item.gradientStart =
-                        newValue;
-
-                }
-
-                update();
-
-            }
+    const trigger =
+        makeColorTrigger(
+            value,
+            callback
         );
 
 
-    const end =
-        createGradientColorButton(
-            isTime
-                ? item.timeGradientEnd || "#7c5cff"
-                : item.gradientEnd || "#7c5cff",
-            newValue => {
-
-                if (isTime) {
-
-                    item.timeGradientEnd =
-                        newValue;
-
-                } else {
-
-                    item.gradientEnd =
-                        newValue;
-
-                }
-
-                update();
-
-            }
-        );
-
-
-    settings.append(
-        start,
-        end
+    wrapper.append(
+        label,
+        trigger
     );
 
 
-    if (checkbox.checked) {
-        settings.classList.remove("hidden");
-    }
-
-
-    checkbox.addEventListener(
-        "change",
-        () => {
-
-            if (isTime) {
-
-                item.timeGradient =
-                    checkbox.checked;
-
-            } else {
-
-                item.gradient =
-                    checkbox.checked;
-
-            }
-
-
-            settings.classList.toggle(
-                "hidden",
-                !checkbox.checked
-            );
-
-
-            update();
-
-            queueSave();
-
-        }
-    );
-
-
-    const parent =
-        document.createElement("div");
-
-
-    parent.append(
-        wrapper,
-        settings
-    );
-
-
-    return parent;
+    return wrapper;
 
 }
 
 
-/* =====================================================
-   GRADIENT COLOR BUTTON
-===================================================== */
-
-function createGradientColorButton(
+function makeColorTrigger(
     value,
     callback
 ) {
@@ -1867,23 +1935,40 @@ function createGradientColorButton(
     const button =
         document.createElement("button");
 
-    button.type = "button";
+    button.type =
+        "button";
 
     button.className =
         "color-trigger";
 
-
-    const dot =
-        document.createElement("span");
-
-    dot.className =
-        "color-dot";
-
-    dot.style.background =
+    button.dataset.color =
         value;
 
 
-    button.appendChild(dot);
+    const circle =
+        document.createElement("span");
+
+    circle.className =
+        "color-circle";
+
+    circle.style.background =
+        value;
+
+
+    const hex =
+        document.createElement("span");
+
+    hex.className =
+        "color-value";
+
+    hex.textContent =
+        value.toUpperCase();
+
+
+    button.append(
+        circle,
+        hex
+    );
 
 
     button.addEventListener(
@@ -1894,7 +1979,13 @@ function createGradientColorButton(
                 value,
                 newValue => {
 
-                    dot.style.background =
+                    circle.style.background =
+                        newValue;
+
+                    hex.textContent =
+                        newValue.toUpperCase();
+
+                    button.dataset.color =
                         newValue;
 
                     callback(
@@ -1913,247 +2004,199 @@ function createGradientColorButton(
 }
 
 
-/* =====================================================
+/* =========================================================
    COLOR PICKER
-===================================================== */
+========================================================= */
 
 function openColorPicker(
-    current,
+    value,
     callback
 ) {
 
-    currentColorTarget =
+    colorTarget =
         callback;
 
+    currentColor =
+        value ||
+        "#111111";
 
-    colorOverlay.classList.remove(
+
+    updateColorModal();
+
+    colorModal.classList.remove(
         "hidden"
     );
-
-
-    systemColorInput.value =
-        normalizeHex(current);
-
-
-    renderRecentColors();
 
 }
 
 
-function closeColorPicker() {
+function updateColorModal() {
 
-    colorOverlay.classList.add(
-        "hidden"
-    );
+    const preview =
+        document.getElementById(
+            "largeColorPreview"
+        );
 
-    currentColorTarget =
-        null;
+    const hex =
+        document.getElementById(
+            "largeColorHex"
+        );
+
+
+    preview.style.background =
+        currentColor;
+
+    hex.textContent =
+        currentColor.toUpperCase();
+
+
+    buildBasicColors();
+
+    buildRecentColors();
 
 }
 
 
-document
-    .getElementById("closeColorPicker")
-    .addEventListener(
-        "click",
-        closeColorPicker
-    );
+function buildBasicColors() {
+
+    const container =
+        document.getElementById(
+            "basicColors"
+        );
 
 
-colorOverlay.addEventListener(
-    "click",
-    event => {
-
-        if (
-            event.target ===
-            colorOverlay
-        ) {
-
-            closeColorPicker();
-
-        }
-
-    }
-);
+    container.innerHTML = "";
 
 
-/* BASIC COLORS */
+    BASIC_COLORS.forEach(color => {
 
-document
-    .querySelectorAll("[data-preset]")
-    .forEach(button => {
+        const button =
+            document.createElement("button");
+
+        button.type =
+            "button";
+
+        button.className =
+            "color-swatch";
 
         button.style.background =
-            button.dataset.preset;
+            color;
+
+
+        if (
+            color.toLowerCase() ===
+            currentColor.toLowerCase()
+        ) {
+
+            button.classList.add(
+                "selected"
+            );
+
+        }
 
 
         button.addEventListener(
             "click",
             () => {
 
-                chooseColor(
-                    button.dataset.preset
-                );
+                selectColor(color);
 
             }
         );
 
+
+        container.appendChild(
+            button
+        );
+
     });
 
-
-/* SYSTEM PICKER */
-
-systemColorButton.addEventListener(
-    "click",
-    () => {
-
-        systemColorInput.click();
-
-    }
-);
-
-
-systemColorInput.addEventListener(
-    "input",
-    () => {
-
-        chooseColor(
-            systemColorInput.value
-        );
-
-    }
-);
-
-
-function chooseColor(color) {
-
-    if (!color) return;
-
-
-    color =
-        normalizeHex(color);
-
-
-    addRecentColor(color);
-
-
-    if (currentColorTarget) {
-
-        currentColorTarget(color);
-
-    }
-
-
-    /*
-       Don't close after every system picker input.
-       Preset buttons close immediately.
-    */
-
-    if (
-        !systemColorInput.matches(":focus")
-    ) {
-
-        closeColorPicker();
-
-    }
-
 }
 
 
-function normalizeHex(color) {
-
-    if (!color) {
-        return "#111111";
-    }
-
-
-    return color.toUpperCase();
-
-}
-
-
-/* =====================================================
-   RECENT COLORS
-===================================================== */
-
-function addRecentColor(color) {
-
-    color =
-        normalizeHex(color);
-
-
-    recentColors =
-        recentColors.filter(
-            item => item !== color
-        );
-
-
-    recentColors.unshift(color);
-
-
-    recentColors =
-        recentColors.slice(0, 12);
-
+function getRecentColors() {
 
     try {
 
-        localStorage.setItem(
-            "editorRecentColors",
-            JSON.stringify(recentColors)
-        );
+        return JSON.parse(
+            localStorage.getItem(
+                "recentColors"
+            )
+        ) || [];
 
-    } catch {}
+    }
 
-}
+    catch {
 
-
-function loadRecentColors() {
-
-    try {
-
-        recentColors =
-            JSON.parse(
-                localStorage.getItem(
-                    "editorRecentColors"
-                ) || "[]"
-            );
-
-        if (!Array.isArray(recentColors)) {
-            recentColors = [];
-        }
-
-    } catch {
-
-        recentColors = [];
+        return [];
 
     }
 
 }
 
 
-function renderRecentColors() {
+function saveRecentColor(color) {
 
-    recentColorsContainer.innerHTML = "";
+    let colors =
+        getRecentColors();
 
 
-    if (!recentColors.length) {
+    colors =
+        colors.filter(
+            item =>
+                item.toLowerCase() !==
+                color.toLowerCase()
+        );
+
+
+    colors.unshift(color);
+
+
+    colors =
+        colors.slice(0, 16);
+
+
+    localStorage.setItem(
+        "recentColors",
+        JSON.stringify(colors)
+    );
+
+}
+
+
+function buildRecentColors() {
+
+    const container =
+        document.getElementById(
+            "recentColors"
+        );
+
+
+    container.innerHTML = "";
+
+
+    const colors =
+        getRecentColors();
+
+
+    if (!colors.length) {
 
         const empty =
             document.createElement("span");
 
-        empty.textContent =
-            "No recent colors";
-
         empty.style.gridColumn =
             "1 / -1";
-
-        empty.style.fontSize =
-            "8px";
 
         empty.style.color =
             "#aaa";
 
-        recentColorsContainer.appendChild(
+        empty.style.fontSize =
+            "8px";
+
+        empty.textContent =
+            "Your recently used colors will appear here";
+
+        container.appendChild(
             empty
         );
 
@@ -2162,10 +2205,16 @@ function renderRecentColors() {
     }
 
 
-    recentColors.forEach(color => {
+    colors.forEach(color => {
 
         const button =
             document.createElement("button");
+
+        button.type =
+            "button";
+
+        button.className =
+            "color-swatch";
 
         button.style.background =
             color;
@@ -2175,21 +2224,13 @@ function renderRecentColors() {
             "click",
             () => {
 
-                if (currentColorTarget) {
-
-                    currentColorTarget(
-                        color
-                    );
-
-                }
-
-                closeColorPicker();
+                selectColor(color);
 
             }
         );
 
 
-        recentColorsContainer.appendChild(
+        container.appendChild(
             button
         );
 
@@ -2198,13 +2239,111 @@ function renderRecentColors() {
 }
 
 
-/* =====================================================
+function selectColor(color) {
+
+    currentColor =
+        color;
+
+
+    saveRecentColor(
+        color
+    );
+
+
+    if (colorTarget) {
+
+        colorTarget(
+            color
+        );
+
+    }
+
+
+    updateColorModal();
+
+}
+
+
+/* COLOR MODAL */
+
+document
+    .getElementById(
+        "closeColorModal"
+    )
+    .addEventListener(
+        "click",
+        closeColorModal
+    );
+
+
+document
+    .querySelector(
+        "#colorModal .modal-backdrop"
+    )
+    .addEventListener(
+        "click",
+        closeColorModal
+    );
+
+
+function closeColorModal() {
+
+    colorModal.classList.add(
+        "hidden"
+    );
+
+    colorTarget = null;
+
+}
+
+
+/* SYSTEM PICKER */
+
+document
+    .getElementById(
+        "systemColorButton"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            systemColorInput.value =
+                currentColor;
+
+            systemColorInput.click();
+
+        }
+    );
+
+
+systemColorInput.addEventListener(
+    "input",
+    () => {
+
+        selectColor(
+            systemColorInput.value
+        );
+
+    }
+);
+
+
+/* =========================================================
    FONT PICKER
-===================================================== */
+========================================================= */
 
-function buildFontList() {
+function openFontPicker(
+    item,
+    update
+) {
 
-    fontList.innerHTML = "";
+    const list =
+        document.getElementById(
+            "fontList"
+        );
+
+
+    list.innerHTML = "";
 
 
     FONTS.forEach(
@@ -2213,24 +2352,23 @@ function buildFontList() {
             const button =
                 document.createElement("button");
 
-            button.type = "button";
+            button.type =
+                "button";
 
             button.className =
                 "font-option";
 
 
-            const preview =
-                document.createElement("span");
+            if (
+                item.fontFamily ===
+                font
+            ) {
 
-            preview.className =
-                "font-option-preview";
+                button.classList.add(
+                    "selected"
+                );
 
-            preview.textContent =
-                "Aa Schedule";
-
-
-            preview.style.fontFamily =
-                font;
+            }
 
 
             const name =
@@ -2242,57 +2380,54 @@ function buildFontList() {
             name.textContent =
                 label;
 
-
-            button.append(
-                preview,
-                name
-            );
-
-
-            button.dataset.font =
+            name.style.fontFamily =
                 font;
 
 
-            fontList.appendChild(
+            const small =
+                document.createElement("span");
+
+            small.className =
+                "font-option-label";
+
+            small.textContent =
+                font;
+
+
+            button.append(
+                name,
+                small
+            );
+
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    item.fontFamily =
+                        font;
+
+                    update();
+
+                    queueSave();
+
+                    fontModal.classList.add(
+                        "hidden"
+                    );
+
+                }
+            );
+
+
+            list.appendChild(
                 button
             );
 
         }
     );
 
-}
 
-
-let fontTarget = null;
-
-
-function openFontPicker(
-    item,
-    button,
-    update
-) {
-
-    fontTarget = {
-        item,
-        button,
-        update
-    };
-
-
-    fontList
-        .querySelectorAll(".font-option")
-        .forEach(option => {
-
-            option.classList.toggle(
-                "active",
-                option.dataset.font ===
-                item.fontFamily
-            );
-
-        });
-
-
-    fontOverlay.classList.remove(
+    fontModal.classList.remove(
         "hidden"
     );
 
@@ -2300,109 +2435,208 @@ function openFontPicker(
 
 
 document
-    .getElementById("closeFontPicker")
+    .getElementById(
+        "closeFontModal"
+    )
     .addEventListener(
         "click",
         () => {
 
-            fontOverlay.classList.add(
+            fontModal.classList.add(
                 "hidden"
             );
-
-            fontTarget = null;
 
         }
     );
 
 
-fontOverlay.addEventListener(
-    "click",
-    event => {
+document
+    .querySelector(
+        "#fontModal .modal-backdrop"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            fontModal.classList.add(
+                "hidden"
+            );
+
+        }
+    );
+
+
+/* =========================================================
+   ICONS
+========================================================= */
+
+function iconUrl(number) {
+
+    return `icons/${number}.png`;
+
+}
+
+
+function applyIcon(
+    element,
+    number,
+    color
+) {
+
+    if (!element) {
+        return;
+    }
+
+
+    const url =
+        `url("${iconUrl(number)}")`;
+
+
+    element.style.maskImage =
+        url;
+
+    element.style.webkitMaskImage =
+        url;
+
+    element.style.background =
+        color || "#111";
+
+}
+
+
+function openIconPicker(
+    item,
+    update
+) {
+
+    const list =
+        document.getElementById(
+            "iconList"
+        );
+
+
+    list.innerHTML = "";
+
+
+    for (
+        let i = 1;
+        i <= 10;
+        i++
+    ) {
+
+        const button =
+            document.createElement("button");
+
+        button.type =
+            "button";
+
+        button.className =
+            "icon-option";
+
 
         if (
-            event.target ===
-            fontOverlay
+            Number(item.icon) === i
         ) {
 
-            fontOverlay.classList.add(
-                "hidden"
+            button.classList.add(
+                "selected"
             );
-
-            fontTarget = null;
 
         }
 
-    }
-);
+
+        const shape =
+            document.createElement("span");
+
+        shape.className =
+            "icon-option-shape";
 
 
-fontList.addEventListener(
-    "click",
-    event => {
-
-        const option =
-            event.target.closest(
-                ".font-option"
-            );
+        applyIcon(
+            shape,
+            i,
+            "#111"
+        );
 
 
-        if (!option || !fontTarget) {
-            return;
-        }
+        button.appendChild(
+            shape
+        );
 
 
-        const font =
-            option.dataset.font;
+        button.addEventListener(
+            "click",
+            () => {
 
+                item.icon =
+                    i;
 
-        fontTarget.item.fontFamily =
-            font;
+                update();
 
+                queueSave();
 
-        fontTarget.button.textContent =
-            font;
-
-        fontTarget.button.style.fontFamily =
-            font;
-
-
-        fontTarget.update();
-
-        queueSave();
-
-
-        fontList
-            .querySelectorAll(".font-option")
-            .forEach(item => {
-
-                item.classList.toggle(
-                    "active",
-                    item === option
+                iconModal.classList.add(
+                    "hidden"
                 );
 
-            });
+            }
+        );
 
 
-        setTimeout(() => {
+        list.appendChild(
+            button
+        );
 
-            fontOverlay.classList.add(
+    }
+
+
+    iconModal.classList.remove(
+        "hidden"
+    );
+
+}
+
+
+document
+    .getElementById(
+        "closeIconModal"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            iconModal.classList.add(
                 "hidden"
             );
 
-            fontTarget = null;
+        }
+    );
 
-        }, 100);
-
-    }
-);
-
-
-/* =====================================================
-   GRID
-===================================================== */
 
 document
-    .querySelectorAll(".grid-mode")
+    .querySelector(
+        "#iconModal .modal-backdrop"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            iconModal.classList.add(
+                "hidden"
+            );
+
+        }
+    );
+
+
+/* =========================================================
+   GRID
+========================================================= */
+
+document
+    .querySelectorAll(
+        "[data-grid-mode]"
+    )
     .forEach(button => {
 
         button.addEventListener(
@@ -2410,7 +2644,8 @@ document
             () => {
 
                 data.global.gridMode =
-                    button.dataset.mode;
+                    button.dataset.gridMode;
+
 
                 updateGridUI();
 
@@ -2443,12 +2678,14 @@ gridThickness.addEventListener(
 function updateGridUI() {
 
     document
-        .querySelectorAll(".grid-mode")
+        .querySelectorAll(
+            "[data-grid-mode]"
+        )
         .forEach(button => {
 
             button.classList.toggle(
                 "active",
-                button.dataset.mode ===
+                button.dataset.gridMode ===
                 data.global.gridMode
             );
 
@@ -2460,95 +2697,71 @@ function updateGridUI() {
 
 
     gridThicknessValue.textContent =
-        data.global.gridThickness;
+        `${data.global.gridThickness} px`;
 
 
-    gridPreviewArea.style.setProperty(
-        "--grid-color",
-        data.global.gridColor
-    );
-
-
-    gridPreviewArea.style.setProperty(
-        "--grid-weight",
-        `${data.global.gridThickness}px`
-    );
-
-
-    gridPreviewArea.classList.toggle(
-        "mode-grid",
-        data.global.gridMode === "grid"
-    );
-
-
-    document
-        .getElementById("gridColorDot")
-        .style.background =
-        data.global.gridColor;
+    updateGridPreview();
 
 }
 
 
-/* =====================================================
+/* =========================================================
+   GRID PREVIEW
+========================================================= */
+
+function updateGridPreview() {
+
+    const preview =
+        document.querySelector(
+            ".grid-real-preview"
+        );
+
+
+    const lines =
+        preview.querySelectorAll(
+            ".preview-line"
+        );
+
+
+    const vertical =
+        preview.querySelector(
+            ".preview-vertical"
+        );
+
+
+    const color =
+        data.global.gridColor;
+
+
+    lines.forEach(line => {
+
+        line.style.background =
+            color;
+
+        line.style.height =
+            `${data.global.gridThickness}px`;
+
+    });
+
+
+    vertical.style.background =
+        color;
+
+    vertical.style.width =
+        `${data.global.gridThickness}px`;
+
+
+    vertical.style.display =
+        data.global.gridMode === "grid"
+            ? "block"
+            : "none";
+
+}
+
+
+/* =========================================================
    POINTER
-===================================================== */
-
-iconPickerButton.addEventListener(
-    "click",
-    () => {
-
-        iconPicker.classList.toggle(
-            "hidden"
-        );
-
-    }
-);
-
-
-iconPicker.addEventListener(
-    "click",
-    event => {
-
-        const button =
-            event.target.closest(
-                "[data-icon]"
-            );
-
-
-        if (!button) return;
-
-
-        data.pointer.icon =
-            Number(
-                button.dataset.icon
-            );
-
-
-        iconPicker
-            .querySelectorAll(
-                "[data-icon]"
-            )
-            .forEach(item => {
-
-                item.classList.toggle(
-                    "active",
-                    item === button
-                );
-
-            });
-
-
-        updatePointerUI();
-
-        queueSave();
-
-        iconPicker.classList.add(
-            "hidden"
-        );
-
-    }
-);
-
+========================================================= */
 
 pointerSize.addEventListener(
     "input",
@@ -2559,6 +2772,8 @@ pointerSize.addEventListener(
                 pointerSize.value
             );
 
+        pointerSizeValue.textContent =
+            pointerSize.value;
 
         updatePointerUI();
 
@@ -2576,10 +2791,11 @@ pointerGradient.addEventListener(
             pointerGradient.checked;
 
 
-        pointerGradientBox.classList.toggle(
-            "hidden",
-            !data.pointer.gradient
-        );
+        pointerGradientOptions
+            .classList.toggle(
+                "hidden",
+                !data.pointer.gradient
+            );
 
 
         updatePointerUI();
@@ -2592,154 +2808,120 @@ pointerGradient.addEventListener(
 
 function updatePointerUI() {
 
-    const iconPath =
-        `icons/${data.pointer.icon}.png`;
-
-
-    pointerPreviewIcon.innerHTML =
-        `<img src="${iconPath}" alt="">`;
-
-
-    selectedIconPreview.innerHTML =
-        `<img src="${iconPath}" alt="">`;
-
-
     pointerSize.value =
         data.pointer.size;
 
-
     pointerSizeValue.textContent =
         data.pointer.size;
-
-
-    pointerPreviewIcon.style.width =
-        `${Math.max(
-            42,
-            data.pointer.size + 20
-        )}px`;
-
-
-    pointerPreviewIcon.style.height =
-        `${Math.max(
-            42,
-            data.pointer.size + 20
-        )}px`;
-
-
-    const image =
-        pointerPreviewIcon.querySelector(
-            "img"
-        );
-
-
-    if (image) {
-
-        image.style.width =
-            `${data.pointer.size}px`;
-
-        image.style.height =
-            `${data.pointer.size}px`;
-
-    }
-
-
-    if (data.pointer.gradient) {
-
-        pointerPreviewIcon.style.background =
-            `linear-gradient(
-                90deg,
-                ${data.pointer.gradientStart},
-                ${data.pointer.gradientEnd}
-            )`;
-
-    } else {
-
-        pointerPreviewIcon.style.background =
-            "transparent";
-
-    }
-
-
-    document
-        .getElementById("pointerColorDot")
-        .style.background =
-        data.pointer.color;
-
-
-    document
-        .getElementById("pointerGradientStartDot")
-        .style.background =
-        data.pointer.gradientStart;
-
-
-    document
-        .getElementById("pointerGradientEndDot")
-        .style.background =
-        data.pointer.gradientEnd;
 
 
     pointerGradient.checked =
         data.pointer.gradient;
 
 
-    pointerGradientBox.classList.toggle(
-        "hidden",
-        !data.pointer.gradient
+    pointerGradientOptions
+        .classList.toggle(
+            "hidden",
+            !data.pointer.gradient
+        );
+
+
+    const icon =
+        document.querySelector(
+            ".pointer-preview-icon"
+        );
+
+
+    const selected =
+        document.getElementById(
+            "selectedIcon"
+        );
+
+
+    applyIcon(
+        icon,
+        data.pointer.icon,
+        data.pointer.color
     );
 
 
-    iconPicker
-        .querySelectorAll("[data-icon]")
-        .forEach(button => {
+    applyIcon(
+        selected,
+        data.pointer.icon,
+        data.pointer.color
+    );
 
-            button.classList.toggle(
-                "active",
-                Number(button.dataset.icon) ===
-                data.pointer.icon
-            );
 
-        });
+    icon.style.width =
+        `${data.pointer.size}px`;
+
+    icon.style.height =
+        `${data.pointer.size}px`;
+
+
+    if (
+        data.pointer.gradient
+    ) {
+
+        const gradient =
+            `linear-gradient(
+                90deg,
+                ${data.pointer.gradientStart},
+                ${data.pointer.gradientEnd}
+            )`;
+
+
+        icon.style.background =
+            gradient;
+
+        icon.style.maskImage =
+            `url("${iconUrl(data.pointer.icon)}")`;
+
+        icon.style.webkitMaskImage =
+            `url("${iconUrl(data.pointer.icon)}")`;
+
+    }
 
 }
 
 
-/* =====================================================
-   POINTER COLOR BUTTONS
-===================================================== */
+/* =========================================================
+   GLOBAL COLOR TRIGGERS
+========================================================= */
 
-function setupGlobalColorButtons() {
+document
+    .querySelectorAll(
+        ".color-trigger[data-color-target]"
+    )
+    .forEach(button => {
 
-    document
-        .querySelectorAll(
-            ".color-trigger[data-color-target]"
-        )
-        .forEach(button => {
+        const target =
+            button.dataset.colorTarget;
+
+
+        /*
+         * GRID
+         */
+
+        if (
+            target ===
+            "gridColor"
+        ) {
 
             button.addEventListener(
                 "click",
                 () => {
 
-                    const target =
-                        button.dataset.colorTarget;
-
-
-                    let current =
-                        getGlobalColor(target);
-
-
                     openColorPicker(
-                        current,
-                        value => {
+                        data.global.gridColor,
+                        color => {
 
-                            setGlobalColor(
-                                target,
-                                value
-                            );
+                            data.global.gridColor =
+                                color;
 
-                            updateGlobalColorUI();
+                            updateGridColorButtons();
 
-                            updateGridUI();
-                            updatePointerUI();
+                            updateGridPreview();
 
                             queueSave();
 
@@ -2749,123 +2931,371 @@ function setupGlobalColorButtons() {
                 }
             );
 
-        });
-
-}
+        }
 
 
-function getGlobalColor(target) {
+        /*
+         * POINTER
+         */
 
-    if (target === "gridColor") {
-        return data.global.gridColor;
-    }
+        if (
+            target ===
+            "pointerColor"
+        ) {
 
-    if (target === "pointerColor") {
-        return data.pointer.color;
-    }
+            button.addEventListener(
+                "click",
+                () => {
 
-    if (
-        target ===
-        "pointerGradientStart"
-    ) {
-        return data.pointer.gradientStart;
-    }
+                    openColorPicker(
+                        data.pointer.color,
+                        color => {
 
-    if (
-        target ===
-        "pointerGradientEnd"
-    ) {
-        return data.pointer.gradientEnd;
-    }
+                            data.pointer.color =
+                                color;
+
+                            updatePointerUI();
+
+                            updatePointerColorButtons();
+
+                            queueSave();
+
+                        }
+                    );
+
+                }
+            );
+
+        }
 
 
-    return "#111111";
+        /*
+         * POINTER GRADIENT
+         */
 
-}
+        if (
+            target ===
+            "pointerGradientStart"
+        ) {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    openColorPicker(
+                        data.pointer.gradientStart,
+                        color => {
+
+                            data.pointer.gradientStart =
+                                color;
+
+                            updatePointerUI();
+
+                            updatePointerColorButtons();
+
+                            queueSave();
+
+                        }
+                    );
+
+                }
+            );
+
+        }
 
 
-function setGlobalColor(
+        if (
+            target ===
+            "pointerGradientEnd"
+        ) {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    openColorPicker(
+                        data.pointer.gradientEnd,
+                        color => {
+
+                            data.pointer.gradientEnd =
+                                color;
+
+                            updatePointerUI();
+
+                            updatePointerColorButtons();
+
+                            queueSave();
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+
+    });
+
+
+function updateColorButton(
     target,
-    value
+    color
 ) {
 
-    if (target === "gridColor") {
-        data.global.gridColor = value;
+    const button =
+        document.querySelector(
+            `.color-trigger[data-color-target="${target}"]`
+        );
+
+
+    if (!button) {
+        return;
     }
 
-    if (target === "pointerColor") {
-        data.pointer.color = value;
+
+    const circle =
+        button.querySelector(
+            ".color-circle"
+        );
+
+    const value =
+        button.querySelector(
+            ".color-value"
+        );
+
+
+    if (circle) {
+        circle.style.background =
+            color;
     }
 
-    if (
-        target ===
-        "pointerGradientStart"
-    ) {
-        data.pointer.gradientStart = value;
-    }
-
-    if (
-        target ===
-        "pointerGradientEnd"
-    ) {
-        data.pointer.gradientEnd = value;
+    if (value) {
+        value.textContent =
+            color.toUpperCase();
     }
 
 }
 
 
-function updateGlobalColorUI() {
+function updateGridColorButtons() {
 
-    document
-        .getElementById("gridColorDot")
-        .style.background =
-        data.global.gridColor;
-
-
-    document
-        .getElementById("pointerColorDot")
-        .style.background =
-        data.pointer.color;
-
-
-    document
-        .getElementById("pointerGradientStartDot")
-        .style.background =
-        data.pointer.gradientStart;
-
-
-    document
-        .getElementById("pointerGradientEndDot")
-        .style.background =
-        data.pointer.gradientEnd;
+    updateColorButton(
+        "gridColor",
+        data.global.gridColor
+    );
 
 }
 
 
-/* =====================================================
-   LOAD UI
-===================================================== */
+function updatePointerColorButtons() {
+
+    updateColorButton(
+        "pointerColor",
+        data.pointer.color
+    );
+
+    updateColorButton(
+        "pointerGradientStart",
+        data.pointer.gradientStart
+    );
+
+    updateColorButton(
+        "pointerGradientEnd",
+        data.pointer.gradientEnd
+    );
+
+}
+
+
+/* =========================================================
+   TRANSFER DAY
+========================================================= */
+
+function createTransferUI() {
+
+    /*
+     * Кнопка добавляется в header только один раз.
+     */
+
+    if (
+        document.getElementById(
+            "transferButton"
+        )
+    ) {
+        return;
+    }
+
+
+    const button =
+        document.createElement("button");
+
+    button.id =
+        "transferButton";
+
+    button.type =
+        "button";
+
+    button.className =
+        "tool-button";
+
+    button.innerHTML =
+        "TRANSFER";
+
+
+    /*
+     * Добавляем в tools.
+     */
+
+    document
+        .querySelector(".global-tools")
+        .appendChild(
+            button
+        );
+
+
+    button.addEventListener(
+        "click",
+        openTransferMenu
+    );
+
+}
+
+
+function openTransferMenu() {
+
+    if (
+        !data.days[selectedDay].length
+    ) {
+
+        alert(
+            "В этом дне нет задач."
+        );
+
+        return;
+
+    }
+
+
+    const target =
+        prompt(
+            "Перенести расписание на день:\n\n" +
+            "MONDAY\n" +
+            "TUESDAY\n" +
+            "WEDNESDAY\n" +
+            "THURSDAY\n" +
+            "FRIDAY\n" +
+            "SATURDAY\n" +
+            "SUNDAY",
+            ""
+        );
+
+
+    if (!target) {
+        return;
+    }
+
+
+    const normalized =
+        target
+            .trim()
+            .toUpperCase();
+
+
+    if (
+        !DAYS.includes(
+            normalized
+        )
+    ) {
+
+        alert(
+            "Такого дня нет."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        normalized ===
+        selectedDay
+    ) {
+
+        alert(
+            "Нельзя перенести день на самого себя."
+        );
+
+        return;
+
+    }
+
+
+    const confirmed =
+        window.confirm(
+            `Вы уверены, что хотите перенести расписание с ${selectedDay} на ${normalized}?`
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    data.days[normalized] =
+        JSON.parse(
+            JSON.stringify(
+                data.days[selectedDay]
+            )
+        ).map(task => {
+
+            return {
+                ...task,
+                id:
+                    crypto.randomUUID()
+            };
+
+        });
+
+
+    queueSave();
+
+    alert(
+        `Расписание перенесено на ${normalized}.`
+    );
+
+}
+
+
+/* =========================================================
+   INIT UI
+========================================================= */
 
 function loadSettingsUI() {
 
+    updateTabs();
+
     updateGridUI();
+
+    updateGridColorButtons();
 
     updatePointerUI();
 
-    updateGlobalColorUI();
+    updatePointerColorButtons();
 
 }
 
 
-/* =====================================================
+/* =========================================================
    SAVE BUTTON
-===================================================== */
+========================================================= */
 
 saveButton.addEventListener(
     "click",
     async () => {
 
-        clearTimeout(saveTimer);
+        clearTimeout(
+            saveTimer
+        );
 
         await save();
 
@@ -2873,9 +3303,9 @@ saveButton.addEventListener(
 );
 
 
-/* =====================================================
+/* =========================================================
    START
-===================================================== */
+========================================================= */
 
 async function start() {
 
@@ -2888,19 +3318,17 @@ async function start() {
     }
 
 
-    loadRecentColors();
-
-    buildFontList();
-
-
     await loadData();
 
 
-    updateTabs();
+    /*
+     * Transfer добавляем после загрузки.
+     */
+
+    createTransferUI();
+
 
     loadSettingsUI();
-
-    setupGlobalColorButtons();
 
     renderTasks();
 
