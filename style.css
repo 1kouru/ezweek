@@ -157,11 +157,6 @@ body {
     align-items: center;
 
     gap: 5px;
-
-    max-width:
-        calc(
-            100vw - 70px
-        );
 }
 
 
@@ -181,6 +176,8 @@ body {
 
     font-size: 25px;
 
+    line-height: 1;
+
     cursor: pointer;
 
     box-shadow:
@@ -196,7 +193,6 @@ body {
 
 .selected-day {
     width: 118px;
-
     min-width: 118px;
 
     height: 42px;
@@ -268,11 +264,14 @@ body {
 
     overflow-x: hidden;
 
-    -webkit-overflow-scrolling: touch;
+    -webkit-overflow-scrolling:
+        touch;
 
-    overscroll-behavior-y: contain;
+    touch-action:
+        pan-y;
 
-    touch-action: pan-y;
+    overscroll-behavior-y:
+        contain;
 }
 
 
@@ -292,12 +291,34 @@ body {
     margin:
         0 auto;
 
-    padding:
-        25px
-        18px
-        100px
+    /*
+     * Никогда не используем
+     * фоновые grid-изображения.
+     */
+
+    background:
+        transparent !important;
+
+    background-image:
+        none !important;
+
+    /*
+     * Левая безопасная область
+     * для большого pointer.
+     */
+
+    padding-top:
+        25px;
+
+    padding-right:
+        18px;
+
+    padding-bottom:
+        100px;
+
+    padding-left:
         max(
-            18px,
+            48px,
             var(--pointer-space, 46px)
         );
 
@@ -323,17 +344,6 @@ body {
 
     display: grid;
 
-    /*
-     * ВАЖНО:
-     *
-     * Время имеет фиксированную
-     * колонку 58px.
-     *
-     * Поэтому мы точно знаем,
-     * где должен стоять разделитель
-     * GRID.
-     */
-
     grid-template-columns:
         58px
         minmax(0, 1fr);
@@ -345,13 +355,9 @@ body {
     padding: 8px 0;
 
     border-bottom:
-        var(
-            --grid-thickness
-        )
+        var(--grid-thickness)
         solid
-        var(
-            --grid-color
-        );
+        var(--grid-color);
 }
 
 
@@ -373,31 +379,27 @@ body {
     line-height: 1.1;
 
     font-size:
-        var(
-            --time-size,
-            11px
-        ) !important;
+        var(--time-size, 11px)
+        !important;
 
     font-weight:
-        var(
-            --time-weight,
-            600
-        ) !important;
+        var(--time-weight, 600)
+        !important;
 
     color:
-        var(
-            --time-color,
-            #999999
-        ) !important;
+        var(--time-color, #999999)
+        !important;
 
     font-family:
         Arial,
         Helvetica,
         sans-serif;
 
-    -webkit-text-size-adjust: none;
+    -webkit-text-size-adjust:
+        none;
 
-    text-size-adjust: none;
+    text-size-adjust:
+        none;
 }
 
 
@@ -411,28 +413,19 @@ body {
     max-width: 100%;
 
     font-size:
-        var(
-            --task-size,
-            15px
-        ) !important;
+        var(--task-size, 15px)
+        !important;
 
     font-family:
-        var(
-            --task-font,
-            Arial
-        ) !important;
+        var(--task-font, Arial)
+        !important;
 
     font-weight:
-        var(
-            --task-weight,
-            500
-        ) !important;
+        var(--task-weight, 500)
+        !important;
 
     color:
-        var(
-            --task-color,
-            #111111
-        );
+        var(--task-color, #111111);
 
     overflow-wrap:
         anywhere;
@@ -440,11 +433,14 @@ body {
     word-break:
         break-word;
 
-    line-height: 1.2;
+    line-height:
+        1.2;
 
-    -webkit-text-size-adjust: none;
+    -webkit-text-size-adjust:
+        none;
 
-    text-size-adjust: none;
+    text-size-adjust:
+        none;
 }
 
 
@@ -470,17 +466,22 @@ body {
    GRID — ROWS
 ========================================================= */
 
+.schedule-board.grid-rows {
+    background:
+        transparent !important;
+
+    background-image:
+        none !important;
+}
+
+
 .schedule-board.grid-rows
 .schedule-row {
 
     border-bottom:
-        var(
-            --grid-thickness
-        )
+        var(--grid-thickness)
         solid
-        var(
-            --grid-color
-        ) !important;
+        var(--grid-color);
 
 }
 
@@ -488,6 +489,16 @@ body {
 /* =========================================================
    GRID — NONE
 ========================================================= */
+
+.schedule-board.grid-none {
+
+    background:
+        transparent !important;
+
+    background-image:
+        none !important;
+}
+
 
 .schedule-board.grid-none
 .schedule-row {
@@ -503,29 +514,38 @@ body {
 ========================================================= */
 
 /*
- * НИКАКИХ background-image.
+ * В GRID нет никакого background-image.
  *
- * GRID = горизонтальные линии +
- * вертикальная линия между TIME/TEXT.
+ * Только:
  *
- * Вертикальная линия делается псевдоэлементом
- * самой строки.
+ * 1. горизонтальная линия
+ * 2. вертикальная линия между TIME и TEXT
  */
+
+.schedule-board.grid-grid {
+
+    background:
+        transparent !important;
+
+    background-image:
+        none !important;
+}
+
 
 .schedule-board.grid-grid
 .schedule-row {
 
     border-bottom:
-        var(
-            --grid-thickness
-        )
+        var(--grid-thickness)
         solid
-        var(
-            --grid-color
-        ) !important;
+        var(--grid-color);
 
 }
 
+
+/*
+ * Единственная вертикальная линия.
+ */
 
 .schedule-board.grid-grid
 .schedule-row::before {
@@ -534,29 +554,18 @@ body {
 
     position: absolute;
 
-    /*
-     * Граница ровно после
-     * TIME-колонки.
-     */
+    top: 0;
+    bottom: 0;
 
     left: 58px;
 
-    top: 0;
-
-    bottom: 0;
-
     width:
-        var(
-            --grid-thickness
-        );
+        var(--grid-thickness);
 
     background:
-        var(
-            --grid-color
-        );
+        var(--grid-color);
 
     pointer-events: none;
-
 }
 
 
@@ -572,23 +581,17 @@ body {
 
     display: none;
 
+    pointer-events: none;
+
     align-items: center;
 
     justify-content: center;
 
-    pointer-events: none;
-
     transform:
         translateY(-50%);
 
-    overflow: visible;
-
-    /*
-     * Pointer сам является mask.
-     */
-
     background-color:
-        #111;
+        #111111;
 
     background-image:
         none !important;
@@ -604,7 +607,7 @@ body {
         none !important;
 
     /*
-     * iOS Safari.
+     * iOS Safari mask.
      */
 
     -webkit-mask-repeat:
@@ -624,31 +627,29 @@ body {
 
     mask-size:
         contain;
-
 }
 
 
 /*
- * Градиент полностью запрещён.
+ * Даже если старый JS/CSS
+ * добавит .gradient,
+ * градиента не будет.
  */
 
 .time-pointer.gradient {
-
-    background-color:
-        #111;
 
     background-image:
         none !important;
 
     filter:
         none !important;
-
 }
 
 
 #pointerSymbol {
 
-    display: none !important;
+    display:
+        none !important;
 
 }
 
@@ -701,14 +702,14 @@ body {
 
 
 /* =========================================================
-   DAYS — ALL 7 FIT
+   DAYS
 ========================================================= */
 
 .days-scroll {
 
     width: 100%;
 
-    display: grid;
+    display: grid !important;
 
     grid-template-columns:
         repeat(
@@ -717,31 +718,30 @@ body {
                 0,
                 1fr
             )
-        );
+        ) !important;
 
     gap: 5px;
 
     padding: 0;
 
-    overflow: hidden;
+    overflow:
+        hidden !important;
 
-    scrollbar-width: none;
-
+    scrollbar-width:
+        none;
 }
 
 
 .days-scroll::-webkit-scrollbar {
-
     display: none;
-
 }
 
 
 .day-button {
 
-    min-width: 0;
-
     width: 100%;
+
+    min-width: 0;
 
     height: 40px;
 
@@ -769,12 +769,11 @@ body {
 
     gap: 3px;
 
-    white-space: nowrap;
+    white-space:
+        nowrap;
 
-    overflow: hidden;
-
-    -webkit-appearance: none;
-
+    overflow:
+        hidden;
 }
 
 
@@ -792,15 +791,12 @@ body {
     width: 3px;
     height: 3px;
 
-    flex: 0 0 3px;
-
     border-radius: 50%;
 
     background:
         currentColor;
 
     opacity: 0;
-
 }
 
 
@@ -834,11 +830,11 @@ span {
 
     opacity: 0;
 
-    pointer-events: none;
+    pointer-events:
+        none;
 
     transition:
         opacity .25s;
-
 }
 
 
@@ -846,8 +842,8 @@ span {
 
     opacity: 1;
 
-    pointer-events: auto;
-
+    pointer-events:
+        auto;
 }
 
 
@@ -868,10 +864,14 @@ span {
             370px
         );
 
-    height: 100vh;
-    height: 100dvh;
+    height:
+        100vh;
 
-    z-index: 700;
+    height:
+        100dvh;
+
+    z-index:
+        700;
 
     padding:
         max(
@@ -905,16 +905,14 @@ span {
 
     display: flex;
 
-    flex-direction: column;
+    flex-direction:
+        column;
 
-    overflow-y: auto;
+    overflow-y:
+        auto;
 
     -webkit-overflow-scrolling:
         touch;
-
-    will-change:
-        transform;
-
 }
 
 
@@ -936,7 +934,6 @@ span {
 
     justify-content:
         flex-end;
-
 }
 
 
@@ -947,12 +944,12 @@ span {
 
     border: 0;
 
-    border-radius: 50%;
+    border-radius:
+        50%;
 
     background: #f2f2f2;
 
     font-size: 27px;
-
 }
 
 
@@ -962,10 +959,10 @@ span {
 
     display: flex;
 
-    align-items: center;
+    align-items:
+        center;
 
     gap: 14px;
-
 }
 
 
@@ -984,12 +981,13 @@ span {
 
     display: flex;
 
-    justify-content: center;
+    justify-content:
+        center;
 
-    align-items: center;
+    align-items:
+        center;
 
     font-weight: 700;
-
 }
 
 
@@ -998,7 +996,6 @@ span {
     font-size: 15px;
 
     font-weight: 700;
-
 }
 
 
@@ -1014,10 +1011,11 @@ span {
 
     overflow: hidden;
 
-    text-overflow: ellipsis;
+    text-overflow:
+        ellipsis;
 
-    white-space: nowrap;
-
+    white-space:
+        nowrap;
 }
 
 
@@ -1028,7 +1026,6 @@ span {
     border-top:
         1px solid
         #eee;
-
 }
 
 
@@ -1042,7 +1039,8 @@ span {
 
     display: flex;
 
-    align-items: center;
+    align-items:
+        center;
 
     justify-content:
         space-between;
@@ -1057,13 +1055,13 @@ span {
     font-weight: 700;
 
     letter-spacing: 1.5px;
-
 }
 
 
 .logout-button {
 
-    margin-top: auto;
+    margin-top:
+        auto;
 
     width: 100%;
     height: 52px;
@@ -1079,7 +1077,6 @@ span {
     font-weight: 700;
 
     letter-spacing: 1.5px;
-
 }
 
 
@@ -1091,17 +1088,16 @@ span {
 
     .menu-button {
 
+        left: 10px;
+
         top:
             max(
                 10px,
                 env(safe-area-inset-top)
             );
 
-        left: 10px;
-
         width: 42px;
         height: 42px;
-
     }
 
 
@@ -1114,7 +1110,6 @@ span {
             );
 
         gap: 4px;
-
     }
 
 
@@ -1126,17 +1121,16 @@ span {
         flex-basis: 39px;
 
         font-size: 23px;
-
     }
 
 
     .selected-day {
 
         width: 106px;
+
         min-width: 106px;
 
         height: 39px;
-
     }
 
 
@@ -1153,7 +1147,6 @@ span {
                 70px +
                 env(safe-area-inset-bottom)
             );
-
     }
 
 
@@ -1165,35 +1158,44 @@ span {
 
         margin: 0;
 
-        padding-top: 18px;
+        padding-top:
+            18px;
 
-        padding-right: 10px;
+        padding-right:
+            10px;
 
-        padding-bottom: 90px;
+        padding-bottom:
+            90px;
 
         /*
-         * место слева для pointer
+         * Указатель всегда имеет
+         * физическое место слева.
          */
 
         padding-left:
             max(
-                48px,
+                55px,
                 var(--pointer-space)
             );
 
+        background:
+            transparent !important;
+
+        background-image:
+            none !important;
     }
 
 
     .schedule-row {
 
-        min-height: 62px;
+        min-height:
+            62px;
 
         grid-template-columns:
             58px
             minmax(0, 1fr);
 
         gap: 9px;
-
     }
 
 
@@ -1201,7 +1203,6 @@ span {
     .schedule-row::before {
 
         left: 58px;
-
     }
 
 
@@ -1214,13 +1215,12 @@ span {
                     0,
                     1fr
                 )
-            );
+            ) !important;
 
         gap: 3px;
 
         padding:
             0 3px;
-
     }
 
 
@@ -1231,14 +1231,20 @@ span {
         border-radius: 9px;
 
         font-size: 7px;
+    }
 
+
+    .time-pointer {
+
+        z-index:
+            250;
     }
 
 }
 
 
 /* =========================================================
-   IPHONE 14+ / 390PX
+   IPHONE 14+
 ========================================================= */
 
 @media (
@@ -1249,8 +1255,8 @@ span {
 
     .day-button {
 
-        font-size: 8px;
-
+        font-size:
+            8px;
     }
 
 }
@@ -1264,8 +1270,8 @@ span {
 
     .day-button {
 
-        font-size: 7px;
-
+        font-size:
+            7px;
     }
 
 }
@@ -1282,28 +1288,26 @@ span {
         left: 25px;
 
         top: 25px;
-
     }
 
 
     .day-navigation {
 
         top: 25px;
-
     }
 
 
     .schedule {
 
-        padding-top: 78px;
-
+        padding-top:
+            78px;
     }
 
 
     .schedule-board {
 
-        width: 700px;
-
+        width:
+            700px;
     }
 
 }
