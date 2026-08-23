@@ -113,10 +113,6 @@ function defaultSchedule() {
 }
 
 
-/* =========================================================
-   DEFAULT TASK
-========================================================= */
-
 function defaultTask() {
 
     return {
@@ -188,6 +184,7 @@ async function loadUser() {
             "auth.html";
 
         return null;
+
     }
 
 
@@ -197,6 +194,7 @@ async function loadUser() {
             "auth.html";
 
         return null;
+
     }
 
 
@@ -232,6 +230,7 @@ async function loadSchedule() {
         );
 
         return;
+
     }
 
 
@@ -253,6 +252,7 @@ async function loadSchedule() {
         await saveSchedule();
 
     }
+
 }
 
 
@@ -264,7 +264,6 @@ function normalizeSchedule(input) {
 
     const source =
         input || {};
-
 
     const base =
         defaultSchedule();
@@ -304,7 +303,7 @@ function normalizeSchedule(input) {
 
 
     /*
-     * Поддержка старых версий.
+     * Совместимость со старыми версиями.
      */
 
     if (
@@ -425,17 +424,12 @@ function normalizeSchedule(input) {
 
 
         result.days[day] =
-            result.days[day].map(task => {
-
-                return {
-
+            result.days[day].map(
+                task => ({
                     ...defaultTask(),
-
                     ...task
-
-                };
-
-            });
+                })
+            );
 
     });
 
@@ -490,6 +484,7 @@ async function saveSchedule() {
         );
 
         return false;
+
     }
 
 
@@ -532,8 +527,7 @@ function getAlmatyTime() {
         Number(
             parts.find(
                 part =>
-                    part.type ===
-                    "hour"
+                    part.type === "hour"
             )?.value || 0
         );
 
@@ -551,8 +545,7 @@ function getAlmatyTime() {
             Number(
                 parts.find(
                     part =>
-                        part.type ===
-                        "minute"
+                        part.type === "minute"
                 )?.value || 0
             ),
 
@@ -560,8 +553,7 @@ function getAlmatyTime() {
             Number(
                 parts.find(
                     part =>
-                        part.type ===
-                        "second"
+                        part.type === "second"
                 )?.value || 0
             )
 
@@ -640,7 +632,7 @@ function render() {
 
 
     /*
-     * Глобальная сетка.
+     * GRID VARIABLES
      */
 
     board.style.setProperty(
@@ -656,17 +648,25 @@ function render() {
 
 
     /*
-     * Место слева под pointer.
+     * LEFT SPACE FOR POINTER
      */
 
     board.style.setProperty(
         "--pointer-space",
-        `${scheduleData.pointer.size + 18}px`
+        `${scheduleData.pointer.size + 16}px`
     );
 
 
+    /*
+     * GRID MODE
+     */
+
     applyGrid();
 
+
+    /*
+     * TASKS
+     */
 
     const items =
         sortItems(
@@ -685,24 +685,24 @@ function render() {
             emptyState
         );
 
-    } else {
+    }
+
+    else {
 
         emptyState.style.display =
             "none";
 
 
         items.forEach(
-            item => {
-
-                createScheduleRow(
-                    item
-                );
-
-            }
+            createScheduleRow
         );
 
     }
 
+
+    /*
+     * POINTER
+     */
 
     renderPointer();
 }
@@ -729,7 +729,7 @@ function createScheduleRow(item) {
 
 
     /*
-     * TIME VARIABLES
+     * TIME
      */
 
     row.style.setProperty(
@@ -755,7 +755,7 @@ function createScheduleRow(item) {
 
 
     /*
-     * TEXT VARIABLES
+     * TEXT
      */
 
     row.style.setProperty(
@@ -787,7 +787,7 @@ function createScheduleRow(item) {
 
 
     /*
-     * TIME
+     * TIME ELEMENT
      */
 
     const time =
@@ -805,7 +805,7 @@ function createScheduleRow(item) {
 
 
     /*
-     * TEXT
+     * TEXT ELEMENT
      */
 
     const task =
@@ -824,6 +824,8 @@ function createScheduleRow(item) {
 
     /*
      * TEXT GRADIENT
+     *
+     * Это градиент ТОЛЬКО текста.
      */
 
     if (
@@ -853,7 +855,9 @@ function createScheduleRow(item) {
         task.style.color =
             "transparent";
 
-    } else {
+    }
+
+    else {
 
         task.style.backgroundImage =
             "none";
@@ -902,46 +906,55 @@ function applyGrid() {
     );
 
 
-    switch (
-        scheduleData.global.gridMode
+    const mode =
+        scheduleData.global.gridMode;
+
+
+    /*
+     * ROWS
+     *
+     * Только горизонтальные линии.
+     */
+
+    if (
+        mode === "rows"
     ) {
 
-        case "rows":
+        board.classList.add(
+            "grid-rows"
+        );
 
-            board.classList.add(
-                "grid-rows"
-            );
-
-            break;
-
-
-        case "grid":
-
-            board.classList.add(
-                "grid-grid"
-            );
-
-            break;
-
-
-        case "none":
-
-            board.classList.add(
-                "grid-none"
-            );
-
-            break;
-
-
-        default:
-
-            board.classList.add(
-                "grid-rows"
-            );
-
-            break;
-
+        return;
     }
+
+
+    /*
+     * GRID
+     *
+     * Горизонтальные линии +
+     * ОДНА вертикальная линия
+     * между TIME и TEXT.
+     */
+
+    if (
+        mode === "grid"
+    ) {
+
+        board.classList.add(
+            "grid-grid"
+        );
+
+        return;
+    }
+
+
+    /*
+     * NONE
+     */
+
+    board.classList.add(
+        "grid-none"
+    );
 }
 
 
@@ -986,8 +999,7 @@ function renderPointer() {
 
 
     /*
-     * Полностью уничтожаем
-     * старый gradient.
+     * Убираем старый gradient.
      */
 
     pointer.classList.remove(
@@ -995,9 +1007,24 @@ function renderPointer() {
     );
 
 
-    pointer.style.background =
-        "transparent";
+    pointer.style.removeProperty(
+        "--pointer-gradient"
+    );
 
+
+    /*
+     * Сам pointer.
+     */
+
+    pointer.style.width =
+        `${size}px`;
+
+    pointer.style.height =
+        `${size}px`;
+
+
+    pointer.style.background =
+        "none";
 
     pointer.style.backgroundImage =
         "none";
@@ -1015,91 +1042,64 @@ function renderPointer() {
         "none";
 
 
-    pointer.style.width =
-        `${size}px`;
+    /*
+     * Используем MASK.
+     *
+     * Иконка:
+     * icons/1.png ...
+     * icons/10.png
+     */
+
+    pointer.style.webkitMaskImage =
+        `url("icons/${icon}.png")`;
+
+    pointer.style.maskImage =
+        `url("icons/${icon}.png")`;
 
 
-    pointer.style.height =
-        `${size}px`;
+    pointer.style.webkitMaskRepeat =
+        "no-repeat";
+
+    pointer.style.maskRepeat =
+        "no-repeat";
+
+
+    pointer.style.webkitMaskPosition =
+        "center";
+
+    pointer.style.maskPosition =
+        "center";
+
+
+    pointer.style.webkitMaskSize =
+        "contain";
+
+    pointer.style.maskSize =
+        "contain";
 
 
     /*
-     * pointerSymbol здесь больше
-     * не рисуется как текст.
+     * Цвет выбранный в EDITOR.
      */
 
-    pointerSymbol.textContent =
-        "";
-
-
-    pointerSymbol.innerHTML =
-        "";
-
-
-    /*
-     * В iOS Safari используем mask
-     * непосредственно на pointerSymbol.
-     */
-
-    pointerSymbol.style.display =
-        "block";
-
-
-    pointerSymbol.style.width =
-        `${size}px`;
-
-
-    pointerSymbol.style.height =
-        `${size}px`;
-
-
-    pointerSymbol.style.backgroundColor =
+    pointer.style.backgroundColor =
         color;
 
 
-    pointerSymbol.style.backgroundImage =
-        "none";
-
-
-    pointerSymbol.style.webkitMaskImage =
-        `url("icons/${icon}.png")`;
-
-
-    pointerSymbol.style.maskImage =
-        `url("icons/${icon}.png")`;
-
-
-    pointerSymbol.style.webkitMaskRepeat =
-        "no-repeat";
-
-
-    pointerSymbol.style.maskRepeat =
-        "no-repeat";
-
-
-    pointerSymbol.style.webkitMaskPosition =
-        "center";
-
-
-    pointerSymbol.style.maskPosition =
-        "center";
-
-
-    pointerSymbol.style.webkitMaskSize =
-        "contain";
-
-
-    pointerSymbol.style.maskSize =
-        "contain";
-
-
-    pointerSymbol.style.filter =
-        "none";
-
-
     /*
-     * Показываем/позиционируем.
+     * pointerSymbol вообще не нужен.
      */
+
+    if (pointerSymbol) {
+
+        pointerSymbol.textContent =
+            "";
+
+        pointerSymbol.style.display =
+            "none";
+
+    }
+
 
     updatePointerPosition();
 }
@@ -1115,6 +1115,11 @@ function updatePointerPosition() {
         return;
     }
 
+
+    /*
+     * Pointer показывается
+     * только для сегодняшнего дня.
+     */
 
     if (
         selectedDay !==
@@ -1159,8 +1164,7 @@ function updatePointerPosition() {
      * Ближайшая задача.
      */
 
-    let nearest =
-        null;
+    let nearest = null;
 
     let difference =
         Infinity;
@@ -1168,7 +1172,7 @@ function updatePointerPosition() {
 
     items.forEach(item => {
 
-        const d =
+        const currentDifference =
             Math.abs(
                 seconds(item.time) -
                 nowSeconds
@@ -1176,11 +1180,12 @@ function updatePointerPosition() {
 
 
         if (
-            d < difference
+            currentDifference <
+            difference
         ) {
 
             difference =
-                d;
+                currentDifference;
 
             nearest =
                 item;
@@ -1199,15 +1204,33 @@ function updatePointerPosition() {
     }
 
 
-    const row =
-        board.querySelector(
-            `.schedule-row[data-time="${CSS.escape(
+    /*
+     * Ищем строку.
+     */
+
+    let targetRow = null;
+
+
+    board
+        .querySelectorAll(
+            ".schedule-row"
+        )
+        .forEach(row => {
+
+            if (
+                row.dataset.time ===
                 nearest.time
-            )}"]`
-        );
+            ) {
+
+                targetRow =
+                    row;
+
+            }
+
+        });
 
 
-    if (!row) {
+    if (!targetRow) {
 
         pointer.style.display =
             "none";
@@ -1216,42 +1239,75 @@ function updatePointerPosition() {
     }
 
 
+    /*
+     * КЛЮЧЕВОЙ МОМЕНТ:
+     *
+     * pointer находится внутри
+     * .schedule, поэтому координаты
+     * считаем относительно .schedule,
+     * а не board.
+     */
+
     const rowRect =
-        row.getBoundingClientRect();
+        targetRow.getBoundingClientRect();
 
 
-    const boardRect =
-        board.getBoundingClientRect();
+    const scheduleRect =
+        schedule.getBoundingClientRect();
 
 
     /*
-     * Центр строки относительно board.
+     * Y с учетом scrollTop.
      */
 
     const y =
         rowRect.top -
-        boardRect.top +
+        scheduleRect.top +
+        schedule.scrollTop +
         (
             rowRect.height /
             2
         );
 
 
+    /*
+     * X:
+     *
+     * board находится внутри schedule.
+     * Ставим pointer в левую область
+     * board.
+     */
+
+    const boardRect =
+        board.getBoundingClientRect();
+
+
+    const pointerSize =
+        Number(
+            scheduleData.pointer.size
+        ) || 28;
+
+
+    const x =
+        boardRect.left -
+        scheduleRect.left -
+        pointerSize -
+        7;
+
+
+    pointer.style.left =
+        `${Math.max(
+            2,
+            x
+        )}px`;
+
+
     pointer.style.top =
         `${y}px`;
 
 
-    /*
-     * Pointer находится слева
-     * от колонки времени.
-     */
-
-    pointer.style.left =
-        `${-scheduleData.pointer.size - 8}px`;
-
-
     pointer.style.display =
-        "flex";
+        "block";
 }
 
 
@@ -1266,7 +1322,8 @@ function updateDayUI() {
 
 
     /*
-     * Верхний DAY/TIME убираем.
+     * Верхний старый DAY/TIME
+     * полностью убираем.
      */
 
     if (dayName) {
@@ -1294,8 +1351,7 @@ function updateDayUI() {
     if (selectedDayLabel) {
 
         selectedDayLabel.textContent =
-            selectedDay ===
-            today
+            selectedDay === today
                 ? "TODAY"
                 : SHORT[selectedDay];
 
@@ -1393,7 +1449,6 @@ if (prevDay) {
 
         }
     );
-
 }
 
 
@@ -1420,7 +1475,6 @@ if (nextDay) {
 
         }
     );
-
 }
 
 
@@ -1436,7 +1490,6 @@ if (selectedDayButton) {
 
         }
     );
-
 }
 
 
@@ -1463,7 +1516,6 @@ dayButtons.forEach(
 ========================================================= */
 
 let startX = 0;
-
 let startY = 0;
 
 
@@ -1571,6 +1623,10 @@ window.addEventListener(
     }
 );
 
+
+/* =========================================================
+   ORIENTATION
+========================================================= */
 
 window.addEventListener(
     "orientationchange",
