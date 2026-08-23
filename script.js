@@ -273,30 +273,6 @@ function normalizeSchedule(data) {
     };
 
 
-    /*
-     * Совместимость со старыми данными.
-     */
-
-    if (
-        !result.global.gridType &&
-        result.global.grid
-    ) {
-
-        result.global.gridType =
-            result.global.grid;
-
-    }
-
-
-    if (
-        result.global.gridThickness == null
-    ) {
-
-        result.global.gridThickness = 1;
-
-    }
-
-
     DAYS.forEach(day => {
 
         if (
@@ -313,89 +289,9 @@ function normalizeSchedule(data) {
         result.days[day] =
             result.days[day].map(item => ({
 
-                id:
-                    item.id ||
-                    crypto.randomUUID(),
+                ...createDefaultTask(),
 
-                time:
-                    item.time ||
-                    "08:00",
-
-                text:
-                    item.text ||
-                    "",
-
-                timeColor:
-                    item.timeColor ||
-                    "#999999",
-
-                timeSize:
-                    item.timeSize ??
-                    11,
-
-                timeWeight:
-                    item.timeWeight ??
-                    600,
-
-                color:
-                    item.color ||
-                    "#111111",
-
-                fontSize:
-                    item.fontSize ??
-                    15,
-
-                fontFamily:
-                    item.fontFamily ||
-                    "Arial",
-
-                fontWeight:
-                    item.fontWeight ??
-                    500,
-
-                gradient:
-                    item.gradient ??
-                    false,
-
-                gradientStart:
-                    item.gradientStart ||
-                    "#ff4ecd",
-
-                gradientEnd:
-                    item.gradientEnd ||
-                    "#7c5cff",
-
-                /*
-                 * Настройки времени
-                 */
-
-                timeBackground:
-                    item.timeBackground ||
-                    "transparent",
-
-                timeRadius:
-                    item.timeRadius ??
-                    10,
-
-                timePadding:
-                    item.timePadding ??
-                    7,
-
-                /*
-                 * Настройки градиента времени
-                 */
-
-                timeGradient:
-                    item.timeGradient ??
-                    false,
-
-                timeGradientStart:
-                    item.timeGradientStart ||
-                    "#ff4ecd",
-
-                timeGradientEnd:
-                    item.timeGradientEnd ||
-                    "#7c5cff"
+                ...item
 
             }));
 
@@ -403,6 +299,55 @@ function normalizeSchedule(data) {
 
 
     return result;
+
+}
+
+
+/* =========================================
+   DEFAULT TASK
+========================================= */
+
+function createDefaultTask() {
+
+    return {
+
+        time: "08:00",
+
+        text: "",
+
+        timeColor: "#999999",
+
+        timeSize: 11,
+
+        timeWeight: 600,
+
+        timeGradient: false,
+
+        timeGradientStart: "#ff4ecd",
+
+        timeGradientEnd: "#7c5cff",
+
+        timeBackground: "transparent",
+
+        timeRadius: 10,
+
+        timePadding: 7,
+
+        color: "#111111",
+
+        fontSize: 15,
+
+        fontFamily: "Arial",
+
+        fontWeight: 500,
+
+        gradient: false,
+
+        gradientStart: "#ff4ecd",
+
+        gradientEnd: "#7c5cff"
+
+    };
 
 }
 
@@ -434,6 +379,7 @@ async function saveSchedule() {
                     updated_at:
                         new Date()
                             .toISOString()
+
                 },
                 {
                     onConflict:
@@ -600,20 +546,26 @@ function render() {
     board.innerHTML = "";
 
 
+    const global =
+        scheduleData.global || {};
+
+
     /*
-     * GRID
+     * GRID VARIABLES
      */
 
     board.style.setProperty(
         "--grid-color",
-        scheduleData.global.gridColor ||
+        global.gridColor ||
         "#e8e8e8"
     );
 
 
     board.style.setProperty(
         "--grid-thickness",
-        `${scheduleData.global.gridThickness ?? 1}px`
+        `${Number(
+            global.gridThickness || 1
+        )}px`
     );
 
 
@@ -621,7 +573,7 @@ function render() {
         sortItems(
             scheduleData.days[
                 selectedDay
-            ]
+            ] || []
         );
 
 
@@ -644,7 +596,250 @@ function render() {
 
         items.forEach(item => {
 
-            createRow(item);
+            const row =
+                document.createElement(
+                    "div"
+                );
+
+
+            row.className =
+                "schedule-row";
+
+
+            row.dataset.time =
+                item.time;
+
+
+            /* =================================
+               TIME SETTINGS
+            ================================= */
+
+            row.style.setProperty(
+                "--time-color",
+                item.timeColor ||
+                "#999999"
+            );
+
+
+            row.style.setProperty(
+                "--time-size",
+                `${Number(
+                    item.timeSize ?? 11
+                )}px`
+            );
+
+
+            row.style.setProperty(
+                "--time-weight",
+                Number(
+                    item.timeWeight ?? 600
+                )
+            );
+
+
+            /* =================================
+               TASK SETTINGS
+            ================================= */
+
+            row.style.setProperty(
+                "--task-size",
+                `${Number(
+                    item.fontSize ?? 15
+                )}px`
+            );
+
+
+            row.style.setProperty(
+                "--task-color",
+                item.color ||
+                "#111111"
+            );
+
+
+            row.style.setProperty(
+                "--task-weight",
+                Number(
+                    item.fontWeight ?? 500
+                )
+            );
+
+
+            row.style.setProperty(
+                "--task-font",
+                item.fontFamily ||
+                "Arial"
+            );
+
+
+            row.style.setProperty(
+                "--task-background",
+                item.background ||
+                "transparent"
+            );
+
+
+            row.style.setProperty(
+                "--task-radius",
+                `${Number(
+                    item.radius ??
+                    item.taskRadius ??
+                    12
+                )}px`
+            );
+
+
+            row.style.setProperty(
+                "--task-padding",
+                `${Number(
+                    item.padding ??
+                    item.taskPadding ??
+                    10
+                )}px`
+            );
+
+
+            /* =================================
+               TIME
+            ================================= */
+
+            const time =
+                document.createElement(
+                    "div"
+                );
+
+
+            time.className =
+                "schedule-time";
+
+
+            time.textContent =
+                item.time;
+
+
+            /*
+             * TIME BACKGROUND
+             */
+
+            if (
+                item.timeBackground &&
+                item.timeBackground !==
+                "transparent"
+            ) {
+
+                time.style.background =
+                    item.timeBackground;
+
+            }
+
+
+            time.style.borderRadius =
+                `${Number(
+                    item.timeRadius ?? 10
+                )}px`;
+
+
+            time.style.padding =
+                `0 ${Number(
+                    item.timePadding ?? 7
+                )}px`;
+
+
+            /*
+             * ВАЖНО:
+             *
+             * Градиент времени НЕ включаем.
+             * На главной странице время
+             * всегда обычного цвета.
+             */
+
+            time.style.backgroundImage =
+                "none";
+
+            time.style.webkitBackgroundClip =
+                "initial";
+
+            time.style.backgroundClip =
+                "initial";
+
+            time.style.webkitTextFillColor =
+                "initial";
+
+            time.style.color =
+                item.timeColor ||
+                "#999999";
+
+
+            /* =================================
+               TASK
+            ================================= */
+
+            const task =
+                document.createElement(
+                    "div"
+                );
+
+
+            task.className =
+                "schedule-task";
+
+
+            task.textContent =
+                item.text || "";
+
+
+            /*
+             * TEXT GRADIENT
+             */
+
+            if (item.gradient) {
+
+                task.style.background =
+                    `linear-gradient(
+                        90deg,
+                        ${item.gradientStart || "#ff4ecd"},
+                        ${item.gradientEnd || "#7c5cff"}
+                    )`;
+
+                task.style.webkitBackgroundClip =
+                    "text";
+
+                task.style.backgroundClip =
+                    "text";
+
+                task.style.webkitTextFillColor =
+                    "transparent";
+
+                task.style.color =
+                    "transparent";
+
+            }
+
+            else {
+
+                task.style.backgroundImage =
+                    "none";
+
+                task.style.webkitBackgroundClip =
+                    "initial";
+
+                task.style.backgroundClip =
+                    "initial";
+
+                task.style.webkitTextFillColor =
+                    "initial";
+
+                task.style.color =
+                    item.color ||
+                    "#111111";
+
+            }
+
+
+            row.appendChild(time);
+
+            row.appendChild(task);
+
+            board.appendChild(row);
 
         });
 
@@ -655,255 +850,7 @@ function render() {
 
     renderPointerStyle();
 
-    /*
-     * Небольшая задержка нужна Safari,
-     * чтобы сначала построилась таблица.
-     */
-
-    requestAnimationFrame(() => {
-
-        updatePointer();
-
-    });
-
-}
-
-
-/* =========================================
-   CREATE ROW
-========================================= */
-
-function createRow(item) {
-
-    const row =
-        document.createElement(
-            "div"
-        );
-
-
-    row.className =
-        "schedule-row";
-
-
-    row.dataset.time =
-        item.time;
-
-
-    /*
-     * TIME
-     */
-
-    const time =
-        document.createElement(
-            "div"
-        );
-
-
-    time.className =
-        "schedule-time";
-
-
-    time.textContent =
-        item.time;
-
-
-    time.style.color =
-        item.timeColor ||
-        "#999999";
-
-
-    time.style.fontSize =
-        `${item.timeSize ?? 11}px`;
-
-
-    time.style.fontWeight =
-        item.timeWeight ?? 600;
-
-
-    time.style.padding =
-        `0 ${item.timePadding ?? 7}px`;
-
-
-    time.style.borderRadius =
-        `${item.timeRadius ?? 10}px`;
-
-
-    if (
-        item.timeBackground &&
-        item.timeBackground !==
-        "transparent"
-    ) {
-
-        time.style.background =
-            item.timeBackground;
-
-    }
-
-    else {
-
-        time.style.background =
-            "transparent";
-
-    }
-
-
-    /*
-     * TIME GRADIENT
-     *
-     * Если в редакторе gradient выключен,
-     * здесь НИКОГДА не будет градиента.
-     */
-
-    if (
-        item.timeGradient === true
-    ) {
-
-        time.style.background =
-            `linear-gradient(
-                90deg,
-                ${item.timeGradientStart},
-                ${item.timeGradientEnd}
-            )`;
-
-        time.style.webkitBackgroundClip =
-            "text";
-
-        time.style.backgroundClip =
-            "text";
-
-        time.style.webkitTextFillColor =
-            "transparent";
-
-    }
-
-    else {
-
-        time.style.backgroundImage =
-            "none";
-
-        time.style.webkitBackgroundClip =
-            "initial";
-
-        time.style.backgroundClip =
-            "initial";
-
-        time.style.webkitTextFillColor =
-            item.timeColor ||
-            "#999999";
-
-        time.style.color =
-            item.timeColor ||
-            "#999999";
-
-    }
-
-
-    /*
-     * TEXT
-     */
-
-    const task =
-        document.createElement(
-            "div"
-        );
-
-
-    task.className =
-        "schedule-task";
-
-
-    task.textContent =
-        item.text ||
-        "TASK";
-
-
-    task.style.fontFamily =
-        item.fontFamily ||
-        "Arial";
-
-
-    task.style.fontSize =
-        `${item.fontSize ?? 15}px`;
-
-
-    task.style.fontWeight =
-        item.fontWeight ?? 500;
-
-
-    task.style.color =
-        item.color ||
-        "#111111";
-
-
-    /*
-     * TEXT GRADIENT
-     */
-
-    if (
-        item.gradient === true
-    ) {
-
-        task.style.backgroundImage =
-            `linear-gradient(
-                90deg,
-                ${item.gradientStart},
-                ${item.gradientEnd}
-            )`;
-
-        task.style.webkitBackgroundClip =
-            "text";
-
-        task.style.backgroundClip =
-            "text";
-
-        task.style.webkitTextFillColor =
-            "transparent";
-
-    }
-
-    else {
-
-        task.style.backgroundImage =
-            "none";
-
-        task.style.webkitBackgroundClip =
-            "initial";
-
-        task.style.backgroundClip =
-            "initial";
-
-        task.style.webkitTextFillColor =
-            item.color ||
-            "#111111";
-
-        task.style.color =
-            item.color ||
-            "#111111";
-
-    }
-
-
-    /*
-     * TEXT BACKGROUND
-     *
-     * В editor.js сейчас у текста нет
-     * отдельного background,
-     * поэтому прозрачный.
-     */
-
-    task.style.backgroundColor =
-        "transparent";
-
-
-    /*
-     * Добавляем
-     */
-
-    row.appendChild(time);
-
-    row.appendChild(task);
-
-    board.appendChild(row);
+    updatePointer();
 
 }
 
@@ -914,89 +861,131 @@ function createRow(item) {
 
 function renderGridStyle() {
 
+    /*
+     * Сначала удаляем ВСЕ варианты.
+     */
+
     board.classList.remove(
         "grid-dots",
         "grid-double",
         "grid-soft",
-        "grid-wave"
+        "grid-wave",
+        "grid-none"
     );
 
 
     const type =
-        scheduleData.global.gridType;
+        scheduleData.global?.gridType ||
+        "rows";
 
 
     /*
-     * rows = обычные строки
+     * НИЧЕГО
      */
 
     if (
-        type === "rows" ||
-        type === "clean"
+        type === "none" ||
+        type === "clean" ||
+        type === "off"
     ) {
+
+        board.classList.add(
+            "grid-none"
+        );
 
         return;
 
     }
 
 
+    /*
+     * ТОЧКИ / СЕТКА
+     */
+
     if (
-        type === "dots"
+        type === "dots" ||
+        type === "grid"
     ) {
 
         board.classList.add(
             "grid-dots"
         );
 
+        return;
+
     }
 
 
+    /*
+     * ЛИНИИ
+     */
+
     if (
-        type === "double"
+        type === "rows" ||
+        type === "lines"
     ) {
+
+        /*
+         * rows — обычные линии между
+         * строками.
+         *
+         * Толщина берётся из редактора.
+         */
 
         board.classList.add(
             "grid-double"
         );
 
+        return;
+
     }
 
 
-    if (
-        type === "soft"
-    ) {
+    /*
+     * СТАРЫЕ ФОРМАТЫ
+     */
+
+    if (type === "double") {
+
+        board.classList.add(
+            "grid-double"
+        );
+
+        return;
+
+    }
+
+
+    if (type === "soft") {
 
         board.classList.add(
             "grid-soft"
         );
 
+        return;
+
     }
 
 
-    if (
-        type === "wave"
-    ) {
+    if (type === "wave") {
 
         board.classList.add(
             "grid-wave"
         );
 
-    }
-
-
-    if (
-        type === "both"
-    ) {
-
-        board.classList.add(
-            "grid-double"
-        );
-
-        board.classList.add(
-            "grid-dots"
-        );
+        return;
 
     }
+
+
+    /*
+     * Если пришло неизвестное значение —
+     * используем линии.
+     */
+
+    board.classList.add(
+        "grid-double"
+    );
 
 }
 
@@ -1008,27 +997,70 @@ function renderGridStyle() {
 function renderPointerStyle() {
 
     const p =
-        scheduleData.pointer;
+        scheduleData.pointer || {};
 
 
-    const size =
-        Number(p.size) || 28;
+    /*
+     * ИКОНКА
+     *
+     * Используем PNG из editor.
+     */
+
+    pointerSymbol.textContent =
+        "";
 
 
-    pointer.style.width =
-        `${size}px`;
+    pointerSymbol.innerHTML =
+        "";
 
 
-    pointer.style.height =
-        `${size}px`;
+    const img =
+        document.createElement(
+            "img"
+        );
 
 
-    pointer.style.fontSize =
-        "0";
+    img.src =
+        `icons/${Number(
+            p.icon || 1
+        )}.png`;
 
 
-    pointer.style.color =
-        "transparent";
+    img.alt = "";
+
+
+    img.draggable = false;
+
+
+    img.style.width =
+        `${Number(
+            p.size || 28
+        )}px`;
+
+
+    img.style.height =
+        `${Number(
+            p.size || 28
+        )}px`;
+
+
+    img.style.display =
+        "block";
+
+
+    img.style.objectFit =
+        "contain";
+
+
+    /*
+     * САМОЕ ВАЖНОЕ:
+     *
+     * НИКАКОГО GRADIENT.
+     *
+     * Не добавляем класс gradient.
+     * Не используем background-clip.
+     * Не используем gradientStart/End.
+     */
 
 
     pointer.classList.remove(
@@ -1036,118 +1068,280 @@ function renderPointerStyle() {
     );
 
 
-    /*
-     * Убираем старый текстовый символ.
-     */
-
-    if (pointerSymbol) {
-
-        pointerSymbol.textContent =
-            "";
-
-        pointerSymbol.style.display =
-            "block";
-
-        pointerSymbol.style.width =
-            "100%";
-
-        pointerSymbol.style.height =
-            "100%";
-
-    }
-
-
-    /*
-     * Используем MASK.
-     *
-     * Это важно:
-     * PNG иконки больше НЕ получают
-     * старый filter и НЕ получают
-     * случайный градиент.
-     */
-
-    const icon =
-        Number(p.icon) || 1;
-
-
-    const iconUrl =
-        `url("icons/${icon}.png")`;
+    pointer.style.background =
+        "none";
 
 
     pointer.style.backgroundImage =
         "none";
 
 
-    pointer.style.backgroundColor =
+    pointer.style.color =
         p.color ||
         "#111111";
 
 
-    pointer.style.webkitMaskImage =
-        iconUrl;
-
-    pointer.style.maskImage =
-        iconUrl;
-
-
-    pointer.style.webkitMaskRepeat =
-        "no-repeat";
-
-    pointer.style.maskRepeat =
-        "no-repeat";
-
-
-    pointer.style.webkitMaskPosition =
-        "center";
-
-    pointer.style.maskPosition =
-        "center";
-
-
-    pointer.style.webkitMaskSize =
-        "contain";
-
-    pointer.style.maskSize =
-        "contain";
-
-
     /*
-     * Градиент включается ТОЛЬКО если
-     * editor реально сохранил true.
+     * Красим чёрную PNG-иконку
+     * в выбранный цвет.
      */
 
-    if (
-        p.gradient === true
-    ) {
+    img.style.filter =
+        colorToFilter(
+            p.color ||
+            "#111111"
+        );
 
-        pointer.style.backgroundImage =
-            `linear-gradient(
-                90deg,
-                ${p.gradientStart || "#ff4ecd"},
-                ${p.gradientEnd || "#7c5cff"}
-            )`;
 
-    }
+    pointerSymbol.appendChild(
+        img
+    );
+
+
+    pointer.style.fontSize =
+        "0";
+
+
+    pointer.style.width =
+        `${Number(
+            p.size || 28
+        )}px`;
+
+
+    pointer.style.height =
+        `${Number(
+            p.size || 28
+        )}px`;
 
 }
 
 
 /* =========================================
-   EXACT POINTER POSITION
+   POINTER COLOR FILTER
 ========================================= */
 
-function updatePointer() {
+function colorToFilter(hex) {
+
+    if (!hex) {
+        return "";
+    }
+
+
+    hex =
+        String(hex)
+            .replace("#", "");
+
+
+    if (hex.length !== 6) {
+        return "";
+    }
+
+
+    const r =
+        parseInt(
+            hex.substring(0, 2),
+            16
+        );
+
+
+    const g =
+        parseInt(
+            hex.substring(2, 4),
+            16
+        );
+
+
+    const b =
+        parseInt(
+            hex.substring(4, 6),
+            16
+        );
+
+
+    /*
+     * SVG/PNG иконки в проекте
+     * предполагаются чёрными.
+     *
+     * Через CSS filter делаем
+     * их выбранного цвета.
+     */
+
+    const max =
+        Math.max(r, g, b);
+
 
     if (
-        !pointer ||
-        !schedule ||
-        !board
+        r === 17 &&
+        g === 17 &&
+        b === 17
     ) {
 
-        return;
+        return "brightness(0)";
 
     }
 
+
+    /*
+     * Точное окрашивание через
+     * invert/sepia/saturate.
+     */
+
+    const hsl =
+        rgbToHsl(
+            r,
+            g,
+            b
+        );
+
+
+    return `
+        brightness(0)
+        saturate(100%)
+        invert(${hsl.invert}%)
+        sepia(${hsl.sepia}%)
+        saturate(${hsl.saturate}%)
+        hue-rotate(${hsl.hue}deg)
+        brightness(${hsl.brightness})
+    `.replace(/\s+/g, " ").trim();
+
+}
+
+
+function rgbToHsl(r, g, b) {
+
+    r /= 255;
+    g /= 255;
+    b /= 255;
+
+
+    const max =
+        Math.max(r, g, b);
+
+    const min =
+        Math.min(r, g, b);
+
+
+    let h = 0;
+    let s = 0;
+
+
+    const l =
+        (max + min) / 2;
+
+
+    if (max !== min) {
+
+        const d =
+            max - min;
+
+
+        s =
+            l > 0.5
+                ? d / (
+                    2 - max - min
+                )
+                : d / (
+                    max + min
+                );
+
+
+        switch (max) {
+
+            case r:
+
+                h =
+                    (
+                        g - b
+                    ) / d +
+                    (
+                        g < b
+                            ? 6
+                            : 0
+                    );
+
+                break;
+
+
+            case g:
+
+                h =
+                    (
+                        b - r
+                    ) / d +
+                    2;
+
+                break;
+
+
+            case b:
+
+                h =
+                    (
+                        r - g
+                    ) / d +
+                    4;
+
+                break;
+
+        }
+
+
+        h /= 6;
+
+    }
+
+
+    /*
+     * Это не математический
+     * inverse filter generator,
+     * но для чёрных PNG подходит
+     * значительно лучше старого
+     * фильтра.
+     */
+
+    return {
+
+        invert:
+            Math.round(
+                l * 100
+            ),
+
+        sepia:
+            Math.round(
+                s * 100
+            ),
+
+        saturate:
+            Math.max(
+                100,
+                Math.round(
+                    s * 700
+                )
+            ),
+
+        hue:
+            Math.round(
+                h * 360
+            ),
+
+        brightness:
+            Math.max(
+                0.5,
+                Math.round(
+                    l * 100
+                ) / 100
+            )
+
+    };
+
+}
+
+
+/* =========================================
+   POINTER POSITION
+========================================= */
+
+function updatePointer() {
 
     if (
         selectedDay !==
@@ -1166,7 +1360,7 @@ function updatePointer() {
         sortItems(
             scheduleData.days[
                 selectedDay
-            ]
+            ] || []
         );
 
 
@@ -1189,10 +1383,6 @@ function updatePointer() {
         now.minute * 60 +
         now.second;
 
-
-    /*
-     * Находим ближайшую задачу.
-     */
 
     let nearest =
         null;
@@ -1271,16 +1461,6 @@ function updatePointer() {
     }
 
 
-    /*
-     * ВАЖНО:
-     *
-     * pointer теперь учитывает
-     * реальный размер своей иконки.
-     *
-     * Он стоит слева от таблицы,
-     * а не поверх времени.
-     */
-
     const rowRect =
         targetRow.getBoundingClientRect();
 
@@ -1289,17 +1469,14 @@ function updatePointer() {
         board.getBoundingClientRect();
 
 
-    const pointerSize =
-        Number(
-            scheduleData.pointer.size
-        ) || 28;
-
+    /*
+     * Центр строки.
+     */
 
     const y =
         rowRect.top -
         boardRect.top +
-        rowRect.height / 2 -
-        pointerSize / 2;
+        rowRect.height / 2;
 
 
     pointer.style.top =
@@ -1323,30 +1500,16 @@ function updateDayUI() {
 
 
     /*
-     * Убираем верхние DAY/TIME.
+     * Эти элементы можно оставить
+     * для совместимости с HTML.
      *
-     * Но если старые элементы остались
-     * в HTML — просто скрываем их.
+     * В CSS их можно скрыть.
      */
 
     if (dayName) {
 
         dayName.textContent =
-            "";
-
-        dayName.style.display =
-            "none";
-
-    }
-
-
-    if (currentTime) {
-
-        currentTime.textContent =
-            "";
-
-        currentTime.style.display =
-            "none";
+            selectedDay;
 
     }
 
@@ -1414,6 +1577,33 @@ function selectDay(day) {
 
     render();
 
+
+    /*
+     * На iPhone автоматически
+     * прокручиваем нижнюю панель
+     * только к выбранному дню.
+     */
+
+    const active =
+        document.querySelector(
+            `.day-button[data-day="${day}"]`
+        );
+
+
+    if (
+        active &&
+        typeof active.scrollIntoView ===
+        "function"
+    ) {
+
+        active.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest",
+            inline: "center"
+        });
+
+    }
+
 }
 
 
@@ -1423,17 +1613,14 @@ function selectDay(day) {
 
 function updateClock() {
 
-    /*
-     * Верхние часы больше не нужны.
-     */
+    const time =
+        getAlmatyTime();
+
 
     if (currentTime) {
 
         currentTime.textContent =
-            "";
-
-        currentTime.style.display =
-            "none";
+            `${String(time.hour).padStart(2, "0")}:${String(time.minute).padStart(2, "0")}`;
 
     }
 
@@ -1543,13 +1730,20 @@ schedule.addEventListener(
     "touchstart",
     e => {
 
-        startX =
-            e.changedTouches[0]
-                .screenX;
+        if (
+            e.changedTouches &&
+            e.changedTouches.length
+        ) {
 
-        startY =
-            e.changedTouches[0]
-                .screenY;
+            startX =
+                e.changedTouches[0]
+                    .screenX;
+
+            startY =
+                e.changedTouches[0]
+                    .screenY;
+
+        }
 
     },
     {
@@ -1561,6 +1755,14 @@ schedule.addEventListener(
 schedule.addEventListener(
     "touchend",
     e => {
+
+        if (
+            !e.changedTouches ||
+            !e.changedTouches.length
+        ) {
+            return;
+        }
+
 
         const endX =
             e.changedTouches[0]
@@ -1635,7 +1837,11 @@ window.addEventListener(
     () => {
 
         requestAnimationFrame(
-            updatePointer
+            () => {
+
+                updatePointer();
+
+            }
         );
 
     }
@@ -1647,8 +1853,12 @@ window.addEventListener(
     () => {
 
         setTimeout(
-            updatePointer,
-            250
+            () => {
+
+                render();
+
+            },
+            150
         );
 
     }
