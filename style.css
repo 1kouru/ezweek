@@ -1,3 +1,7 @@
+/* =========================================================
+   RESET
+========================================================= */
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -12,14 +16,17 @@ body {
     width: 100%;
     height: 100%;
 
+    min-width: 0;
+    min-height: 100%;
+
     background: #f8f8f8;
+
+    color: #111;
 
     font-family:
         Arial,
         Helvetica,
         sans-serif;
-
-    color: #111;
 
     overflow: hidden;
 
@@ -32,35 +39,35 @@ body {
 }
 
 
-/* =========================================
+/* =========================================================
    APP
-========================================= */
+========================================================= */
 
 .app {
+    position: relative;
+
     width: 100vw;
     width: 100dvw;
 
     height: 100vh;
     height: 100dvh;
 
-    position: relative;
-
     overflow: hidden;
 }
 
 
-/* =========================================
-   OLD HEADER — HIDDEN
-========================================= */
+/* =========================================================
+   OLD HEADER
+========================================================= */
 
 .header {
     display: none !important;
 }
 
 
-/* =========================================
+/* =========================================================
    MENU BUTTON
-========================================= */
+========================================================= */
 
 .menu-button {
     position: fixed;
@@ -79,13 +86,14 @@ body {
     height: 44px;
 
     border: 0;
-
     border-radius: 50%;
 
-    background: rgba(255,255,255,.96);
+    background:
+        rgba(255,255,255,.96);
 
     box-shadow:
-        0 5px 25px rgba(0,0,0,.08);
+        0 5px 25px
+        rgba(0,0,0,.08);
 
     display: flex;
 
@@ -98,8 +106,6 @@ body {
     gap: 5px;
 
     cursor: pointer;
-
-    -webkit-appearance: none;
 }
 
 
@@ -115,9 +121,9 @@ body {
 }
 
 
-/* =========================================
+/* =========================================================
    TOP DAY NAVIGATION
-========================================= */
+========================================================= */
 
 .day-navigation {
     position: fixed;
@@ -150,30 +156,32 @@ body {
     flex: 0 0 42px;
 
     border: 0;
-
     border-radius: 50%;
 
     background: #fff;
 
+    color: #111;
+
     font-size: 25px;
+
+    line-height: 1;
 
     cursor: pointer;
 
     box-shadow:
-        0 5px 20px rgba(0,0,0,.06);
-
-    -webkit-appearance: none;
+        0 5px 20px
+        rgba(0,0,0,.06);
 }
 
 
 .selected-day {
+    width: 118px;
     min-width: 118px;
 
     height: 42px;
 
     border: 0;
-
-    border-radius: 23px;
+    border-radius: 24px;
 
     background: #111;
 
@@ -192,26 +200,30 @@ body {
 .selected-day-label {
     font-size: 7px;
 
-    letter-spacing: 1.7px;
+    line-height: 1;
+
+    letter-spacing: 1.6px;
 
     opacity: .55;
 }
 
 
 .selected-day-name {
-    margin-top: 2px;
+    margin-top: 3px;
 
     font-size: 10px;
 
+    line-height: 1;
+
     font-weight: 700;
 
-    letter-spacing: 1.4px;
+    letter-spacing: 1.3px;
 }
 
 
-/* =========================================
+/* =========================================================
    SCHEDULE
-========================================= */
+========================================================= */
 
 .schedule {
     position: absolute;
@@ -231,63 +243,79 @@ body {
         );
 
     overflow-y: auto;
-
     overflow-x: hidden;
 
     -webkit-overflow-scrolling: touch;
 
-    overscroll-behavior-x: none;
+    overscroll-behavior-y: contain;
 
     touch-action: pan-y;
-
-    scroll-behavior: smooth;
 }
 
 
-/* =========================================
+/* =========================================================
    BOARD
-========================================= */
+========================================================= */
 
 .schedule-board {
-    width: min(
-        94vw,
-        700px
-    );
+    position: relative;
 
-    margin: 0 auto;
+    width:
+        min(
+            94vw,
+            700px
+        );
+
+    margin:
+        0 auto;
+
+    /*
+     * Главное:
+     * padding-left зависит от размера pointer.
+     *
+     * Если pointer 28px:
+     * примерно 46px места.
+     *
+     * Если pointer 70px:
+     * примерно 88px места.
+     */
 
     padding:
         25px 18px
-        100px;
+        100px
+        max(
+            18px,
+            var(--pointer-space, 46px)
+        );
 
-    position: relative;
+    --grid-color: #e8e8e8;
+
+    --grid-thickness: 1px;
+
+    --pointer-space: 46px;
 }
 
 
-/* =========================================
+/* =========================================================
    ROW
-========================================= */
+========================================================= */
 
 .schedule-row {
+    position: relative;
+
     min-height: 66px;
 
     display: grid;
 
-    /*
-     * ВАЖНО:
-     * Pointer получает отдельное место
-     * слева от времени.
-     */
-
     grid-template-columns:
-        58px
+        max-content
         minmax(0, 1fr);
 
     gap: 13px;
 
     align-items: center;
 
-    position: relative;
+    padding: 8px 0;
 
     border-bottom:
         var(
@@ -297,32 +325,41 @@ body {
         solid
         var(
             --grid-color,
-            rgba(0,0,0,.08)
+            #e8e8e8
         );
-
-    padding: 8px 0;
 }
 
 
-/* =========================================
+/* =========================================================
    TIME
-========================================= */
+========================================================= */
 
 .schedule-time {
     min-width: 0;
 
-    width: 100%;
+    width: max-content;
+
+    max-width: 100%;
+
+    justify-self: end;
+
+    text-align: right;
+
+    white-space: nowrap;
+
+    overflow: visible;
+
+    line-height: 1.1;
+
+    /*
+     * Все параметры приходят
+     * из editor.js через variables.
+     */
 
     font-size:
         var(
             --time-size,
             11px
-        );
-
-    color:
-        var(
-            --time-color,
-            #999
         );
 
     font-weight:
@@ -331,58 +368,35 @@ body {
             600
         );
 
-    text-align: right;
+    color:
+        var(
+            --time-color,
+            #999999
+        );
 
-    white-space: nowrap;
-
-    line-height: 1.1;
+    /*
+     * В текущем editor.js
+     * fontFamily для времени нет.
+     * Поэтому обычный Arial.
+     */
 
     font-family:
         Arial,
         Helvetica,
         sans-serif;
 
-    border-radius:
-        var(
-            --time-radius,
-            10px
-        );
-
-    padding:
-        0
-        var(
-            --time-padding,
-            7px
-        );
-
-    overflow: visible;
-
-    /*
-     * Не даём iOS самостоятельно
-     * менять размер текста.
-     */
-
     -webkit-text-size-adjust: none;
-
     text-size-adjust: none;
 }
 
 
-/* =========================================
+/* =========================================================
    TASK
-========================================= */
+========================================================= */
 
 .schedule-task {
     min-width: 0;
-
-    padding:
-        10px;
-
-    border-radius:
-        var(
-            --task-radius,
-            12px
-        );
+    max-width: 100%;
 
     font-size:
         var(
@@ -408,33 +422,26 @@ body {
             #111
         );
 
-    background:
-        var(
-            --task-background,
-            transparent
-        );
-
     overflow-wrap: anywhere;
 
-    word-break: normal;
+    word-break: break-word;
 
     line-height: 1.2;
 
     -webkit-text-size-adjust: none;
-
     text-size-adjust: none;
 }
 
 
-/* =========================================
+/* =========================================================
    EMPTY
-========================================= */
+========================================================= */
 
-.empty-state,
-.empty {
+.empty-state {
     text-align: center;
 
-    padding: 80px 20px;
+    padding:
+        80px 20px;
 
     color: #aaa;
 
@@ -444,33 +451,14 @@ body {
 }
 
 
-/* =========================================
+/* =========================================================
    POINTER
-========================================= */
+========================================================= */
 
 .time-pointer {
     position: absolute;
 
     z-index: 100;
-
-    /*
-     * Pointer находится левее
-     * времени.
-     *
-     * Благодаря этому большой pointer
-     * не накрывает время.
-     */
-
-    left: -2px;
-
-    width: 46px;
-
-    height: 46px;
-
-    transform:
-        translateY(-50%);
-
-    pointer-events: none;
 
     display: none;
 
@@ -478,241 +466,225 @@ body {
 
     justify-content: center;
 
-    line-height: 1;
+    pointer-events: none;
 
-    color: #111;
+    transform:
+        translateY(-50%);
+
+    overflow: visible;
+
+    background:
+        transparent !important;
+
+    background-image:
+        none !important;
+
+    color:
+        transparent !important;
+
+    font-size: 0;
+
+    line-height: 0;
 
     /*
-     * НИКАКОГО ГРАДИЕНТА.
+     * Никакого gradient.
      */
 
-    background: transparent !important;
+    -webkit-background-clip:
+        initial !important;
 
-    background-image: none !important;
+    background-clip:
+        initial !important;
 
-    -webkit-background-clip: initial !important;
-
-    background-clip: initial !important;
-
-    -webkit-text-fill-color: initial !important;
+    -webkit-text-fill-color:
+        initial !important;
 }
 
 
 /*
- * Полностью убиваем старый gradient-класс.
+ * Даже старый класс gradient
+ * больше ничего не делает.
  */
 
 .time-pointer.gradient {
-    background: transparent !important;
+    background:
+        transparent !important;
 
-    background-image: none !important;
+    background-image:
+        none !important;
 
-    -webkit-background-clip: initial !important;
+    -webkit-background-clip:
+        initial !important;
 
-    background-clip: initial !important;
+    background-clip:
+        initial !important;
 
-    color: #111 !important;
+    color:
+        transparent !important;
 
-    -webkit-text-fill-color: initial !important;
+    -webkit-text-fill-color:
+        initial !important;
 }
 
 
 /*
- * Картинка pointer.
+ * Сам pointer-symbol превращается
+ * в одноцветную mask.
  */
 
 #pointerSymbol {
+    display: block;
+
     width: 28px;
     height: 28px;
 
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
     flex: 0 0 auto;
 
-    background: transparent !important;
+    background:
+        #111;
 
-    background-image: none !important;
+    background-image:
+        none !important;
 
-    -webkit-background-clip: initial !important;
+    -webkit-mask-repeat:
+        no-repeat;
 
-    background-clip: initial !important;
+    mask-repeat:
+        no-repeat;
 
-    -webkit-text-fill-color: initial !important;
+    -webkit-mask-position:
+        center;
+
+    mask-position:
+        center;
+
+    -webkit-mask-size:
+        contain;
+
+    mask-size:
+        contain;
+
+    /*
+     * Градиент полностью отключён.
+     */
+
+    -webkit-background-clip:
+        initial !important;
+
+    background-clip:
+        initial !important;
+
+    -webkit-text-fill-color:
+        initial !important;
 }
 
 
-#pointerSymbol img {
-    display: block;
-
-    width: 100%;
-    height: 100%;
-
-    object-fit: contain;
-
-    pointer-events: none;
-
-    user-select: none;
-
-    -webkit-user-drag: none;
-}
-
-
-/* =========================================
+/* =========================================================
    GRID — ROWS
-========================================= */
+========================================================= */
 
-.grid-rows .schedule-row {
+.schedule-board.grid-rows
+.schedule-row {
+
     border-bottom:
         var(
-            --grid-thickness,
-            1px
+            --grid-thickness
         )
         solid
         var(
-            --grid-color,
-            #e8e8e8
+            --grid-color
         );
 }
 
 
-/* =========================================
+/* =========================================================
    GRID — NONE
-========================================= */
+========================================================= */
 
-.grid-none .schedule-row {
-    border-bottom: none !important;
+.schedule-board.grid-none
+.schedule-row {
 
-    box-shadow: none !important;
+    border-bottom:
+        none !important;
+
 }
 
 
-/* =========================================
-   GRID — DOTS
-========================================= */
+/* =========================================================
+   GRID — GRID
+========================================================= */
 
-.grid-dots {
+.schedule-board.grid-grid {
+
+    /*
+     * Основная сетка.
+     */
+
     background-image:
-        radial-gradient(
-            var(--grid-color, #e8e8e8)
-            calc(
-                var(--grid-thickness, 1px)
-                / 2
-            ),
+        linear-gradient(
+            to right,
+            var(--grid-color)
+            0,
+            var(--grid-color)
+            var(--grid-thickness),
             transparent
-            calc(
-                var(--grid-thickness, 1px)
-                / 2 + .5px
-            )
+            var(--grid-thickness)
+        ),
+        linear-gradient(
+            to bottom,
+            var(--grid-color)
+            0,
+            var(--grid-color)
+            var(--grid-thickness),
+            transparent
+            var(--grid-thickness)
         );
+
+    /*
+     * Ширина колонок сетки.
+     */
 
     background-size:
-        18px 18px;
+        100px 100%,
+        100% 66px;
 
     background-position:
-        center top;
+        0 0,
+        0 0;
+
 }
 
 
-.grid-dots .schedule-row {
-    border-bottom: none;
-}
+/*
+ * В grid mode строки тоже должны
+ * сохранять горизонтальные линии.
+ */
 
+.schedule-board.grid-grid
+.schedule-row {
 
-/* =========================================
-   GRID — DOUBLE
-========================================= */
-
-.grid-double .schedule-row {
     border-bottom:
         var(
-            --grid-thickness,
-            1px
+            --grid-thickness
         )
         solid
         var(
-            --grid-color,
-            #e8e8e8
+            --grid-color
         );
 
-    box-shadow:
-        0 2px 0
-        rgba(0,0,0,.025);
 }
 
 
-/* =========================================
-   GRID — SOFT
-========================================= */
-
-.grid-soft .schedule-row {
-    border-bottom:
-        var(
-            --grid-thickness,
-            1px
-        )
-        solid
-        var(
-            --grid-color,
-            #e8e8e8
-        );
-
-    border-radius: 20px;
-}
-
-
-/* =========================================
-   GRID — WAVE
-========================================= */
-
-.grid-wave .schedule-row {
-    border-bottom: 0;
-
-    margin-bottom: 5px;
-}
-
-
-.grid-wave .schedule-row::after {
-    content: "";
-
-    position: absolute;
-
-    left: 58px;
-    right: 0;
-
-    bottom: 0;
-
-    height:
-        var(
-            --grid-thickness,
-            1px
-        );
-
-    background:
-        linear-gradient(
-            90deg,
-            transparent,
-            var(--grid-color, #e8e8e8),
-            transparent
-        );
-
-    opacity: .7;
-}
-
-
-/* =========================================
+/* =========================================================
    BOTTOM NAVIGATION
-========================================= */
+========================================================= */
 
 .bottom-navigation {
     position: fixed;
 
-    bottom: 0;
-
     left: 0;
     right: 0;
+    bottom: 0;
 
     z-index: 200;
 
@@ -725,12 +697,17 @@ body {
         );
 
     background:
-        rgba(255,255,255,.96);
-
-    backdrop-filter:
-        blur(15px);
+        rgba(
+            255,
+            255,
+            255,
+            .97
+        );
 
     -webkit-backdrop-filter:
+        blur(15px);
+
+    backdrop-filter:
         blur(15px);
 
     border-top:
@@ -739,22 +716,20 @@ body {
 }
 
 
-/* =========================================
+/* =========================================================
    DAYS
-========================================= */
+========================================================= */
 
 .days-scroll {
     width: 100%;
 
     display: grid;
 
-    /*
-     * Все 7 дней помещаются сразу.
-     * Никакого горизонтального скролла.
-     */
-
     grid-template-columns:
-        repeat(7, minmax(0, 1fr));
+        repeat(
+            7,
+            minmax(0,1fr)
+        );
 
     gap: 5px;
 
@@ -790,7 +765,7 @@ body {
 
     font-weight: 700;
 
-    letter-spacing: .4px;
+    letter-spacing: .3px;
 
     display: flex;
 
@@ -802,39 +777,51 @@ body {
 
     gap: 3px;
 
+    white-space: nowrap;
+
+    overflow: hidden;
+
     -webkit-appearance: none;
 
-    white-space: nowrap;
+    touch-action: manipulation;
 }
 
 
 .day-button.active {
+
     background: #111;
 
     color: #fff;
+
 }
 
 
 .day-button span {
-    width: 4px;
-    height: 4px;
+
+    width: 3px;
+    height: 3px;
+
+    flex: 0 0 3px;
 
     border-radius: 50%;
 
-    background: currentColor;
+    background:
+        currentColor;
 
     opacity: 0;
 }
 
 
 .day-button.today:not(.active) span {
+
     opacity: .5;
+
 }
 
 
-/* =========================================
-   MENU
-========================================= */
+/* =========================================================
+   MENU OVERLAY
+========================================================= */
 
 .menu-overlay {
     position: fixed;
@@ -844,7 +831,12 @@ body {
     z-index: 600;
 
     background:
-        rgba(0,0,0,.3);
+        rgba(
+            0,
+            0,
+            0,
+            .3
+        );
 
     opacity: 0;
 
@@ -856,11 +848,17 @@ body {
 
 
 .menu-overlay.open {
+
     opacity: 1;
 
     pointer-events: auto;
+
 }
 
+
+/* =========================================================
+   SIDE MENU
+========================================================= */
 
 .side-menu {
     position: fixed;
@@ -868,11 +866,13 @@ body {
     top: 0;
     left: 0;
 
-    width: min(
-        88vw,
-        370px
-    );
+    width:
+        min(
+            88vw,
+            370px
+        );
 
+    height: 100vh;
     height: 100dvh;
 
     z-index: 700;
@@ -891,11 +891,21 @@ body {
     background: #fff;
 
     transform:
-        translateX(-105%);
+        translate3d(
+            -105%,
+            0,
+            0
+        );
 
     transition:
-        transform .3s
-        cubic-bezier(.22,1,.36,1);
+        transform
+        .3s
+        cubic-bezier(
+            .22,
+            1,
+            .36,
+            1
+        );
 
     display: flex;
 
@@ -903,24 +913,38 @@ body {
 
     overflow-y: auto;
 
-    -webkit-overflow-scrolling: touch;
+    -webkit-overflow-scrolling:
+        touch;
+
+    will-change:
+        transform;
 }
 
 
 .side-menu.open {
+
     transform:
-        translateX(0);
+        translate3d(
+            0,
+            0,
+            0
+        );
+
 }
 
 
 .menu-top {
+
     display: flex;
 
-    justify-content: flex-end;
+    justify-content:
+        flex-end;
+
 }
 
 
 .close-menu {
+
     width: 42px;
     height: 42px;
 
@@ -931,10 +955,12 @@ body {
     background: #f2f2f2;
 
     font-size: 27px;
+
 }
 
 
 .menu-profile {
+
     margin-top: 40px;
 
     display: flex;
@@ -942,12 +968,16 @@ body {
     align-items: center;
 
     gap: 14px;
+
 }
 
 
 .menu-avatar {
+
     width: 55px;
     height: 55px;
+
+    flex: 0 0 55px;
 
     border-radius: 50%;
 
@@ -962,17 +992,21 @@ body {
     align-items: center;
 
     font-weight: 700;
+
 }
 
 
 .menu-username {
+
     font-size: 15px;
 
     font-weight: 700;
+
 }
 
 
 .menu-email {
+
     margin-top: 5px;
 
     font-size: 11px;
@@ -984,19 +1018,25 @@ body {
     overflow: hidden;
 
     text-overflow: ellipsis;
+
+    white-space: nowrap;
+
 }
 
 
 .menu-links {
+
     margin-top: 40px;
 
     border-top:
         1px solid
         #eee;
+
 }
 
 
 .menu-link {
+
     height: 62px;
 
     border-bottom:
@@ -1007,9 +1047,11 @@ body {
 
     align-items: center;
 
-    justify-content: space-between;
+    justify-content:
+        space-between;
 
-    text-decoration: none;
+    text-decoration:
+        none;
 
     color: #777;
 
@@ -1018,10 +1060,12 @@ body {
     font-weight: 700;
 
     letter-spacing: 1.5px;
+
 }
 
 
 .logout-button {
+
     margin-top: auto;
 
     width: 100%;
@@ -1038,16 +1082,21 @@ body {
     font-weight: 700;
 
     letter-spacing: 1.5px;
+
 }
 
 
-/* =========================================
-   IPHONE / MOBILE
-========================================= */
+/* =========================================================
+   IPHONE 14+
+========================================================= */
 
 @media (max-width: 767px) {
 
     .menu-button {
+
+        width: 42px;
+        height: 42px;
+
         left: 10px;
 
         top:
@@ -1056,38 +1105,46 @@ body {
                 env(safe-area-inset-top)
             );
 
-        width: 42px;
-        height: 42px;
     }
 
 
     .day-navigation {
+
         top:
             max(
                 10px,
                 env(safe-area-inset-top)
             );
+
+        gap: 4px;
+
     }
 
 
     .nav-button {
-        width: 40px;
-        height: 40px;
 
-        flex-basis: 40px;
+        width: 39px;
+        height: 39px;
+
+        flex-basis: 39px;
 
         font-size: 23px;
+
     }
 
 
     .selected-day {
-        min-width: 108px;
 
-        height: 40px;
+        width: 106px;
+        min-width: 106px;
+
+        height: 39px;
+
     }
 
 
     .schedule {
+
         padding-top:
             calc(
                 62px +
@@ -1096,9 +1153,10 @@ body {
 
         padding-bottom:
             calc(
-                68px +
+                70px +
                 env(safe-area-inset-bottom)
             );
+
     }
 
 
@@ -1106,166 +1164,147 @@ body {
 
         width: 100%;
 
-        padding-left: 56px;
-
-        padding-right: 12px;
-
         padding-top: 18px;
 
+        padding-right: 10px;
+
         padding-bottom: 90px;
+
     }
 
-
-    /*
-     * Здесь оставляем место
-     * под большой pointer.
-     */
 
     .schedule-row {
-        grid-template-columns:
-            62px
-            minmax(0, 1fr);
-
-        gap: 8px;
 
         min-height: 62px;
-    }
 
+        gap: 9px;
 
-    .schedule-time {
-        font-size:
-            var(--time-size, 11px);
-
-        padding:
-            0
-            var(--time-padding, 7px);
-    }
-
-
-    .schedule-task {
-        font-size:
-            var(--task-size, 15px);
-
-        padding: 8px;
-    }
-
-
-    .time-pointer {
-        left: 2px;
-
-        width: 50px;
-        height: 50px;
-    }
-
-
-    #pointerSymbol {
-        width: 28px;
-        height: 28px;
     }
 
 
     .day-button {
-        height: 38px;
+
+        height: 39px;
 
         border-radius: 10px;
 
         font-size: 7.5px;
 
-        letter-spacing: .2px;
     }
+
+
+    .side-menu {
+
+        width:
+            min(
+                88vw,
+                360px
+            );
+
+    }
+
 }
 
 
-/* =========================================
-   SMALL IPHONES
-========================================= */
+/* =========================================================
+   IPHONE 14 / 15 / 16 / 17
+========================================================= */
 
-@media (max-width: 390px) {
+@media (
+    min-width: 390px
+) and (
+    max-width: 767px
+) {
 
-    .schedule-board {
-        padding-left: 52px;
+    .days-scroll {
 
-        padding-right: 9px;
-    }
+        gap: 5px;
 
+        padding:
+            0 4px;
 
-    .schedule-row {
-        grid-template-columns:
-            57px
-            minmax(0, 1fr);
-
-        gap: 6px;
     }
 
 
     .day-button {
-        font-size: 7px;
+
+        font-size: 8px;
+
+    }
+
+}
+
+
+/* =========================================================
+   NARROW IPHONE
+========================================================= */
+
+@media (max-width: 389px) {
+
+    .days-scroll {
+
+        gap: 3px;
+
+        padding:
+            0 3px;
+
     }
 
 
-    .days-scroll {
-        gap: 4px;
+    .day-button {
+
+        height: 38px;
+
+        font-size: 7px;
+
+        letter-spacing: 0;
+
     }
 
 
     .selected-day {
-        min-width: 104px;
+
+        width: 100px;
+        min-width: 100px;
+
     }
+
 }
 
 
-/* =========================================
-   IPHONE 14/15/16/17 CLASS
-========================================= */
-
-@media (min-width: 391px) and (max-width: 767px) {
-
-    .schedule-board {
-        padding-left: 58px;
-        padding-right: 12px;
-    }
-
-
-    .schedule-row {
-        grid-template-columns:
-            62px
-            minmax(0, 1fr);
-    }
-
-
-    .day-button {
-        font-size: 8px;
-    }
-}
-
-
-/* =========================================
+/* =========================================================
    DESKTOP
-========================================= */
+========================================================= */
 
 @media (min-width: 768px) {
 
     .menu-button {
+
         left: 25px;
+
         top: 25px;
+
     }
 
 
     .day-navigation {
+
         top: 25px;
+
+    }
+
+
+    .schedule {
+
+        padding-top: 78px;
+
     }
 
 
     .schedule-board {
+
         width: 700px;
 
-        padding-left: 70px;
     }
 
-
-    .schedule-row {
-        grid-template-columns:
-            58px
-            minmax(0, 1fr);
-    }
 }
