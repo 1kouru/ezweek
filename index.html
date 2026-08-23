@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 
 <head>
 
@@ -7,7 +7,7 @@
 
     <meta
         name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no"
     >
 
     <title>Routine</title>
@@ -24,9 +24,8 @@
 
     <main class="app">
 
-        <!-- =========================================
-             HEADER
-        ========================================== -->
+
+        <!-- HEADER -->
 
         <header class="header">
 
@@ -34,7 +33,7 @@
                 class="day"
                 id="dayName"
             >
-                THURSDAY
+                MONDAY
             </div>
 
             <div
@@ -47,116 +46,72 @@
         </header>
 
 
-        <!-- =========================================
-             DAY NAVIGATION
-        ========================================== -->
+        <!-- MENU BUTTON -->
 
-        <nav
-            class="day-navigation"
-            aria-label="Schedule navigation"
+        <button
+            class="menu-button"
+            id="menuButton"
+            type="button"
+            aria-label="Menu"
         >
 
+            <span></span>
+
+            <span></span>
+
+            <span></span>
+
+        </button>
+
+
+        <!-- DAY NAVIGATION -->
+
+        <div class="day-navigation">
+
             <button
-                class="nav-arrow"
+                class="nav-button"
                 id="prevDay"
                 type="button"
-                aria-label="Previous day"
             >
                 ‹
             </button>
 
 
-            <div
-                class="days"
-                id="daysList"
+            <button
+                class="selected-day"
+                id="selectedDayButton"
+                type="button"
             >
 
-                <button
-                    class="day-button"
-                    data-day="MONDAY"
-                    type="button"
+                <span
+                    class="selected-day-label"
+                    id="selectedDayLabel"
                 >
-                    <span>MON</span>
-                </button>
+                    TODAY
+                </span>
 
-                <button
-                    class="day-button"
-                    data-day="TUESDAY"
-                    type="button"
+                <span
+                    class="selected-day-name"
+                    id="selectedDayName"
                 >
-                    <span>TUE</span>
-                </button>
+                    MONDAY
+                </span>
 
-                <button
-                    class="day-button"
-                    data-day="WEDNESDAY"
-                    type="button"
-                >
-                    <span>WED</span>
-                </button>
-
-                <button
-                    class="day-button"
-                    data-day="THURSDAY"
-                    type="button"
-                >
-                    <span>THU</span>
-                </button>
-
-                <button
-                    class="day-button"
-                    data-day="FRIDAY"
-                    type="button"
-                >
-                    <span>FRI</span>
-                </button>
-
-                <button
-                    class="day-button"
-                    data-day="SATURDAY"
-                    type="button"
-                >
-                    <span>SAT</span>
-                </button>
-
-                <button
-                    class="day-button"
-                    data-day="SUNDAY"
-                    type="button"
-                >
-                    <span>SUN</span>
-                </button>
-
-            </div>
+            </button>
 
 
             <button
-                class="nav-arrow"
+                class="nav-button"
                 id="nextDay"
                 type="button"
-                aria-label="Next day"
             >
                 ›
             </button>
 
-        </nav>
-
-
-        <!-- =========================================
-             VIEWING LABEL
-        ========================================== -->
-
-        <div
-            class="viewing"
-            id="viewingLabel"
-        >
-            TODAY
         </div>
 
 
-        <!-- =========================================
-             TODAY BUTTON
-        ========================================== -->
+        <!-- TODAY -->
 
         <button
             class="today-button"
@@ -167,11 +122,12 @@
         </button>
 
 
-        <!-- =========================================
-             SCHEDULE
-        ========================================== -->
+        <!-- SCHEDULE -->
 
-        <section class="schedule">
+        <section
+            class="schedule"
+            id="schedule"
+        >
 
             <div class="image-wrapper">
 
@@ -180,7 +136,6 @@
                     src=""
                     alt="Schedule"
                 >
-
 
                 <div class="pointer">
 
@@ -193,10 +148,193 @@
         </section>
 
 
+        <!-- BOTTOM DAYS -->
+
+        <nav class="bottom-navigation">
+
+            <div class="days-scroll">
+
+                <button
+                    class="day-button"
+                    data-day="MONDAY"
+                    type="button"
+                >
+                    MON
+                    <span class="day-indicator"></span>
+                </button>
+
+
+                <button
+                    class="day-button"
+                    data-day="TUESDAY"
+                    type="button"
+                >
+                    TUE
+                    <span class="day-indicator"></span>
+                </button>
+
+
+                <button
+                    class="day-button"
+                    data-day="WEDNESDAY"
+                    type="button"
+                >
+                    WED
+                    <span class="day-indicator"></span>
+                </button>
+
+
+                <button
+                    class="day-button"
+                    data-day="THURSDAY"
+                    type="button"
+                >
+                    THU
+                    <span class="day-indicator"></span>
+                </button>
+
+
+                <button
+                    class="day-button"
+                    data-day="FRIDAY"
+                    type="button"
+                >
+                    FRI
+                    <span class="day-indicator"></span>
+                </button>
+
+
+                <button
+                    class="day-button"
+                    data-day="SATURDAY"
+                    type="button"
+                >
+                    SAT
+                    <span class="day-indicator"></span>
+                </button>
+
+
+                <button
+                    class="day-button"
+                    data-day="SUNDAY"
+                    type="button"
+                >
+                    SUN
+                    <span class="day-indicator"></span>
+                </button>
+
+            </div>
+
+        </nav>
+
+
+        <!-- MENU OVERLAY -->
+
+        <div
+            class="menu-overlay"
+            id="menuOverlay"
+        ></div>
+
+
+        <!-- SIDE MENU -->
+
+        <aside
+            class="side-menu"
+            id="sideMenu"
+        >
+
+            <div class="menu-top">
+
+                <button
+                    class="close-menu"
+                    id="closeMenu"
+                    type="button"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <div class="menu-profile">
+
+                <div
+                    class="menu-avatar"
+                    id="menuAvatar"
+                >
+                    R
+                </div>
+
+
+                <div class="menu-user-info">
+
+                    <div
+                        class="menu-username"
+                        id="menuUsername"
+                    >
+                        USER
+                    </div>
+
+                    <div
+                        class="menu-email"
+                        id="menuEmail"
+                    >
+                        user@email.com
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="menu-links">
+
+                <a
+                    href="profile.html"
+                    class="menu-link"
+                >
+                    <span>
+                        PROFILE
+                    </span>
+
+                    <span class="menu-arrow">
+                        ›
+                    </span>
+                </a>
+
+
+                <a
+                    href="index.html"
+                    class="menu-link active"
+                >
+                    <span>
+                        SCHEDULE
+                    </span>
+
+                    <span class="menu-arrow">
+                        ›
+                    </span>
+                </a>
+
+            </div>
+
+
+            <button
+                class="logout-button"
+                id="logoutButton"
+                type="button"
+            >
+                LOG OUT
+            </button>
+
+        </aside>
+
+
     </main>
 
 
-    <script src="script.js"></script>
+<script type="module" src="script.js"></script>
+<script src="menu.js"></script>
 
 </body>
 

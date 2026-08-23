@@ -1,0 +1,877 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+    -webkit-tap-highlight-color: transparent;
+}
+
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+
+    background: #ffffff;
+}
+
+
+body {
+    color: #111111;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+}
+
+
+button,
+input {
+    font: inherit;
+}
+
+
+button {
+    cursor: pointer;
+}
+
+
+.profile-app {
+    width: 100%;
+    min-height: 100dvh;
+
+    padding:
+        max(20px, env(safe-area-inset-top))
+        22px
+        calc(50px + env(safe-area-inset-bottom));
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.profile-header {
+    height: 46px;
+
+    display: flex;
+    align-items: center;
+
+    position: relative;
+}
+
+
+.back-button {
+    width: 42px;
+    height: 42px;
+
+    border-radius: 50%;
+
+    background: rgba(17,17,17,.05);
+
+    color: #111111;
+
+    text-decoration: none;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 30px;
+    font-weight: 300;
+}
+
+
+.profile-header-title {
+    position: absolute;
+
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    font-size: 10px;
+    font-weight: 600;
+
+    letter-spacing: 2px;
+}
+
+
+/* =========================================
+   HERO
+========================================= */
+
+.profile-hero {
+    width: 100%;
+    max-width: 560px;
+
+    margin: 25px auto 0;
+
+    text-align: center;
+}
+
+
+.avatar-stage {
+    height: 265px;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+
+    overflow: hidden;
+}
+
+
+.avatar-character {
+    position: relative;
+
+    width: 190px;
+    height: 245px;
+}
+
+
+/* =========================================
+   HEAD
+========================================= */
+
+.avatar-head {
+    position: absolute;
+
+    z-index: 4;
+
+    top: 24px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    width: 104px;
+    height: 112px;
+
+    border-radius:
+        52px
+        52px
+        44px
+        44px;
+
+    background: #f1c8a5;
+
+    transition:
+        background .2s ease;
+}
+
+
+/* =========================================
+   HAIR
+========================================= */
+
+.avatar-hair {
+    position: absolute;
+
+    z-index: 7;
+
+    top: 13px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    width: 112px;
+    height: 62px;
+
+    border-radius:
+        60px
+        60px
+        25px
+        25px;
+
+    background: #111111;
+
+    transition:
+        all .2s ease;
+}
+
+
+.avatar-hair-back {
+    position: absolute;
+
+    z-index: 2;
+
+    top: 55px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    width: 116px;
+    height: 125px;
+
+    border-radius: 50px;
+
+    background: #111111;
+
+    opacity: 0;
+
+    transition: all .2s ease;
+}
+
+
+/* =========================================
+   EYES
+========================================= */
+
+.avatar-eyes {
+    position: absolute;
+
+    top: 43px;
+    left: 0;
+    right: 0;
+
+    display: flex;
+    justify-content: center;
+
+    gap: 23px;
+}
+
+
+.eye {
+    position: relative;
+
+    display: block;
+
+    width: 25px;
+    height: 31px;
+
+    border-radius: 50%;
+
+    background: #ffffff;
+
+    border: 2px solid rgba(17,17,17,.08);
+
+    overflow: hidden;
+
+    transition: all .2s ease;
+}
+
+
+.pupil {
+    position: absolute;
+
+    width: 11px;
+    height: 14px;
+
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%, -50%);
+
+    border-radius: 50%;
+
+    background: #69462d;
+
+    transition: all .2s ease;
+}
+
+
+/* =========================================
+   MOUTH
+========================================= */
+
+.avatar-mouth {
+    position: absolute;
+
+    z-index: 8;
+
+    left: 50%;
+    top: 80px;
+
+    width: 20px;
+    height: 8px;
+
+    transform: translateX(-50%);
+
+    border-bottom:
+        2px solid #111111;
+
+    border-radius: 0 0 50% 50%;
+
+    transition: all .2s ease;
+}
+
+
+/* =========================================
+   BODY
+========================================= */
+
+.avatar-body {
+    position: absolute;
+
+    z-index: 3;
+
+    left: 50%;
+    bottom: 0;
+
+    transform: translateX(-50%);
+
+    width: 150px;
+    height: 125px;
+
+    background: #111111;
+
+    border-radius:
+        65px
+        65px
+        0
+        0;
+
+    transition: all .2s ease;
+}
+
+
+/* =========================================
+   USER
+========================================= */
+
+.profile-user {
+    margin-top: 8px;
+}
+
+
+.profile-username {
+    width: min(280px, 100%);
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    text-align: center;
+
+    font-size: 22px;
+    font-weight: 600;
+
+    letter-spacing: 1px;
+}
+
+
+.profile-username:focus {
+    border-bottom: 1px solid #111111;
+}
+
+
+.profile-email {
+    margin-top: 8px;
+
+    font-size: 12px;
+
+    color: rgba(17,17,17,.4);
+}
+
+
+/* =========================================
+   CUSTOMIZER
+========================================= */
+
+.customizer {
+    width: 100%;
+    max-width: 560px;
+
+    margin: 50px auto 0;
+}
+
+
+.section-heading {
+    padding-bottom: 15px;
+
+    border-bottom:
+        1px solid rgba(17,17,17,.1);
+
+    font-size: 10px;
+    font-weight: 600;
+
+    letter-spacing: 2px;
+}
+
+
+.custom-section {
+    padding: 23px 0;
+
+    border-bottom:
+        1px solid rgba(17,17,17,.08);
+}
+
+
+.custom-label {
+    margin-bottom: 14px;
+
+    font-size: 9px;
+    font-weight: 600;
+
+    letter-spacing: 1.5px;
+
+    color: rgba(17,17,17,.42);
+}
+
+
+/* =========================================
+   OPTIONS
+========================================= */
+
+.options {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 8px;
+}
+
+
+.option {
+    min-width: 82px;
+    height: 40px;
+
+    padding: 0 14px;
+
+    border:
+        1px solid rgba(17,17,17,.12);
+
+    background: #ffffff;
+
+    color: rgba(17,17,17,.45);
+
+    font-size: 8px;
+    font-weight: 600;
+
+    letter-spacing: 1px;
+
+    transition:
+        .15s ease;
+}
+
+
+.option:hover {
+    border-color: #111111;
+}
+
+
+.option.active {
+    background: #111111;
+
+    color: #ffffff;
+
+    border-color: #111111;
+}
+
+
+/* =========================================
+   HAIR CARDS
+========================================= */
+
+.hair-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 8px;
+}
+
+
+.hair-card {
+    min-height: 72px;
+
+    border:
+        1px solid rgba(17,17,17,.12);
+
+    background: #ffffff;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    color: rgba(17,17,17,.45);
+
+    font-size: 7px;
+    font-weight: 600;
+
+    letter-spacing: 1px;
+}
+
+
+.hair-card.active {
+    background: #111111;
+    color: #ffffff;
+
+    border-color: #111111;
+}
+
+
+.hair-preview {
+    width: 30px;
+    height: 25px;
+
+    border-radius: 50%;
+
+    background: #111111;
+
+    display: block;
+}
+
+
+.hair-preview.long,
+.hair-preview.bob {
+    height: 34px;
+}
+
+
+.hair-preview.curly {
+    border-radius: 45% 55% 50% 45%;
+}
+
+
+.hair-preview.ponytail {
+    border-radius: 50% 50% 20% 50%;
+    transform: translateX(-4px);
+}
+
+
+.hair-preview.wavy {
+    border-radius: 55% 45% 45% 55%;
+}
+
+
+/* =========================================
+   COLORS
+========================================= */
+
+.color-options {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 13px;
+}
+
+
+.color-option,
+.eye-color-option {
+    width: 38px;
+    height: 38px;
+
+    border-radius: 50%;
+
+    border:
+        2px solid transparent;
+
+    background: #111111;
+}
+
+
+.color-option.brown {
+    background: #69462d;
+}
+
+
+.color-option.blonde {
+    background: #d6b36a;
+}
+
+
+.color-option.red {
+    background: #a63d32;
+}
+
+
+.color-option.pink {
+    background: #e98da9;
+}
+
+
+.color-option.blue {
+    background: #4d83c2;
+}
+
+
+.color-option.white {
+    background: #eeeeee;
+}
+
+
+.eye-color-option {
+    background: #69462d;
+}
+
+
+.eye-color-option.green {
+    background: #4f8155;
+}
+
+
+.eye-color-option.blue {
+    background: #4e83bd;
+}
+
+
+.eye-color-option.gray {
+    background: #7b8188;
+}
+
+
+.eye-color-option.black {
+    background: #111111;
+}
+
+
+.color-option.active,
+.eye-color-option.active {
+    border-color: #111111;
+
+    box-shadow:
+        0 0 0 3px #ffffff,
+        0 0 0 4px #111111;
+}
+
+
+/* =========================================
+   SAVE
+========================================= */
+
+.save-profile {
+    width: 100%;
+    height: 56px;
+
+    margin-top: 32px;
+
+    border: none;
+
+    background: #111111;
+
+    color: #ffffff;
+
+    font-size: 10px;
+    font-weight: 600;
+
+    letter-spacing: 2px;
+
+    transition: opacity .2s ease;
+}
+
+
+.save-profile:disabled {
+    opacity: .5;
+}
+
+
+.save-status {
+    min-height: 20px;
+
+    margin-top: 12px;
+
+    text-align: center;
+
+    font-size: 9px;
+
+    letter-spacing: 1px;
+
+    color: rgba(17,17,17,.45);
+}
+
+
+/* =========================================
+   HAIR STYLES
+========================================= */
+
+.avatar-character.hair-none .avatar-hair {
+    display: none;
+}
+
+
+.avatar-character.hair-long .avatar-hair {
+    width: 120px;
+    height: 145px;
+
+    top: 15px;
+
+    border-radius:
+        60px
+        60px
+        45px
+        45px;
+}
+
+
+.avatar-character.hair-long .avatar-hair-back {
+    opacity: 1;
+}
+
+
+.avatar-character.hair-bob .avatar-hair {
+    width: 124px;
+    height: 120px;
+
+    top: 13px;
+
+    border-radius:
+        60px
+        60px
+        35px
+        35px;
+}
+
+
+.avatar-character.hair-ponytail .avatar-hair {
+    width: 116px;
+    height: 72px;
+}
+
+
+.avatar-character.hair-ponytail .avatar-hair-back {
+    opacity: 1;
+
+    width: 50px;
+    height: 90px;
+
+    left: 74%;
+    top: 42px;
+
+    border-radius: 30px;
+}
+
+
+.avatar-character.hair-curly .avatar-hair {
+    width: 122px;
+    height: 80px;
+
+    border-radius: 45% 55% 35% 50%;
+}
+
+
+.avatar-character.hair-wavy .avatar-hair {
+    width: 120px;
+    height: 90px;
+
+    border-radius: 55% 45% 40% 45%;
+}
+
+
+.avatar-character.hair-messy .avatar-hair {
+    width: 120px;
+    height: 68px;
+
+    border-radius:
+        45% 55% 25% 35%;
+}
+
+
+.avatar-character.hair-fade .avatar-hair {
+    width: 110px;
+    height: 48px;
+
+    border-radius:
+        50px
+        50px
+        15px
+        15px;
+}
+
+
+/* =========================================
+   EYES
+========================================= */
+
+.avatar-character.eyes-soft .eye {
+    height: 23px;
+    border-radius: 50%;
+}
+
+
+.avatar-character.eyes-happy .eye {
+    height: 15px;
+
+    background: transparent;
+
+    border:
+        0
+        0
+        2px
+        0
+        solid #111111;
+
+    overflow: visible;
+}
+
+
+.avatar-character.eyes-happy .pupil {
+    display: none;
+}
+
+
+.avatar-character.eyes-sharp .eye {
+    height: 20px;
+
+    transform: rotate(-8deg);
+
+    border-radius: 60% 40% 40% 60%;
+}
+
+
+/* =========================================
+   MOUTHS
+========================================= */
+
+.avatar-character.mouth-small .avatar-mouth {
+    width: 10px;
+    height: 3px;
+
+    border-bottom: 2px solid #111111;
+}
+
+
+.avatar-character.mouth-open .avatar-mouth {
+    width: 15px;
+    height: 12px;
+
+    background: #111111;
+
+    border: none;
+
+    border-radius: 50%;
+}
+
+
+.avatar-character.mouth-flat .avatar-mouth {
+    width: 18px;
+    height: 0;
+
+    border-bottom: 2px solid #111111;
+
+    border-radius: 0;
+}
+
+
+.avatar-character.mouth-cute .avatar-mouth {
+    width: 18px;
+    height: 7px;
+
+    border-bottom: 3px solid #111111;
+
+    border-radius: 50%;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 380px) {
+
+    .hair-grid {
+        grid-template-columns:
+            repeat(3, 1fr);
+    }
+
+    .option {
+        min-width: 75px;
+    }
+
+}

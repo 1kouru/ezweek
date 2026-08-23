@@ -1,12 +1,11 @@
-/* =========================================
-   RESET
-========================================= */
-
 * {
     margin: 0;
     padding: 0;
 
     box-sizing: border-box;
+
+    -webkit-tap-highlight-color:
+        transparent;
 }
 
 
@@ -14,11 +13,12 @@ html,
 body {
     width: 100%;
     height: 100%;
+
+    background: #ffffff;
 }
 
 
 body {
-    background: #ffffff;
     color: #111111;
 
     font-family:
@@ -28,13 +28,10 @@ body {
 
     overflow: hidden;
 
-    -webkit-font-smoothing: antialiased;
+    -webkit-font-smoothing:
+        antialiased;
 }
 
-
-/* =========================================
-   APP
-========================================= */
 
 .app {
     position: relative;
@@ -42,10 +39,8 @@ body {
     width: 100vw;
     height: 100vh;
 
-    display: flex;
-
-    justify-content: center;
-    align-items: center;
+    width: 100dvw;
+    height: 100dvh;
 }
 
 
@@ -56,8 +51,13 @@ body {
 .header {
     position: fixed;
 
-    top: 20px;
-    left: 15px;
+    top:
+        max(
+            20px,
+            env(safe-area-inset-top)
+        );
+
+    left: 18px;
 
     z-index: 100;
 
@@ -66,30 +66,74 @@ body {
 
 
 .day {
-    font-size: 16px;
+    font-size: 15px;
+
     font-weight: 600;
 
-    letter-spacing: 3px;
-
-    line-height: 1;
-
-    color: #111111;
+    letter-spacing: 2.5px;
 }
 
 
 .time {
-    margin-top: 7px;
+    margin-top: 6px;
 
-    font-size: 14px;
+    font-size: 12px;
 
     letter-spacing: 2px;
 
     opacity: 0.4;
+}
 
-    color: #111111;
 
-    font-variant-numeric:
-        tabular-nums;
+/* =========================================
+   MENU BUTTON
+========================================= */
+
+.menu-button {
+    position: fixed;
+
+    top:
+        max(
+            16px,
+            env(safe-area-inset-top)
+        );
+
+    right: 16px;
+
+    z-index: 200;
+
+    width: 46px;
+    height: 46px;
+
+    border: none;
+
+    background:
+        rgba(255, 255, 255, 0.92);
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 5px;
+
+    cursor: pointer;
+
+    border-radius: 50%;
+
+    box-shadow:
+        0 2px 12px
+        rgba(0, 0, 0, 0.06);
+}
+
+
+.menu-button span {
+    width: 17px;
+    height: 1px;
+
+    background: #111111;
 }
 
 
@@ -100,289 +144,98 @@ body {
 .day-navigation {
     position: fixed;
 
-    top: 20px;
+    top:
+        max(
+            16px,
+            env(safe-area-inset-top)
+        );
+
     left: 50%;
 
-    transform: translateX(-50%);
+    transform:
+        translateX(-50%);
 
     z-index: 100;
 
     display: flex;
+
+    align-items: center;
+
+    gap: 5px;
+}
+
+
+.nav-button {
+    width: 46px;
+    height: 46px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: #ffffff;
+
+    color: #111111;
+
+    font-size: 30px;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 2px 12px
+        rgba(0, 0, 0, 0.06);
+}
+
+
+.selected-day {
+    min-width: 130px;
+    height: 46px;
+
+    border: none;
+
+    border-radius: 24px;
+
+    background: #111111;
+
+    color: #ffffff;
+
+    display: flex;
+
+    flex-direction: column;
 
     align-items: center;
     justify-content: center;
 
-    gap: 10px;
-
-    padding:
-        8px
-        10px;
-
-    background:
-        rgba(255, 255, 255, 0.82);
-
-    border:
-        1px solid
-        rgba(17, 17, 17, 0.10);
-
-    backdrop-filter:
-        blur(12px);
-
-    -webkit-backdrop-filter:
-        blur(12px);
-
-    border-radius: 999px;
+    cursor: pointer;
 }
 
 
-/* =========================================
-   DAYS
-========================================= */
+.selected-day-label {
+    font-size: 7px;
 
-.days {
-    display: flex;
+    letter-spacing: 1.8px;
 
-    align-items: center;
-
-    gap: 3px;
+    opacity: 0.55;
 }
 
 
-/* =========================================
-   DAY BUTTON
-========================================= */
-
-.day-button {
-    position: relative;
-
-    width: 36px;
-    height: 30px;
-
-    border: none;
-
-    border-radius: 999px;
-
-    background:
-        transparent;
-
-    color:
-        rgba(17, 17, 17, 0.35);
-
-    font-family: inherit;
+.selected-day-name {
+    margin-top: 2px;
 
     font-size: 10px;
-    font-weight: 600;
 
-    letter-spacing: 0.5px;
-
-    cursor: pointer;
-
-    transition:
-        background 0.2s ease,
-        color 0.2s ease,
-        transform 0.2s ease;
-}
-
-
-.day-button:hover {
-    color: #111111;
-
-    background:
-        rgba(17, 17, 17, 0.06);
-}
-
-
-.day-button:active {
-    transform:
-        scale(0.92);
-}
-
-
-/* =========================================
-   TODAY DOT
-========================================= */
-
-.day-button.today::after {
-    content: "";
-
-    position: absolute;
-
-    bottom: 3px;
-    left: 50%;
-
-    transform:
-        translateX(-50%);
-
-    width: 3px;
-    height: 3px;
-
-    border-radius: 50%;
-
-    background:
-        #111111;
-
-    opacity: 0.35;
-}
-
-
-/* =========================================
-   ACTIVE DAY
-========================================= */
-
-.day-button.active {
-    background: #111111;
-
-    color: #ffffff;
-}
-
-
-.day-button.active::after {
-    display: none;
-}
-
-
-/* =========================================
-   NAV ARROWS
-========================================= */
-
-.nav-arrow {
-    width: 26px;
-    height: 30px;
-
-    border: none;
-
-    background:
-        transparent;
-
-    color:
-        rgba(17, 17, 17, 0.45);
-
-    font-family: Arial, sans-serif;
-
-    font-size: 24px;
-    font-weight: 300;
-
-    line-height: 1;
-
-    cursor: pointer;
-
-    transition:
-        color 0.2s ease,
-        transform 0.2s ease;
-}
-
-
-.nav-arrow:hover {
-    color: #111111;
-}
-
-
-.nav-arrow:active {
-    transform:
-        scale(0.85);
-}
-
-
-/* =========================================
-   VIEWING LABEL
-========================================= */
-
-.viewing {
-    position: fixed;
-
-    top: 68px;
-    left: 50%;
-
-    transform:
-        translateX(-50%);
-
-    z-index: 100;
-
-    font-size: 9px;
-    font-weight: 600;
-
-    letter-spacing: 2px;
-
-    color:
-        rgba(17, 17, 17, 0.30);
-
-    white-space: nowrap;
-
-    pointer-events: none;
-
-    transition:
-        opacity 0.2s ease;
-}
-
-
-.viewing.future {
-    color:
-        rgba(17, 17, 17, 0.55);
-}
-
-
-/* =========================================
-   TODAY BUTTON
-========================================= */
-
-.today-button {
-    position: fixed;
-
-    top: 20px;
-    right: 15px;
-
-    z-index: 100;
-
-    height: 30px;
-
-    padding:
-        0
-        13px;
-
-    border:
-        1px solid
-        rgba(17, 17, 17, 0.12);
-
-    border-radius: 999px;
-
-    background:
-        rgba(255, 255, 255, 0.75);
-
-    color:
-        rgba(17, 17, 17, 0.65);
-
-    font-family: inherit;
-
-    font-size: 9px;
     font-weight: 600;
 
     letter-spacing: 1.5px;
-
-    cursor: pointer;
-
-    backdrop-filter:
-        blur(10px);
-
-    -webkit-backdrop-filter:
-        blur(10px);
-
-    transition:
-        background 0.2s ease,
-        color 0.2s ease,
-        transform 0.2s ease;
 }
 
 
-.today-button:hover {
-    background: #111111;
+/* =========================================
+   TODAY
+========================================= */
 
-    color: #ffffff;
-}
-
-
-.today-button:active {
-    transform:
-        scale(0.94);
+.today-button {
+    display: none;
 }
 
 
@@ -391,57 +244,51 @@ body {
 ========================================= */
 
 .schedule {
-    position: relative;
+    position: absolute;
 
-    width: 100%;
-    height: 100%;
+    inset: 0;
 
     display: flex;
 
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+
+    padding-top: 70px;
+
+    padding-bottom:
+        calc(
+            80px +
+            env(safe-area-inset-bottom)
+        );
+
+    touch-action: pan-y;
 }
 
-
-/* =========================================
-   IMAGE WRAPPER
-========================================= */
 
 .image-wrapper {
     position: relative;
 
-    /*
-        Исходное изображение:
-        1080 × 1920
-    */
-
     width:
         min(
-            90vw,
-            calc(100vh * 1080 / 1920)
+            94vw,
+            calc(
+                (100dvh - 145px)
+                * 1080 / 1920
+            )
         );
 
     aspect-ratio:
         1080 / 1920;
-
-    flex-shrink: 0;
 }
 
-
-/* =========================================
-   IMAGE
-========================================= */
 
 #scheduleImage {
     position: absolute;
 
-    top: 0;
-    left: 0;
+    inset: 0;
 
     width: 100%;
     height: 100%;
-
-    display: block;
 
     object-fit: fill;
 
@@ -451,18 +298,10 @@ body {
 }
 
 
-/* =========================================
-   POINTER
-========================================= */
-
 .pointer {
     position: absolute;
 
-    top: 0;
-    left: 0;
-
-    width: 100%;
-    height: 100%;
+    inset: 0;
 
     pointer-events: none;
 
@@ -470,18 +309,10 @@ body {
 }
 
 
-/* =========================================
-   TRIANGLE
-========================================= */
-
 .triangle {
     position: absolute;
 
-    /*
-        Расстояние от левого края PNG.
-    */
-
-    left: -18px;
+    left: -16px;
 
     width: 0;
     height: 0;
@@ -497,117 +328,393 @@ body {
 
     transform:
         translateY(-50%);
-
-    z-index: 20;
 }
 
 
 /* =========================================
-   MOBILE
+   BOTTOM NAVIGATION
 ========================================= */
 
-@media (max-width: 599px) {
+.bottom-navigation {
+    position: fixed;
 
-    .day-navigation {
-        gap: 4px;
+    left: 0;
+    right: 0;
+    bottom: 0;
 
-        padding:
-            6px
-            7px;
+    z-index: 100;
 
-        max-width: calc(100vw - 110px);
-    }
+    padding-top: 10px;
 
+    padding-bottom:
+        max(
+            12px,
+            env(safe-area-inset-bottom)
+        );
 
-    .days {
-        gap: 1px;
-    }
+    background:
+        rgba(255, 255, 255, 0.96);
 
-
-    .day-button {
-        width: 29px;
-        height: 28px;
-
-        font-size: 8px;
-    }
-
-
-    .nav-arrow {
-        width: 18px;
-
-        font-size: 20px;
-    }
+    border-top:
+        1px solid
+        rgba(17, 17, 17, 0.06);
+}
 
 
-    .viewing {
-        top: 62px;
+.days-scroll {
+    display: flex;
 
-        font-size: 8px;
+    gap: 7px;
 
-        letter-spacing: 1.5px;
-    }
+    overflow-x: auto;
+
+    padding:
+        0
+        18px;
+
+    scrollbar-width: none;
+
+    -webkit-overflow-scrolling: touch;
+}
 
 
-    .today-button {
-        right: 10px;
+.days-scroll::-webkit-scrollbar {
+    display: none;
+}
 
-        padding:
-            0
-            9px;
 
-        font-size: 8px;
-    }
+.day-button {
+    flex: 0 0 auto;
 
+    min-width: 54px;
+    height: 42px;
+
+    border: none;
+
+    border-radius: 14px;
+
+    background:
+        rgba(17, 17, 17, 0.04);
+
+    color:
+        rgba(17, 17, 17, 0.4);
+
+    font-size: 9px;
+
+    font-weight: 600;
+
+    letter-spacing: 0.8px;
+
+    cursor: pointer;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 4px;
+}
+
+
+.day-button.active {
+    background: #111111;
+
+    color: #ffffff;
+}
+
+
+.day-indicator {
+    width: 4px;
+    height: 4px;
+
+    border-radius: 50%;
+
+    background: currentColor;
+
+    opacity: 0;
+}
+
+
+.day-button.today
+.day-indicator {
+    opacity: 0.55;
+}
+
+
+.day-button.active
+.day-indicator {
+    opacity: 0;
 }
 
 
 /* =========================================
-   TABLET
+   MENU OVERLAY
 ========================================= */
 
-@media (min-width: 600px) {
+.menu-overlay {
+    position: fixed;
 
-    .header {
-        top: 30px;
-        left: 30px;
-    }
+    inset: 0;
 
+    z-index: 300;
 
-    .day {
-        font-size: 20px;
-    }
+    background:
+        rgba(0, 0, 0, 0.25);
 
+    opacity: 0;
 
-    .time {
-        font-size: 16px;
-    }
+    pointer-events: none;
 
-
-    .day-navigation {
-        top: 25px;
-    }
+    transition:
+        opacity 0.25s ease;
+}
 
 
-    .today-button {
-        top: 25px;
-        right: 30px;
-    }
+.menu-overlay.open {
+    opacity: 1;
+
+    pointer-events: auto;
+}
 
 
-    .viewing {
-        top: 73px;
-    }
+/* =========================================
+   SIDE MENU
+========================================= */
+
+.side-menu {
+    position: fixed;
+
+    top: 0;
+    right: 0;
+
+    z-index: 400;
+
+    width:
+        min(
+            86vw,
+            360px
+        );
+
+    height: 100dvh;
+
+    padding:
+        max(
+            20px,
+            env(safe-area-inset-top)
+        )
+        22px
+        max(
+            24px,
+            env(safe-area-inset-bottom)
+        );
+
+    background: #ffffff;
+
+    transform:
+        translateX(100%);
+
+    transition:
+        transform 0.3s
+        cubic-bezier(
+            0.22,
+            1,
+            0.36,
+            1
+        );
+
+    display: flex;
+
+    flex-direction: column;
+}
 
 
-    .triangle {
-        left: -22px;
+.side-menu.open {
+    transform:
+        translateX(0);
+}
 
-        border-top-width: 9px;
-        border-bottom-width: 9px;
 
-        border-left-width: 14px;
-    }
+/* =========================================
+   MENU TOP
+========================================= */
 
+.menu-top {
+    display: flex;
+
+    justify-content: flex-end;
+}
+
+
+.close-menu {
+    width: 42px;
+    height: 42px;
+
+    border: none;
+
+    background:
+        rgba(17, 17, 17, 0.05);
+
+    border-radius: 50%;
+
+    color: #111111;
+
+    font-size: 27px;
+
+    font-weight: 300;
+
+    cursor: pointer;
+}
+
+
+/* =========================================
+   PROFILE
+========================================= */
+
+.menu-profile {
+    margin-top: 45px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+}
+
+
+.menu-avatar {
+    width: 58px;
+    height: 58px;
+
+    border-radius: 50%;
+
+    background: #111111;
+
+    color: #ffffff;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 17px;
+
+    font-weight: 600;
+}
+
+
+.menu-user-info {
+    min-width: 0;
+}
+
+
+.menu-username {
+    font-size: 15px;
+
+    font-weight: 600;
+
+    letter-spacing: 0.5px;
+}
+
+
+.menu-email {
+    margin-top: 6px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+
+    font-size: 11px;
+
+    color:
+        rgba(17, 17, 17, 0.4);
+}
+
+
+/* =========================================
+   MENU LINKS
+========================================= */
+
+.menu-links {
+    margin-top: 45px;
+
+    border-top:
+        1px solid
+        rgba(17, 17, 17, 0.1);
+}
+
+
+.menu-link {
+    height: 62px;
+
+    padding:
+        0
+        3px;
+
+    border-bottom:
+        1px solid
+        rgba(17, 17, 17, 0.08);
+
+    color:
+        rgba(17, 17, 17, 0.45);
+
+    text-decoration: none;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    font-size: 10px;
+
+    font-weight: 600;
+
+    letter-spacing: 1.6px;
+}
+
+
+.menu-link.active {
+    color: #111111;
+}
+
+
+.menu-arrow {
+    font-size: 22px;
+
+    font-weight: 300;
+}
+
+
+/* =========================================
+   LOGOUT
+========================================= */
+
+.logout-button {
+    margin-top: auto;
+
+    width: 100%;
+    height: 54px;
+
+    border:
+        1px solid
+        rgba(17, 17, 17, 0.14);
+
+    background: #ffffff;
+
+    color: #111111;
+
+    font-family: inherit;
+
+    font-size: 10px;
+
+    font-weight: 600;
+
+    letter-spacing: 2px;
+
+    cursor: pointer;
 }
 
 
@@ -615,61 +722,39 @@ body {
    DESKTOP
 ========================================= */
 
-@media (min-width: 1000px) {
+@media (min-width: 768px) {
 
     .header {
-        top: 35px;
-        left: 40px;
+        top: 30px;
+        left: 35px;
     }
 
 
-    .day {
-        font-size: 24px;
-    }
-
-
-    .time {
-        font-size: 17px;
+    .menu-button {
+        top: 25px;
+        right: 30px;
     }
 
 
     .day-navigation {
-        top: 30px;
-
-        padding:
-            9px
-            12px;
-
-        gap: 12px;
+        top: 25px;
     }
 
 
-    .day-button {
-        width: 40px;
-        height: 32px;
-
-        font-size: 10px;
+    .image-wrapper {
+        width:
+            min(
+                70vw,
+                calc(
+                    (100vh - 150px)
+                    * 1080 / 1920
+                )
+            );
     }
 
 
-    .today-button {
-        top: 35px;
-        right: 40px;
-    }
-
-
-    .viewing {
-        top: 82px;
-    }
-
-
-    .triangle {
-        left: -25px;
-
-        border-top-width: 10px;
-        border-bottom-width: 10px;
-
-        border-left-width: 16px;
+    .days-scroll {
+        justify-content: center;
     }
 
 }

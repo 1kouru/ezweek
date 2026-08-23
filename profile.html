@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    >
+
+    <title>Routine — Profile</title>
+
+    <link
+        rel="stylesheet"
+        href="profile.css"
+    >
+
+</head>
+
+
+<body>
+
+<main class="profile-app">
+
+
+    <!-- HEADER -->
+
+    <header class="profile-header">
+
+        <a
+            href="index.html"
+            class="back-button"
+        >
+            ‹
+        </a>
+
+        <div class="profile-header-title">
+            PROFILE
+        </div>
+
+    </header>
+
+
+    <!-- AVATAR -->
+
+    <section class="profile-hero">
+
+        <div class="avatar-stage">
+
+            <div
+                class="avatar-character"
+                id="avatarCharacter"
+            >
+
+                <!-- HAIR BACK -->
+
+                <div
+                    class="avatar-hair-back"
+                    id="avatarHairBack"
+                ></div>
+
+
+                <!-- HEAD -->
+
+                <div
+                    class="avatar-head"
+                    id="avatarHead"
+                >
+
+                    <!-- EYES -->
+
+                    <div
+                        class="avatar-eyes"
+                        id="avatarEyes"
+                    >
+
+                        <span class="eye eye-left">
+                            <span class="pupil"></span>
+                        </span>
+
+                        <span class="eye eye-right">
+                            <span class="pupil"></span>
+                        </span>
+
+                    </div>
+
+
+                    <!-- MOUTH -->
+
+                    <div
+                        class="avatar-mouth"
+                        id="avatarMouth"
+                    ></div>
+
+                </div>
+
+
+                <!-- HAIR -->
+
+                <div
+                    class="avatar-hair"
+                    id="avatarHair"
+                ></div>
+
+
+                <!-- BODY -->
+
+                <div
+                    class="avatar-body"
+                    id="avatarBody"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+        <div class="profile-user">
+
+            <input
+                id="profileUsername"
+                class="profile-username"
+                type="text"
+                maxlength="20"
+                value="USER"
+                aria-label="Username"
+            >
+
+            <div
+                class="profile-email"
+                id="profileEmail"
+            >
+                user@email.com
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- CUSTOMIZATION -->
+
+    <section class="customizer">
+
+        <div class="section-heading">
+            APPEARANCE
+        </div>
+
+
+        <!-- SKIN -->
+
+        <div class="custom-section">
+
+            <div class="custom-label">
+                SKIN
+            </div>
+
+            <div class="options">
+
+                <button
+                    class="option skin-option"
+                    data-value="light"
+                    type="button"
+                >
+                    LIGHT
+                </button>
+
+                <button
+                    class="option skin-option"
+                    data-value="medium"
+                    type="button"
+                >
+                    MEDIUM
+                </button>
+
+                <button
+                    class="option skin-option"
+                    data-value="dark"
+                    type="button"
+                >
+                    DARK
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- HAIR STYLE -->
+
+        <div class="custom-section">
+
+            <div class="custom-label">
+                HAIRSTYLE
+            </div>
+
+            <div class="hair-grid">
+
+                <button
+                    class="hair-card hair-option"
+                    data-value="none"
+                    type="button"
+                >
+                    <span class="hair-preview bald"></span>
+                    <span>NONE</span>
+                </button>
+
+
+                <button
+                    class="hair-card hair-option"
+                    data-value="short"
+                    type="button"
+                >
+                    <span class="hair-preview short"></span>
+                    <span>SHORT</span>
+                </button>
+
+
+                <button
+                    class="hair-card hair-option"
+                    data-value="messy"
+                    type="button"
+                >
+                    <span class="hair-preview messy"></span>
+                    <span>MESSY</span>
+                </button>
+
+
+                <button
+                    class="hair-card hair-option"
+                    data-value="fade"
+                    type="button"
+                >
+                    <span class="hair-preview fade"></span>
+                    <span>FADE</span>
+                </button>
+
+
+                <button
+                    class="hair-card hair-option"
+                    data-value="curly"
+                    type="button"
+                >
+                    <span class="hair-preview curly"></span>
+                    <span>CURLY</span>
+                </button>
+
+
+                <button
+                    class="hair-card hair-option"
+                    data-value="long"
+                    type="button"
+                >
+                    <span class="hair-preview long"></span>
+                    <span>LONG</span>
+                </button>
+
+
+                <button
+                    class="hair-card hair-option"
+                    data-value="bob"
+                    type="button"
+                >
+                    <span class="hair-preview bob"></span>
+                    <span>BOB</span>
+                </button>
+
+
+                <button
+                    class="hair-card hair-option"
+                    data-value="ponytail"
+                    type="button"
+                >
+                    <span class="hair-preview ponytail"></span>
+                    <span>PONYTAIL</span>
+                </button>
+
+
+                <button
+                    class="hair-card hair-option"
+                    data-value="wavy"
+                    type="button"
+                >
+                    <span class="hair-preview wavy"></span>
+                    <span>WAVY</span>
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- HAIR COLOR -->
+
+        <div class="custom-section">
+
+            <div class="custom-label">
+                HAIR COLOR
+            </div>
+
+            <div class="color-options">
+
+                <button
+                    class="color-option"
+                    data-value="black"
+                    type="button"
+                    aria-label="Black"
+                ></button>
+
+                <button
+                    class="color-option brown"
+                    data-value="brown"
+                    type="button"
+                    aria-label="Brown"
+                ></button>
+
+                <button
+                    class="color-option blonde"
+                    data-value="blonde"
+                    type="button"
+                    aria-label="Blonde"
+                ></button>
+
+                <button
+                    class="color-option red"
+                    data-value="red"
+                    type="button"
+                    aria-label="Red"
+                ></button>
+
+                <button
+                    class="color-option pink"
+                    data-value="pink"
+                    type="button"
+                    aria-label="Pink"
+                ></button>
+
+                <button
+                    class="color-option blue"
+                    data-value="blue"
+                    type="button"
+                    aria-label="Blue"
+                ></button>
+
+                <button
+                    class="color-option white"
+                    data-value="white"
+                    type="button"
+                    aria-label="White"
+                ></button>
+
+            </div>
+
+        </div>
+
+
+        <!-- EYES -->
+
+        <div class="custom-section">
+
+            <div class="custom-label">
+                EYES
+            </div>
+
+            <div class="options">
+
+                <button
+                    class="option eyes-option"
+                    data-value="round"
+                    type="button"
+                >
+                    ROUND
+                </button>
+
+                <button
+                    class="option eyes-option"
+                    data-value="soft"
+                    type="button"
+                >
+                    SOFT
+                </button>
+
+                <button
+                    class="option eyes-option"
+                    data-value="happy"
+                    type="button"
+                >
+                    HAPPY
+                </button>
+
+                <button
+                    class="option eyes-option"
+                    data-value="sharp"
+                    type="button"
+                >
+                    SHARP
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- EYE COLOR -->
+
+        <div class="custom-section">
+
+            <div class="custom-label">
+                EYE COLOR
+            </div>
+
+            <div class="color-options">
+
+                <button
+                    class="eye-color-option"
+                    data-value="brown"
+                    type="button"
+                ></button>
+
+                <button
+                    class="eye-color-option green"
+                    data-value="green"
+                    type="button"
+                ></button>
+
+                <button
+                    class="eye-color-option blue"
+                    data-value="blue"
+                    type="button"
+                ></button>
+
+                <button
+                    class="eye-color-option gray"
+                    data-value="gray"
+                    type="button"
+                ></button>
+
+                <button
+                    class="eye-color-option black"
+                    data-value="black"
+                    type="button"
+                ></button>
+
+            </div>
+
+        </div>
+
+
+        <!-- MOUTH -->
+
+        <div class="custom-section">
+
+            <div class="custom-label">
+                MOUTH
+            </div>
+
+            <div class="options">
+
+                <button
+                    class="option mouth-option"
+                    data-value="smile"
+                    type="button"
+                >
+                    SMILE
+                </button>
+
+                <button
+                    class="option mouth-option"
+                    data-value="small"
+                    type="button"
+                >
+                    SMALL
+                </button>
+
+                <button
+                    class="option mouth-option"
+                    data-value="open"
+                    type="button"
+                >
+                    OPEN
+                </button>
+
+                <button
+                    class="option mouth-option"
+                    data-value="flat"
+                    type="button"
+                >
+                    FLAT
+                </button>
+
+                <button
+                    class="option mouth-option"
+                    data-value="cute"
+                    type="button"
+                >
+                    CUTE
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- OUTFIT -->
+
+        <div class="custom-section">
+
+            <div class="custom-label">
+                OUTFIT
+            </div>
+
+            <div class="options">
+
+                <button
+                    class="option outfit-option"
+                    data-value="hoodie"
+                    type="button"
+                >
+                    HOODIE
+                </button>
+
+                <button
+                    class="option outfit-option"
+                    data-value="shirt"
+                    type="button"
+                >
+                    SHIRT
+                </button>
+
+                <button
+                    class="option outfit-option"
+                    data-value="jacket"
+                    type="button"
+                >
+                    JACKET
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- OUTFIT COLOR -->
+
+        <div class="custom-section">
+
+            <div class="custom-label">
+                OUTFIT COLOR
+            </div>
+
+            <div class="options">
+
+                <button
+                    class="option outfit-color-option"
+                    data-value="black"
+                    type="button"
+                >
+                    BLACK
+                </button>
+
+                <button
+                    class="option outfit-color-option"
+                    data-value="white"
+                    type="button"
+                >
+                    WHITE
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <button
+            class="save-profile"
+            id="saveProfile"
+            type="button"
+        >
+            SAVE CHANGES
+        </button>
+
+
+        <div
+            class="save-status"
+            id="saveStatus"
+        ></div>
+
+    </section>
+
+
+</main>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="supabase.js"></script>
+
+<script src="profile.js"></script>
+
+</body>
+
+</html>

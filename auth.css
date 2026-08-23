@@ -1,0 +1,383 @@
+* {
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+
+    -webkit-tap-highlight-color:
+        transparent;
+}
+
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+
+    background: #ffffff;
+}
+
+
+body {
+    color: #111111;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    -webkit-font-smoothing:
+        antialiased;
+}
+
+
+.auth-app {
+    width: 100%;
+    min-height: 100vh;
+
+    min-height: 100dvh;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    padding:
+        calc(
+            30px +
+            env(safe-area-inset-top)
+        )
+        24px
+        calc(
+            30px +
+            env(safe-area-inset-bottom)
+        );
+}
+
+
+/* =========================================
+   LOGO
+========================================= */
+
+.auth-logo {
+    position: fixed;
+
+    top:
+        max(
+            25px,
+            env(safe-area-inset-top)
+        );
+
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+}
+
+
+.logo-line {
+    width: 20px;
+    height: 1px;
+
+    background: #111111;
+}
+
+
+.logo-name {
+    font-size: 11px;
+
+    font-weight: 600;
+
+    letter-spacing: 4px;
+}
+
+
+/* =========================================
+   CARD
+========================================= */
+
+.auth-card {
+    width: 100%;
+    max-width: 360px;
+
+    display: none;
+
+    animation:
+        fadeIn
+        0.25s ease;
+}
+
+
+.auth-card.active {
+    display: block;
+}
+
+
+@keyframes fadeIn {
+
+    from {
+
+        opacity: 0;
+
+        transform:
+            translateY(8px);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            translateY(0);
+
+    }
+
+}
+
+
+/* =========================================
+   HEADING
+========================================= */
+
+.auth-heading {
+    margin-bottom: 38px;
+}
+
+
+.auth-title {
+    font-size: 22px;
+
+    font-weight: 600;
+
+    letter-spacing: 2px;
+}
+
+
+.auth-description {
+    margin-top: 9px;
+
+    font-size: 13px;
+
+    color:
+        rgba(17, 17, 17, 0.45);
+
+    letter-spacing: 0.2px;
+}
+
+
+/* =========================================
+   FORM
+========================================= */
+
+.auth-form {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 19px;
+}
+
+
+.input-group {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+
+.input-group label {
+    font-size: 9px;
+
+    font-weight: 600;
+
+    letter-spacing: 1.8px;
+
+    color:
+        rgba(17, 17, 17, 0.45);
+}
+
+
+.input-group input {
+    width: 100%;
+    height: 52px;
+
+    padding:
+        0
+        16px;
+
+    border:
+        1px solid
+        rgba(17, 17, 17, 0.14);
+
+    border-radius: 0;
+
+    outline: none;
+
+    background: #ffffff;
+
+    color: #111111;
+
+    font-family: inherit;
+
+    font-size: 15px;
+
+    transition:
+        border-color 0.2s ease;
+}
+
+
+.input-group input:focus {
+    border-color: #111111;
+}
+
+
+.input-group input::placeholder {
+    color:
+        rgba(17, 17, 17, 0.25);
+}
+
+
+/* =========================================
+   MESSAGE
+========================================= */
+
+.auth-message {
+    display: none;
+
+    min-height: 16px;
+
+    font-size: 11px;
+
+    line-height: 1.4;
+
+    color:
+        #b00020;
+}
+
+
+.auth-message.show {
+    display: block;
+}
+
+
+.auth-message.success {
+    color: #167c35;
+}
+
+
+/* =========================================
+   SUBMIT
+========================================= */
+
+.auth-submit {
+    width: 100%;
+    height: 54px;
+
+    margin-top: 4px;
+
+    border: none;
+
+    background: #111111;
+
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-size: 10px;
+
+    font-weight: 600;
+
+    letter-spacing: 2px;
+
+    cursor: pointer;
+
+    transition:
+        opacity 0.2s ease,
+        transform 0.15s ease;
+
+    touch-action:
+        manipulation;
+}
+
+
+.auth-submit:active {
+    transform:
+        scale(0.98);
+}
+
+
+.auth-submit:disabled {
+    opacity: 0.4;
+
+    cursor: default;
+}
+
+
+/* =========================================
+   SWITCH
+========================================= */
+
+.auth-switch {
+    margin-top: 28px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 9px;
+
+    font-size: 12px;
+
+    color:
+        rgba(17, 17, 17, 0.45);
+}
+
+
+.auth-switch button {
+    border: none;
+
+    background: none;
+
+    color: #111111;
+
+    font-family: inherit;
+
+    font-size: 10px;
+
+    font-weight: 600;
+
+    letter-spacing: 1.5px;
+
+    cursor: pointer;
+}
+
+
+/* =========================================
+   DESKTOP
+========================================= */
+
+@media (min-width: 700px) {
+
+    .auth-card {
+        max-width: 400px;
+    }
+
+
+    .auth-title {
+        font-size: 26px;
+    }
+
+}

@@ -1,23 +1,59 @@
-const image = document.getElementById("scheduleImage");
-const triangle = document.querySelector(".triangle");
+const image =
+    document.getElementById("scheduleImage");
 
-const dayName = document.getElementById("dayName");
-const currentTime = document.getElementById("currentTime");
+const triangle =
+    document.querySelector(".triangle");
 
-const prevDayButton = document.getElementById("prevDay");
-const nextDayButton = document.getElementById("nextDay");
+const dayName =
+    document.getElementById("dayName");
 
-const todayButton = document.getElementById("todayButton");
+const currentTime =
+    document.getElementById("currentTime");
 
-const viewingLabel = document.getElementById("viewingLabel");
+const prevDayButton =
+    document.getElementById("prevDay");
+
+const nextDayButton =
+    document.getElementById("nextDay");
+
+const selectedDayButton =
+    document.getElementById(
+        "selectedDayButton"
+    );
+
+const selectedDayLabel =
+    document.getElementById(
+        "selectedDayLabel"
+    );
+
+const selectedDayName =
+    document.getElementById(
+        "selectedDayName"
+    );
+
+const scheduleElement =
+    document.getElementById("schedule");
 
 const dayButtons =
-    document.querySelectorAll(".day-button");
+    document.querySelectorAll(
+        ".day-button"
+    );
 
+import { supabase } from "./supabase.js";
 
-/* =====================================================
+const {
+    data: {
+        session
+    }
+} = await supabase.auth.getSession();
+
+if (!session) {
+    window.location.href = "auth.html";
+}
+
+/* =========================================
    РАСПИСАНИЕ
-===================================================== */
+========================================= */
 
 const DAYS = {
 
@@ -25,15 +61,19 @@ const DAYS = {
         image: 1,
 
         times: [
-            "08:00", "08:10", "08:30", "09:15", "09:40",
-            "10:00", "11:00", "14:00", "15:00", "18:00",
-            "20:00", "21:00", "23:00", "23:15"
+            "08:00", "08:10", "08:30",
+            "09:15", "09:40", "10:00",
+            "11:00", "14:00", "15:00",
+            "18:00", "20:00", "21:00",
+            "23:00", "23:15"
         ],
 
         positions: [
-            3.82, 5.47, 7.03, 8.75, 10.39,
-            12.02, 13.67, 15.17, 16.93, 18.46,
-            20.18, 21.74, 23.48, 25.22
+            3.82, 5.47, 7.03,
+            8.75, 10.39, 12.02,
+            13.67, 15.17, 16.93,
+            18.46, 20.18, 21.74,
+            23.48, 25.22
         ]
     },
 
@@ -42,15 +82,19 @@ const DAYS = {
         image: 2,
 
         times: [
-            "08:00", "08:10", "08:30", "09:15", "09:40",
-            "10:00", "11:00", "14:00", "15:30", "16:00",
-            "17:00", "18:00", "20:00", "23:00", "23:15"
+            "08:00", "08:10", "08:30",
+            "09:15", "09:40", "10:00",
+            "11:00", "14:00", "15:30",
+            "16:00", "17:00", "18:00",
+            "20:00", "23:00", "23:15"
         ],
 
         positions: [
-            2.60, 4.25, 5.81, 7.53, 9.17,
-            10.80, 12.44, 13.88, 15.71, 17.16,
-            18.88, 20.54, 22.24, 23.91, 25.51
+            2.60, 4.25, 5.81,
+            7.53, 9.17, 10.80,
+            12.44, 13.88, 15.71,
+            17.16, 18.88, 20.54,
+            22.24, 23.91, 25.51
         ]
     },
 
@@ -59,15 +103,19 @@ const DAYS = {
         image: 3,
 
         times: [
-            "08:00", "08:10", "08:30", "09:15", "09:40",
-            "10:00", "11:00", "13:00", "14:00", "15:00",
-            "20:00", "21:00", "22:00", "23:00", "23:15"
+            "08:00", "08:10", "08:30",
+            "09:15", "09:40", "10:00",
+            "11:00", "13:00", "14:00",
+            "15:00", "20:00", "21:00",
+            "22:00", "23:00", "23:15"
         ],
 
         positions: [
-            2.60, 4.25, 5.81, 7.53, 9.17,
-            10.80, 12.44, 13.88, 15.71, 17.16,
-            18.88, 20.54, 22.24, 23.91, 25.51
+            2.60, 4.25, 5.81,
+            7.53, 9.17, 10.80,
+            12.44, 13.88, 15.71,
+            17.16, 18.88, 20.54,
+            22.24, 23.91, 25.51
         ]
     },
 
@@ -76,15 +124,19 @@ const DAYS = {
         image: 4,
 
         times: [
-            "08:00", "08:10", "08:30", "09:15", "09:40",
-            "10:00", "11:00", "14:00", "15:00", "17:00",
-            "19:30", "20:30", "21:30", "23:00", "23:15"
+            "08:00", "08:10", "08:30",
+            "09:15", "09:40", "10:00",
+            "11:00", "14:00", "15:00",
+            "17:00", "19:30", "20:30",
+            "21:30", "23:00", "23:15"
         ],
 
         positions: [
-            2.60, 4.25, 5.81, 7.53, 9.17,
-            10.80, 12.44, 13.88, 15.71, 17.16,
-            18.88, 20.54, 22.24, 23.91, 25.51
+            2.60, 4.25, 5.81,
+            7.53, 9.17, 10.80,
+            12.44, 13.88, 15.71,
+            17.16, 18.88, 20.54,
+            22.24, 23.91, 25.51
         ]
     },
 
@@ -93,15 +145,19 @@ const DAYS = {
         image: 5,
 
         times: [
-            "08:00", "08:10", "08:30", "09:15", "09:40",
-            "10:00", "11:00", "13:00", "14:00", "15:00",
-            "20:00", "21:00", "21:30", "23:00", "23:15"
+            "08:00", "08:10", "08:30",
+            "09:15", "09:40", "10:00",
+            "11:00", "13:00", "14:00",
+            "15:00", "20:00", "21:00",
+            "21:30", "23:00", "23:15"
         ],
 
         positions: [
-            2.60, 4.25, 5.81, 7.53, 9.17,
-            10.80, 12.44, 13.88, 15.71, 17.16,
-            18.88, 20.54, 22.24, 23.91, 25.51
+            2.60, 4.25, 5.81,
+            7.53, 9.17, 10.80,
+            12.44, 13.88, 15.71,
+            17.16, 18.88, 20.54,
+            22.24, 23.91, 25.51
         ]
     },
 
@@ -110,15 +166,19 @@ const DAYS = {
         image: 6,
 
         times: [
-            "08:30", "08:40", "09:00", "09:45", "10:10",
-            "10:30", "11:30", "15:00", "16:00", "17:00",
-            "18:00", "20:00", "23:00", "23:15"
+            "08:30", "08:40", "09:00",
+            "09:45", "10:10", "10:30",
+            "11:30", "15:00", "16:00",
+            "17:00", "18:00", "20:00",
+            "23:00", "23:15"
         ],
 
         positions: [
-            3.82, 5.47, 7.03, 8.75, 10.39,
-            12.02, 13.67, 15.17, 16.93, 18.46,
-            20.18, 21.74, 23.48, 25.22
+            3.82, 5.47, 7.03,
+            8.75, 10.39, 12.02,
+            13.67, 15.17, 16.93,
+            18.46, 20.18, 21.74,
+            23.48, 25.22
         ]
     },
 
@@ -127,24 +187,24 @@ const DAYS = {
         image: 7,
 
         times: [
-            "09:00", "09:10", "09:30", "10:00", "13:00",
-            "14:00", "15:00", "18:00", "19:00", "20:00",
-            "21:00", "22:00", "22:15", "23:00"
+            "09:00", "09:10", "09:30",
+            "10:00", "13:00", "14:00",
+            "15:00", "18:00", "19:00",
+            "20:00", "21:00", "22:00",
+            "22:15", "23:00"
         ],
 
         positions: [
-            3.82, 5.47, 7.03, 8.75, 10.39,
-            12.02, 13.67, 15.17, 16.93, 18.46,
-            20.18, 21.74, 23.48, 25.22
+            3.82, 5.47, 7.03,
+            8.75, 10.39, 12.02,
+            13.67, 15.17, 16.93,
+            18.46, 20.18, 21.74,
+            23.48, 25.22
         ]
     }
 
 };
 
-
-/* =====================================================
-   ПОРЯДОК ДНЕЙ
-===================================================== */
 
 const WEEK = [
     "MONDAY",
@@ -170,53 +230,78 @@ const SHORT_NAMES = {
 };
 
 
-/* =====================================================
-   КАКОЙ ДЕНЬ МЫ СЕЙЧАС СМОТРИМ
-===================================================== */
-
 let selectedDay = null;
 
 
-/* =====================================================
-   ВРЕМЯ АЛМАТЫ
-===================================================== */
+/* =========================================
+   AUTH CHECK
+========================================= */
+
+async function checkAuth() {
+
+    const {
+        data
+    } = await supabase.auth.getSession();
+
+    if (!data.session) {
+
+        window.location.href =
+            "auth.html";
+
+    }
+
+}
+
+
+checkAuth();
+
+
+/* =========================================
+   ALMATY TIME
+========================================= */
 
 function getAlmatyTime() {
 
-    const parts = new Intl.DateTimeFormat(
-        "en-US",
-        {
-            timeZone: "Asia/Almaty",
+    const parts =
+        new Intl.DateTimeFormat(
+            "en-US",
+            {
+                timeZone: "Asia/Almaty",
 
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
 
-            hour12: false
-        }
-    )
-    .formatToParts(new Date());
-
-
-    let hour = Number(
-        parts.find(
-            p => p.type === "hour"
-        ).value
-    );
+                hour12: false
+            }
+        )
+        .formatToParts(
+            new Date()
+        );
 
 
-    const minute = Number(
-        parts.find(
-            p => p.type === "minute"
-        ).value
-    );
+    let hour =
+        Number(
+            parts.find(
+                p => p.type === "hour"
+            ).value
+        );
 
 
-    const second = Number(
-        parts.find(
-            p => p.type === "second"
-        ).value
-    );
+    const minute =
+        Number(
+            parts.find(
+                p => p.type === "minute"
+            ).value
+        );
+
+
+    const second =
+        Number(
+            parts.find(
+                p => p.type === "second"
+            ).value
+        );
 
 
     if (hour === 24) {
@@ -233,10 +318,6 @@ function getAlmatyTime() {
 }
 
 
-/* =====================================================
-   ДЕНЬ АЛМАТЫ
-===================================================== */
-
 function getAlmatyDay() {
 
     return new Intl.DateTimeFormat(
@@ -246,15 +327,13 @@ function getAlmatyDay() {
             weekday: "long"
         }
     )
-    .format(new Date())
+    .format(
+        new Date()
+    )
     .toUpperCase();
 
 }
 
-
-/* =====================================================
-   ВРЕМЯ → СЕКУНДЫ
-===================================================== */
 
 function timeToSeconds(time) {
 
@@ -275,10 +354,6 @@ function timeToSeconds(time) {
 }
 
 
-/* =====================================================
-   ТЕКУЩЕЕ ВРЕМЯ → СЕКУНДЫ
-===================================================== */
-
 function getCurrentSeconds(time) {
 
     return (
@@ -290,9 +365,9 @@ function getCurrentSeconds(time) {
 }
 
 
-/* =====================================================
-   ПОЗИЦИЯ ПО ВРЕМЕНИ
-===================================================== */
+/* =========================================
+   POSITION
+========================================= */
 
 function calculatePosition(
     times,
@@ -310,14 +385,9 @@ function calculatePosition(
         i++
     ) {
 
-        const scheduleTime =
-            timeToSeconds(
-                times[i]
-            );
-
-
         if (
-            currentSeconds >= scheduleTime
+            currentSeconds >=
+            timeToSeconds(times[i])
         ) {
 
             currentPosition =
@@ -339,10 +409,6 @@ function calculatePosition(
 }
 
 
-/* =====================================================
-   PHOTOSHOP → PIXELS
-===================================================== */
-
 function inchesToOriginalPixels(
     inches
 ) {
@@ -353,10 +419,6 @@ function inchesToOriginalPixels(
 
 }
 
-
-/* =====================================================
-   ПОСТАВИТЬ ТРЕУГОЛЬНИК
-===================================================== */
 
 function updateTriangle(
     yInches
@@ -377,14 +439,12 @@ function updateTriangle(
         renderedHeight / 1920;
 
 
-    const originalY =
+    const renderedY =
         inchesToOriginalPixels(
             yInches
-        );
-
-
-    const renderedY =
-        originalY * scale;
+        )
+        *
+        scale;
 
 
     triangle.style.top =
@@ -393,64 +453,11 @@ function updateTriangle(
 }
 
 
-/* =====================================================
-   ЗАГРУЗИТЬ ДЕНЬ
-===================================================== */
-
-function loadDay(day) {
-
-    const schedule =
-        DAYS[day];
-
-
-    if (!schedule) {
-        return;
-    }
-
-
-    const imagePath =
-        `images/${schedule.image}.png`;
-
-
-    if (
-        image.getAttribute("src") ===
-        imagePath
-    ) {
-
-        updateTriangleForSelectedDay();
-
-        return;
-
-    }
-
-
-    image.src =
-        imagePath;
-
-
-    image.onload = () => {
-
-        updateTriangleForSelectedDay();
-
-    };
-
-}
-
-
-/* =====================================================
-   ОБНОВИТЬ СТРЕЛКУ
-===================================================== */
-
 function updateTriangleForSelectedDay() {
 
     const today =
         getAlmatyDay();
 
-
-    /*
-        Если смотрим не сегодняшний день,
-        стрелку скрываем.
-    */
 
     if (
         selectedDay !== today
@@ -472,17 +479,13 @@ function updateTriangleForSelectedDay() {
         DAYS[selectedDay];
 
 
-    const time =
-        getAlmatyTime();
-
-
     const currentSeconds =
         getCurrentSeconds(
-            time
+            getAlmatyTime()
         );
 
 
-    const y =
+    const position =
         calculatePosition(
             schedule.times,
             schedule.positions,
@@ -490,14 +493,48 @@ function updateTriangleForSelectedDay() {
         );
 
 
-    updateTriangle(y);
+    updateTriangle(
+        position
+    );
 
 }
 
 
-/* =====================================================
-   ОБНОВИТЬ КНОПКИ ДНЕЙ
-===================================================== */
+/* =========================================
+   LOAD DAY
+========================================= */
+
+function loadDay(day) {
+
+    const imagePath =
+        `images/${DAYS[day].image}.png`;
+
+
+    if (
+        image.getAttribute("src") ===
+        imagePath
+    ) {
+
+        updateTriangleForSelectedDay();
+
+        return;
+
+    }
+
+
+    image.onload =
+        updateTriangleForSelectedDay;
+
+
+    image.src =
+        imagePath;
+
+}
+
+
+/* =========================================
+   UI
+========================================= */
 
 function updateDayButtons() {
 
@@ -508,36 +545,18 @@ function updateDayButtons() {
     dayButtons.forEach(
         button => {
 
-            const buttonDay =
-                button.dataset.day;
-
-
-            button.classList.remove(
+            button.classList.toggle(
                 "active",
-                "today"
+                button.dataset.day ===
+                selectedDay
             );
 
 
-            if (
-                buttonDay === selectedDay
-            ) {
-
-                button.classList.add(
-                    "active"
-                );
-
-            }
-
-
-            if (
-                buttonDay === today
-            ) {
-
-                button.classList.add(
-                    "today"
-                );
-
-            }
+            button.classList.toggle(
+                "today",
+                button.dataset.day ===
+                today
+            );
 
         }
     );
@@ -545,96 +564,65 @@ function updateDayButtons() {
 }
 
 
-/* =====================================================
-   ОБНОВИТЬ VIEWING LABEL
-===================================================== */
-
-function updateViewingLabel() {
+function updateSelectedDayInfo() {
 
     const today =
         getAlmatyDay();
+
+
+    selectedDayName.textContent =
+        selectedDay;
 
 
     if (
         selectedDay === today
     ) {
 
-        viewingLabel.textContent =
+        selectedDayLabel.textContent =
             "TODAY";
 
-        viewingLabel.classList.remove(
-            "future"
-        );
+        return;
+
+    }
+
+
+    let difference =
+        WEEK.indexOf(selectedDay) -
+        WEEK.indexOf(today);
+
+
+    if (difference < 0) {
+
+        difference += 7;
+
+    }
+
+
+    if (difference === 1) {
+
+        selectedDayLabel.textContent =
+            "TOMORROW";
+
+    }
+
+    else if (difference === 2) {
+
+        selectedDayLabel.textContent =
+            "DAY AFTER TOMORROW";
 
     }
 
     else {
 
-        const todayIndex =
-            WEEK.indexOf(today);
-
-
-        const selectedIndex =
-            WEEK.indexOf(selectedDay);
-
-
-        let difference =
-            selectedIndex -
-            todayIndex;
-
-
-        if (difference < 0) {
-
-            difference += 7;
-
-        }
-
-
-        viewingLabel.classList.add(
-            "future"
-        );
-
-
-        if (
-            difference === 1
-        ) {
-
-            viewingLabel.textContent =
-                "TOMORROW";
-
-        }
-
-        else if (
-            difference === 2
-        ) {
-
-            viewingLabel.textContent =
-                "DAY AFTER TOMORROW";
-
-        }
-
-        else {
-
-            viewingLabel.textContent =
-                SHORT_NAMES[selectedDay];
-
-        }
+        selectedDayLabel.textContent =
+            SHORT_NAMES[selectedDay];
 
     }
 
 }
 
 
-/* =====================================================
-   ВЫБРАТЬ ДЕНЬ
-===================================================== */
-
 function selectDay(day) {
-
-    if (!DAYS[day]) {
-        return;
-    }
-
 
     selectedDay =
         day;
@@ -646,72 +634,54 @@ function selectDay(day) {
 
     updateDayButtons();
 
-
-    updateViewingLabel();
-
+    updateSelectedDayInfo();
 
     loadDay(day);
 
 }
 
 
-/* =====================================================
-   ПРЕДЫДУЩИЙ ДЕНЬ
-===================================================== */
-
 function previousDay() {
 
-    const currentIndex =
-        WEEK.indexOf(
-            selectedDay
-        );
-
-
-    const previousIndex =
-        (
-            currentIndex - 1 + WEEK.length
-        )
-        %
-        WEEK.length;
+    const index =
+        WEEK.indexOf(selectedDay);
 
 
     selectDay(
-        WEEK[previousIndex]
+        WEEK[
+            (
+                index - 1 + 7
+            )
+            %
+            7
+        ]
     );
 
 }
 
-
-/* =====================================================
-   СЛЕДУЮЩИЙ ДЕНЬ
-===================================================== */
 
 function nextDay() {
 
-    const currentIndex =
-        WEEK.indexOf(
-            selectedDay
-        );
-
-
-    const nextIndex =
-        (
-            currentIndex + 1
-        )
-        %
-        WEEK.length;
+    const index =
+        WEEK.indexOf(selectedDay);
 
 
     selectDay(
-        WEEK[nextIndex]
+        WEEK[
+            (
+                index + 1
+            )
+            %
+            7
+        ]
     );
 
 }
 
 
-/* =====================================================
-   ОБНОВИТЬ ВРЕМЯ
-===================================================== */
+/* =========================================
+   CLOCK
+========================================= */
 
 function updateClock() {
 
@@ -731,56 +701,33 @@ function updateClock() {
 }
 
 
-/* =====================================================
-   ОСНОВНОЕ ОБНОВЛЕНИЕ
-===================================================== */
+/* =========================================
+   EVENTS
+========================================= */
 
-function update() {
+prevDayButton.addEventListener(
+    "click",
+    previousDay
+);
 
-    const today =
-        getAlmatyDay();
+
+nextDayButton.addEventListener(
+    "click",
+    nextDay
+);
 
 
-    /*
-        Если день изменился, но пользователь
-        смотрел сегодняшний день — автоматически
-        переключаемся на новый день.
-    */
+selectedDayButton.addEventListener(
+    "click",
+    () => {
 
-    if (!selectedDay) {
-
-        selectedDay =
-            today;
+        selectDay(
+            getAlmatyDay()
+        );
 
     }
+);
 
-
-    updateClock();
-
-
-    /*
-        Если selectedDay больше не соответствует
-        сегодняшнему дню, мы НЕ переключаем
-        пользователя принудительно.
-
-        Он может спокойно смотреть завтра,
-        послезавтра и другие дни.
-    */
-
-    updateDayButtons();
-
-
-    updateViewingLabel();
-
-
-    updateTriangleForSelectedDay();
-
-}
-
-
-/* =====================================================
-   КЛИК ПО ДНЯМ
-===================================================== */
 
 dayButtons.forEach(
     button => {
@@ -800,73 +747,120 @@ dayButtons.forEach(
 );
 
 
-/* =====================================================
-   СТРЕЛКИ
-===================================================== */
+/* =========================================
+   SWIPE
+========================================= */
 
-prevDayButton.addEventListener(
-    "click",
-    previousDay
-);
+let startX = 0;
+let startY = 0;
 
 
-nextDayButton.addEventListener(
-    "click",
-    nextDay
-);
+scheduleElement.addEventListener(
+    "touchstart",
 
+    event => {
 
-/* =====================================================
-   КНОПКА TODAY
-===================================================== */
+        startX =
+            event.changedTouches[0].screenX;
 
-todayButton.addEventListener(
-    "click",
-    () => {
+        startY =
+            event.changedTouches[0].screenY;
 
-        selectDay(
-            getAlmatyDay()
-        );
+    },
 
+    {
+        passive: true
     }
+
 );
 
 
-/* =====================================================
-   RESIZE
-===================================================== */
+scheduleElement.addEventListener(
+    "touchend",
+
+    event => {
+
+        const endX =
+            event.changedTouches[0].screenX;
+
+        const endY =
+            event.changedTouches[0].screenY;
+
+
+        const diffX =
+            endX - startX;
+
+        const diffY =
+            endY - startY;
+
+
+        if (
+            Math.abs(diffX) <
+            50
+        ) {
+
+            return;
+
+        }
+
+
+        if (
+            Math.abs(diffX) <=
+            Math.abs(diffY)
+        ) {
+
+            return;
+
+        }
+
+
+        if (diffX < 0) {
+
+            nextDay();
+
+        }
+
+        else {
+
+            previousDay();
+
+        }
+
+    },
+
+    {
+        passive: true
+    }
+
+);
+
 
 window.addEventListener(
     "resize",
-    () => {
-
-        updateTriangleForSelectedDay();
-
-    }
+    updateTriangleForSelectedDay
 );
 
 
-/* =====================================================
-   ОБНОВЛЕНИЕ
-===================================================== */
+/* =========================================
+   START
+========================================= */
+
+selectedDay =
+    getAlmatyDay();
+
+
+selectDay(
+    selectedDay
+);
+
 
 setInterval(
     () => {
 
-        update();
+        updateClock();
+
+        updateTriangleForSelectedDay();
 
     },
     1000
 );
-
-
-/* =====================================================
-   START
-===================================================== */
-
-selectDay(
-    getAlmatyDay()
-);
-
-
-update();

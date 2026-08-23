@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    >
+
+    <title>Routine — Auth</title>
+
+    <link
+        rel="stylesheet"
+        href="auth.css"
+    >
+
+</head>
+
+
+<body>
+
+    <main class="auth-app">
+
+
+        <!-- LOGO -->
+
+        <div class="auth-logo">
+
+            <div class="logo-line"></div>
+
+            <div class="logo-name">
+                ROUTINE
+            </div>
+
+        </div>
+
+
+        <!-- LOGIN -->
+
+        <section
+            class="auth-card active"
+            id="loginCard"
+        >
+
+            <div class="auth-heading">
+
+                <div class="auth-title">
+                    WELCOME BACK
+                </div>
+
+                <div class="auth-description">
+                    Log in to continue your routine.
+                </div>
+
+            </div>
+
+
+            <form
+                id="loginForm"
+                class="auth-form"
+            >
+
+                <div class="input-group">
+
+                    <label for="loginEmail">
+                        EMAIL
+                    </label>
+
+                    <input
+                        id="loginEmail"
+                        type="email"
+                        placeholder="you@email.com"
+                        autocomplete="email"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="input-group">
+
+                    <label for="loginPassword">
+                        PASSWORD
+                    </label>
+
+                    <input
+                        id="loginPassword"
+                        type="password"
+                        placeholder="••••••••"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                </div>
+
+
+                <div
+                    class="auth-message"
+                    id="loginMessage"
+                ></div>
+
+
+                <button
+                    type="submit"
+                    class="auth-submit"
+                    id="loginButton"
+                >
+                    LOG IN
+                </button>
+
+            </form>
+
+
+            <div class="auth-switch">
+
+                <span>
+                    Don't have an account?
+                </span>
+
+                <button
+                    type="button"
+                    id="showRegister"
+                >
+                    CREATE ACCOUNT
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- REGISTER -->
+
+        <section
+            class="auth-card"
+            id="registerCard"
+        >
+
+            <div class="auth-heading">
+
+                <div class="auth-title">
+                    CREATE ACCOUNT
+                </div>
+
+                <div class="auth-description">
+                    Start building your routine.
+                </div>
+
+            </div>
+
+
+            <form
+                id="registerForm"
+                class="auth-form"
+            >
+
+                <div class="input-group">
+
+                    <label for="registerUsername">
+                        USERNAME
+                    </label>
+
+                    <input
+                        id="registerUsername"
+                        type="text"
+                        placeholder="Your name"
+                        autocomplete="username"
+                        minlength="3"
+                        maxlength="20"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="input-group">
+
+                    <label for="registerEmail">
+                        EMAIL
+                    </label>
+
+                    <input
+                        id="registerEmail"
+                        type="email"
+                        placeholder="you@email.com"
+                        autocomplete="email"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="input-group">
+
+                    <label for="registerPassword">
+                        PASSWORD
+                    </label>
+
+                    <input
+                        id="registerPassword"
+                        type="password"
+                        placeholder="Minimum 6 characters"
+                        autocomplete="new-password"
+                        minlength="6"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="input-group">
+
+                    <label for="registerPasswordConfirm">
+                        CONFIRM PASSWORD
+                    </label>
+
+                    <input
+                        id="registerPasswordConfirm"
+                        type="password"
+                        placeholder="Repeat password"
+                        autocomplete="new-password"
+                        minlength="6"
+                        required
+                    >
+
+                </div>
+
+
+                <div
+                    class="auth-message"
+                    id="registerMessage"
+                ></div>
+
+
+                <button
+                    type="submit"
+                    class="auth-submit"
+                    id="registerButton"
+                >
+                    CREATE ACCOUNT
+                </button>
+
+            </form>
+
+
+            <div class="auth-switch">
+
+                <span>
+                    Already have an account?
+                </span>
+
+                <button
+                    type="button"
+                    id="showLogin"
+                >
+                    LOG IN
+                </button>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <!-- SUPABASE -->
+
+<script type="module" src="auth.js"></script>
+
+</body>
+
+</html>
