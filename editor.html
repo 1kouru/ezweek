@@ -1,62 +1,33 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta
         name="viewport"
-        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+        content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1"
     >
 
-    <meta
-        name="theme-color"
-        content="#f5f5f5"
-    >
+    <meta name="theme-color" content="#f5f5f5">
 
     <title>Edit Schedule</title>
 
-    <link
-        rel="stylesheet"
-        href="editor.css"
-    >
-
+    <link rel="stylesheet" href="editor.css">
 </head>
-
 
 <body>
 
 <header class="editor-header">
 
-    <a
-        href="index.html"
-        class="back"
-        aria-label="Back"
-    >
-        ‹
-    </a>
+    <a href="index.html" class="back">‹</a>
 
     <div class="header-info">
-
-        <div class="editor-title">
-            EDIT SCHEDULE
-        </div>
-
-        <div
-            class="editor-subtitle"
-            id="saveStatus"
-        >
-            READY
-        </div>
-
+        <div class="editor-title">EDIT SCHEDULE</div>
+        <div class="editor-subtitle" id="saveStatus">READY</div>
     </div>
 
-    <button
-        id="saveButton"
-        class="save-button"
-        type="button"
-    >
+    <button id="saveButton" class="save-button">
         SAVE
     </button>
 
@@ -69,13 +40,13 @@
 
     <nav class="day-tabs">
 
-        <button data-day="MONDAY" type="button">MON</button>
-        <button data-day="TUESDAY" type="button">TUE</button>
-        <button data-day="WEDNESDAY" type="button">WED</button>
-        <button data-day="THURSDAY" type="button">THU</button>
-        <button data-day="FRIDAY" type="button">FRI</button>
-        <button data-day="SATURDAY" type="button">SAT</button>
-        <button data-day="SUNDAY" type="button">SUN</button>
+        <button data-day="MONDAY">MON</button>
+        <button data-day="TUESDAY">TUE</button>
+        <button data-day="WEDNESDAY">WED</button>
+        <button data-day="THURSDAY">THU</button>
+        <button data-day="FRIDAY">FRI</button>
+        <button data-day="SATURDAY">SAT</button>
+        <button data-day="SUNDAY">SUN</button>
 
     </nav>
 
@@ -84,30 +55,16 @@
 
     <section class="global-tools">
 
-        <button
-            id="addTask"
-            class="add-button"
-            type="button"
-        >
-            <span class="plus">+</span>
-            <span>ADD TASK</span>
+        <button id="addTask" class="add-button">
+            <span class="plus">＋</span>
+            ADD TASK
         </button>
 
-        <button
-            id="gridButton"
-            class="tool-button"
-            type="button"
-        >
-            <span class="tool-icon">▦</span>
+        <button id="gridButton" class="tool-button">
             GRID
         </button>
 
-        <button
-            id="pointerButton"
-            class="tool-button"
-            type="button"
-        >
-            <span class="tool-icon">›</span>
+        <button id="pointerButton" class="tool-button">
             POINTER
         </button>
 
@@ -116,88 +73,41 @@
 
     <!-- GRID -->
 
-    <section
-        id="gridPanel"
-        class="global-panel hidden"
-    >
+    <section id="gridPanel" class="global-panel hidden">
 
         <div class="panel-top">
 
             <div>
-                <div class="panel-title">GRID</div>
-                <div class="panel-subtitle">
-                    schedule lines
-                </div>
+                <div class="panel-title">Grid</div>
+                <div class="panel-subtitle">Schedule lines</div>
             </div>
 
-            <button
-                class="panel-close"
-                data-close-panel="gridPanel"
-                type="button"
-            >
+            <button class="close-panel" data-close="gridPanel">
                 ×
             </button>
 
         </div>
 
 
-        <div
-            id="gridPreview"
-            class="grid-preview grid-clean"
-        >
+        <div class="live-preview grid-live-preview">
 
-            <div class="grid-preview-time">
-                08:00
+            <div class="preview-time-column">
+                <span>08:00</span>
+                <span>09:00</span>
+                <span>10:00</span>
             </div>
 
-            <div class="grid-preview-body">
+            <div
+                class="grid-preview-area"
+                id="gridPreviewArea"
+            >
 
-                <div class="grid-row">
-
-                    <div class="grid-example-time">
-                        08:00
-                    </div>
-
-                    <div class="grid-example-task">
-                        Morning routine
-                    </div>
-
+                <div class="preview-example-task">
+                    Morning routine
                 </div>
 
-                <div class="grid-row">
-
-                    <div class="grid-example-time">
-                        09:00
-                    </div>
-
-                    <div class="grid-example-task">
-                        Breakfast
-                    </div>
-
-                </div>
-
-                <div class="grid-row">
-
-                    <div class="grid-example-time">
-                        10:00
-                    </div>
-
-                    <div class="grid-example-task">
-                        Study
-                    </div>
-
-                </div>
-
-                <div class="grid-row">
-
-                    <div class="grid-example-time">
-                        11:00
-                    </div>
-
-                    <div class="grid-example-task">
-                        Walk
-                    </div>
-
+                <div class="preview-example-task second">
+                    Breakfast
                 </div>
 
             </div>
@@ -205,51 +115,61 @@
         </div>
 
 
-        <div class="grid-options">
-
-            <button data-grid="clean" type="button">
-                <span class="grid-icon clean"></span>
-                <span>Clean</span>
-            </button>
-
-            <button data-grid="dots" type="button">
-                <span class="grid-icon dots"></span>
-                <span>Dots</span>
-            </button>
-
-            <button data-grid="double" type="button">
-                <span class="grid-icon double"></span>
-                <span>Double</span>
-            </button>
-
-            <button data-grid="soft" type="button">
-                <span class="grid-icon soft"></span>
-                <span>Soft</span>
-            </button>
-
-            <button data-grid="wave" type="button">
-                <span class="grid-icon wave"></span>
-                <span>Wave</span>
-            </button>
-
+        <div class="setting-label">
+            LINES
         </div>
 
-
-        <div class="setting-line">
-
-            <span>Line color</span>
+        <div class="segmented">
 
             <button
-                id="gridColorButton"
-                class="color-swatch"
-                type="button"
-            ></button>
+                class="grid-mode"
+                data-mode="rows"
+            >
+                ROWS
+            </button>
+
+            <button
+                class="grid-mode"
+                data-mode="grid"
+            >
+                GRID
+            </button>
+
+        </div>
+
+
+        <div class="setting-label">
+            THICKNESS
+        </div>
+
+        <div class="range-box">
+
+            <div class="range-head">
+                <span>Line weight</span>
+                <output id="gridThicknessValue">1</output>
+            </div>
 
             <input
-                id="gridColor"
-                class="native-color"
-                type="color"
+                id="gridThickness"
+                type="range"
+                min="1"
+                max="3"
+                step="1"
             >
+
+        </div>
+
+
+        <div class="color-row">
+
+            <span>LINE COLOR</span>
+
+            <button
+                class="color-trigger"
+                data-color-target="gridColor"
+            >
+                <span class="color-dot" id="gridColorDot"></span>
+            </button>
 
         </div>
 
@@ -258,159 +178,181 @@
 
     <!-- POINTER -->
 
-    <section
-        id="pointerPanel"
-        class="global-panel hidden"
-    >
+    <section id="pointerPanel" class="global-panel hidden">
 
         <div class="panel-top">
 
             <div>
-                <div class="panel-title">POINTER</div>
-                <div class="panel-subtitle">
-                    current time
-                </div>
+                <div class="panel-title">Pointer</div>
+                <div class="panel-subtitle">Current time indicator</div>
             </div>
 
-            <button
-                class="panel-close"
-                data-close-panel="pointerPanel"
-                type="button"
-            >
+            <button class="close-panel" data-close="pointerPanel">
                 ×
             </button>
 
         </div>
 
 
-        <div class="pointer-preview">
+        <div class="live-preview pointer-live-preview">
 
-            <div
-                id="pointerPreview"
-                class="pointer-preview-icon"
-            >
-                <span class="pointer-fallback">›</span>
+            <div class="pointer-preview-icon" id="pointerPreviewIcon">
+                <img src="icons/1.png" alt="">
             </div>
 
-            <div class="pointer-preview-info">
-
+            <div class="pointer-preview-copy">
                 <strong>14:00</strong>
+                <span>Current time</span>
+            </div>
 
-                <span>
-                    current task
-                </span>
+        </div>
+
+
+        <div class="setting-label">
+            ICON
+        </div>
+
+        <button
+            class="custom-select-button"
+            id="iconPickerButton"
+        >
+
+            <span id="selectedIconPreview">
+                <img src="icons/1.png" alt="">
+            </span>
+
+            <span>Select icon</span>
+
+            <b>⌄</b>
+
+        </button>
+
+
+        <div id="iconPicker" class="custom-popup hidden">
+
+            <div class="popup-title">
+                Choose pointer
+            </div>
+
+            <div class="icon-grid">
+
+                <button data-icon="1">
+                    <img src="icons/1.png" alt="">
+                </button>
+
+                <button data-icon="2">
+                    <img src="icons/2.png" alt="">
+                </button>
+
+                <button data-icon="3">
+                    <img src="icons/3.png" alt="">
+                </button>
+
+                <button data-icon="4">
+                    <img src="icons/4.png" alt="">
+                </button>
+
+                <button data-icon="5">
+                    <img src="icons/5.png" alt="">
+                </button>
+
+                <button data-icon="6">
+                    <img src="icons/6.png" alt="">
+                </button>
+
+                <button data-icon="7">
+                    <img src="icons/7.png" alt="">
+                </button>
+
+                <button data-icon="8">
+                    <img src="icons/8.png" alt="">
+                </button>
+
+                <button data-icon="9">
+                    <img src="icons/9.png" alt="">
+                </button>
+
+                <button data-icon="10">
+                    <img src="icons/10.png" alt="">
+                </button>
 
             </div>
 
         </div>
 
 
-        <div class="pointer-settings">
+        <div class="two-controls">
 
-            <div class="setting-line">
+            <div class="range-box">
 
-                <span>Symbol</span>
-
-                <button
-                    id="pointerSymbolButton"
-                    class="symbol-button"
-                    type="button"
-                >
-                    <span
-                        id="pointerSymbolIcon"
-                        class="selected-symbol"
-                    ></span>
-                </button>
-
-            </div>
-
-
-            <div class="setting-line">
-
-                <span>Color</span>
-
-                <button
-                    id="pointerColorButton"
-                    class="color-swatch"
-                    type="button"
-                ></button>
-
-                <input
-                    id="pointerColor"
-                    class="native-color"
-                    type="color"
-                >
-
-            </div>
-
-
-            <div class="range-row">
-
-                <div class="range-name">
-                    Size
+                <div class="range-head">
+                    <span>SIZE</span>
+                    <output id="pointerSizeValue">28</output>
                 </div>
 
                 <input
                     id="pointerSize"
                     type="range"
                     min="12"
-                    max="60"
-                    step="1"
+                    max="70"
                 >
-
-                <output id="pointerSizeValue">
-                    28
-                </output>
 
             </div>
 
+            <div class="color-row compact-color-row">
 
-            <div class="toggle-line">
+                <span>COLOR</span>
 
+                <button
+                    class="color-trigger"
+                    data-color-target="pointerColor"
+                >
+                    <span class="color-dot" id="pointerColorDot"></span>
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="gradient-row">
+
+            <label>
+                <input type="checkbox" id="pointerGradient">
                 <span>Gradient</span>
+            </label>
 
-                <label class="switch">
+        </div>
 
-                    <input
-                        type="checkbox"
-                        id="pointerGradient"
-                    >
 
-                    <span></span>
+        <div
+            id="pointerGradientBox"
+            class="gradient-box hidden"
+        >
 
-                </label>
+            <div class="gradient-color-item">
+
+                <span>START</span>
+
+                <button
+                    class="color-trigger"
+                    data-color-target="pointerGradientStart"
+                >
+                    <span class="color-dot" id="pointerGradientStartDot"></span>
+                </button>
 
             </div>
 
+            <div class="gradient-color-item">
 
-            <div
-                id="pointerGradientOptions"
-                class="gradient-mini hidden"
-            >
+                <span>END</span>
 
                 <button
-                    id="pointerGradientStartButton"
-                    class="gradient-color"
-                    type="button"
-                ></button>
-
-                <button
-                    id="pointerGradientEndButton"
-                    class="gradient-color"
-                    type="button"
-                ></button>
-
-                <input
-                    id="pointerGradientStart"
-                    class="native-color"
-                    type="color"
+                    class="color-trigger"
+                    data-color-target="pointerGradientEnd"
                 >
-
-                <input
-                    id="pointerGradientEnd"
-                    class="native-color"
-                    type="color"
-                >
+                    <span class="color-dot" id="pointerGradientEndDot"></span>
+                </button>
 
             </div>
 
@@ -419,79 +361,106 @@
     </section>
 
 
-    <!-- SYMBOL POPUP -->
-
-    <div
-        id="symbolPopup"
-        class="floating-popup hidden"
-    >
-
-        <div class="popup-title">
-            SYMBOL
-        </div>
-
-        <div
-            id="symbolGrid"
-            class="symbol-grid"
-        ></div>
-
-    </div>
-
-
-    <!-- COLOR POPUP -->
-
-    <div
-        id="colorPopup"
-        class="color-popup hidden"
-    >
-
-        <div class="popup-title">
-            COLOR
-        </div>
-
-        <div class="color-preview-row">
-
-            <div
-                id="colorPreview"
-                class="big-color-preview"
-            ></div>
-
-            <div>
-                <div class="color-name">
-                    Custom color
-                </div>
-
-                <div class="color-hint">
-                    tap below to choose
-                </div>
-            </div>
-
-        </div>
-
-        <input
-            id="popupColorInput"
-            type="color"
-        >
-
-    </div>
-
-
     <!-- TASKS -->
 
-    <section
-        id="tasks"
-        class="tasks"
-    ></section>
-
+    <section id="tasks"></section>
 
 </main>
 
 
-<script
-    type="module"
-    src="editor.js"
-></script>
+<!-- COLOR PICKER -->
+
+<div id="colorOverlay" class="overlay hidden">
+
+    <div class="picker-sheet">
+
+        <div class="picker-header">
+
+            <div>
+                <strong>Color</strong>
+                <span>Choose a color</span>
+            </div>
+
+            <button id="closeColorPicker">
+                ×
+            </button>
+
+        </div>
+
+
+        <div class="color-section-title">
+            BASIC
+        </div>
+
+        <div class="basic-colors">
+
+            <button data-preset="#111111"></button>
+            <button data-preset="#ffffff"></button>
+            <button data-preset="#8B8B8B"></button>
+            <button data-preset="#FF4ECD"></button>
+            <button data-preset="#7C5CFF"></button>
+            <button data-preset="#FF5C5C"></button>
+            <button data-preset="#FF9F43"></button>
+            <button data-preset="#FFD166"></button>
+            <button data-preset="#6BCB77"></button>
+            <button data-preset="#4D96FF"></button>
+            <button data-preset="#00C2A8"></button>
+            <button data-preset="#B86BFF"></button>
+
+        </div>
+
+
+        <div class="color-section-title recent-title">
+            RECENT
+        </div>
+
+        <div id="recentColors" class="recent-colors"></div>
+
+
+        <button id="systemColorButton" class="system-color-button">
+            <span>＋</span>
+            Pick another color
+        </button>
+
+        <input
+            id="systemColorInput"
+            type="color"
+            class="real-color-input"
+        >
+
+    </div>
+
+</div>
+
+
+<!-- FONT PICKER -->
+
+<div id="fontOverlay" class="overlay hidden">
+
+    <div class="font-sheet">
+
+        <div class="picker-header">
+
+            <div>
+                <strong>Font</strong>
+                <span>Choose typography</span>
+            </div>
+
+            <button id="closeFontPicker">
+                ×
+            </button>
+
+        </div>
+
+
+        <div id="fontList" class="font-list"></div>
+
+    </div>
+
+</div>
+
+
+<script type="module" src="editor.js"></script>
 
 </body>
-
 </html>
