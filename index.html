@@ -15,46 +15,39 @@
 
     <link
         rel="stylesheet"
-        href="style.css"
+        href="style.css?v=20260823-10"
     >
 
 </head>
 
 
 <body>
-<link
-    rel="stylesheet"
-    href="style.css?v=20260823-3"
->
-    <script
-    type="module"
-    src="script.js?v=20260823-3"
-></script>
+
+
 <main class="app">
 
 
     <!-- HEADER -->
 
-    <header class="header">
+    <header
+        class="header"
+        aria-hidden="true"
+    >
 
         <div
             class="day"
             id="dayName"
-        >
-            LOADING
-        </div>
+        ></div>
 
         <div
             class="time"
             id="currentTime"
-        >
-            --:--
-        </div>
+        ></div>
 
     </header>
 
 
-    <!-- MENU -->
+    <!-- MENU BUTTON -->
 
     <button
         class="menu-button"
@@ -78,6 +71,7 @@
             class="nav-button"
             id="prevDay"
             type="button"
+            aria-label="Previous day"
         >
             ‹
         </button>
@@ -110,6 +104,7 @@
             class="nav-button"
             id="nextDay"
             type="button"
+            aria-label="Next day"
         >
             ›
         </button>
@@ -144,11 +139,12 @@
         <div
             class="time-pointer"
             id="timePointer"
+            aria-hidden="true"
         >
 
-            <span id="pointerSymbol">
-                ▶
-            </span>
+            <span
+                id="pointerSymbol"
+            ></span>
 
         </div>
 
@@ -157,65 +153,83 @@
 
     <!-- BOTTOM DAYS -->
 
-    <nav class="bottom-navigation">
+    <nav
+        class="bottom-navigation"
+        aria-label="Days"
+    >
 
         <div class="days-scroll">
 
+
             <button
                 class="day-button"
+                type="button"
                 data-day="MONDAY"
             >
                 MON
                 <span></span>
             </button>
 
+
             <button
                 class="day-button"
+                type="button"
                 data-day="TUESDAY"
             >
                 TUE
                 <span></span>
             </button>
 
+
             <button
                 class="day-button"
+                type="button"
                 data-day="WEDNESDAY"
             >
                 WED
                 <span></span>
             </button>
 
+
             <button
                 class="day-button"
+                type="button"
                 data-day="THURSDAY"
             >
                 THU
                 <span></span>
             </button>
 
+
             <button
                 class="day-button"
+                type="button"
                 data-day="FRIDAY"
             >
                 FRI
                 <span></span>
             </button>
 
+
             <button
                 class="day-button"
+                type="button"
                 data-day="SATURDAY"
             >
                 SAT
                 <span></span>
             </button>
 
+
             <button
                 class="day-button"
+                type="button"
                 data-day="SUNDAY"
             >
                 SUN
                 <span></span>
             </button>
+
 
         </div>
 
@@ -243,6 +257,7 @@
                 class="close-menu"
                 id="closeMenu"
                 type="button"
+                aria-label="Close menu"
             >
                 ×
             </button>
@@ -269,6 +284,7 @@
                     USER
                 </div>
 
+
                 <div
                     class="menu-email"
                     id="menuEmail"
@@ -281,7 +297,7 @@
         </div>
 
 
-        <div class="menu-links">
+        <nav class="menu-links">
 
             <a
                 href="profile.html"
@@ -300,15 +316,17 @@
                 <span>›</span>
             </a>
 
-        </div>
+        </nav>
 
 
         <button
             class="logout-button"
             id="logoutButton"
+            type="button"
         >
             LOG OUT
         </button>
+
 
     </aside>
 
@@ -316,15 +334,19 @@
 </main>
 
 
+<!-- MAIN SCRIPT -->
+
 <script
     type="module"
-    src="script.js"
+    src="script.js?v=20260823-10"
 ></script>
 
 
+<!-- MENU SCRIPT -->
+
 <script
     type="module"
-    src="menu.js"
+    src="menu.js?v=20260823-10"
 ></script>
 
 
