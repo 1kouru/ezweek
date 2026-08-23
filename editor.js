@@ -2,7 +2,7 @@ import { supabase } from "./supabase.js";
 
 
 /* =========================================
-   DAYS
+   CONSTANTS
 ========================================= */
 
 const DAYS = [
@@ -21,8 +21,6 @@ let selectedDay = "MONDAY";
 let user = null;
 
 let data = null;
-
-let openedTaskId = null;
 
 let saveTimer = null;
 
@@ -55,9 +53,6 @@ const gridPanel =
 const pointerPanel =
     document.getElementById("pointerPanel");
 
-const selectedDayTitle =
-    document.getElementById("selectedDayTitle");
-
 
 /* =========================================
    DEFAULT DATA
@@ -68,9 +63,7 @@ function defaultData() {
     const days = {};
 
     DAYS.forEach(day => {
-
         days[day] = [];
-
     });
 
 
@@ -82,21 +75,7 @@ function defaultData() {
 
             grid: "clean",
 
-            gridColor: "#e8e8e8",
-
-            timeColor: "#999999",
-
-            timeSize: 11,
-
-            taskSize: 15,
-
-            taskColor: "#111111",
-
-            taskBackground: "transparent",
-
-            taskRadius: 12,
-
-            taskPadding: 10
+            gridColor: "#e8e8e8"
 
         },
 
@@ -117,6 +96,181 @@ function defaultData() {
         }
 
     };
+
+}
+
+
+/* =========================================
+   DEFAULT TASK
+========================================= */
+
+function createDefaultTask(copy = null) {
+
+    if (copy) {
+
+        return {
+
+            ...JSON.parse(
+                JSON.stringify(copy)
+            ),
+
+            id:
+                crypto.randomUUID()
+
+        };
+
+    }
+
+
+    return {
+
+        id:
+            crypto.randomUUID(),
+
+        time:
+            "08:00",
+
+        text:
+            "NEW TASK",
+
+
+        /* TIME */
+
+        timeColor:
+            "#999999",
+
+        timeSize:
+            11,
+
+        timeWeight:
+            600,
+
+
+        /* TEXT */
+
+        color:
+            "#111111",
+
+        fontSize:
+            15,
+
+        fontFamily:
+            "Arial",
+
+        fontWeight:
+            500,
+
+        gradient:
+            false,
+
+        gradientStart:
+            "#ff4ecd",
+
+        gradientEnd:
+            "#7c5cff",
+
+
+        /* CARD */
+
+        background:
+            "transparent",
+
+        radius:
+            12,
+
+        padding:
+            10
+
+    };
+
+}
+
+
+/* =========================================
+   AUTH
+========================================= */
+
+async function initUser() {
+
+    const {
+        data: sessionData
+    } =
+        await supabase.auth.getSession();
+
+
+    if (!sessionData.session) {
+
+        window.location.href =
+            "auth.html";
+
+        return false;
+
+    }
+
+
+    user =
+        sessionData.session.user;
+
+
+    return true;
+
+}
+
+
+/* =========================================
+   LOAD
+========================================= */
+
+async function loadData() {
+
+    setStatus("LOADING...");
+
+
+    const {
+        data: row,
+        error
+    } =
+        await supabase
+
+            .from("schedules")
+
+            .select("data")
+
+            .eq(
+                "user_id",
+                user.id
+            )
+
+            .maybeSingle();
+
+
+    if (error) {
+
+        console.error(
+            "LOAD ERROR:",
+            error
+        );
+
+        setStatus("LOAD ERROR");
+
+        alert(
+            "Не удалось загрузить расписание:\n\n" +
+            error.message
+        );
+
+        return;
+
+    }
+
+
+    data =
+        row?.data ||
+        defaultData();
+
+
+    normalize();
+
+    setStatus("READY");
 
 }
 
@@ -178,183 +332,16 @@ function normalize() {
 
 
         data.days[day] =
-            data.days[day].map(item => {
+            data.days[day].map(task => {
 
                 return {
-
-                    id:
-                        item.id ||
-                        crypto.randomUUID(),
-
-                    time:
-                        item.time ||
-                        "08:00",
-
-                    text:
-                        item.text ||
-                        "NEW TASK",
-
-                    color:
-                        item.color ||
-                        data.global.taskColor,
-
-                    fontSize:
-                        Number(
-                            item.fontSize ||
-                            data.global.taskSize
-                        ),
-
-                    fontFamily:
-                        item.fontFamily ||
-                        "Arial",
-
-                    fontWeight:
-                        Number(
-                            item.fontWeight ||
-                            500
-                        ),
-
-                    background:
-                        item.background ||
-                        "transparent",
-
-                    radius:
-                        Number(
-                            item.radius ??
-                            data.global.taskRadius
-                        ),
-
-                    padding:
-                        Number(
-                            item.padding ??
-                            data.global.taskPadding
-                        ),
-
-                    timeColor:
-                        item.timeColor ||
-                        data.global.timeColor,
-
-                    timeSize:
-                        Number(
-                            item.timeSize ||
-                            data.global.timeSize
-                        ),
-
-                    timeWeight:
-                        Number(
-                            item.timeWeight ||
-                            600
-                        ),
-
-                    gradient:
-                        Boolean(
-                            item.gradient
-                        ),
-
-                    gradientStart:
-                        item.gradientStart ||
-                        "#ff4ecd",
-
-                    gradientEnd:
-                        item.gradientEnd ||
-                        "#7c5cff"
-
+                    ...createDefaultTask(),
+                    ...task
                 };
 
             });
 
     });
-
-}
-
-
-/* =========================================
-   AUTH
-========================================= */
-
-async function initUser() {
-
-    const {
-        data: sessionData
-    } =
-        await supabase.auth.getSession();
-
-
-    if (
-        !sessionData.session
-    ) {
-
-        window.location.href =
-            "auth.html";
-
-        return false;
-
-    }
-
-
-    user =
-        sessionData.session.user;
-
-
-    return true;
-
-}
-
-
-/* =========================================
-   LOAD
-========================================= */
-
-async function loadData() {
-
-    setStatus("LOADING...");
-
-
-    const {
-        data: row,
-        error
-    } =
-        await supabase
-
-            .from("schedules")
-
-            .select("data")
-
-            .eq(
-                "user_id",
-                user.id
-            )
-
-            .maybeSingle();
-
-
-    if (error) {
-
-        console.error(error);
-
-        setStatus("LOAD ERROR");
-
-        alert(
-            "Не удалось загрузить расписание:\n\n" +
-            error.message
-        );
-
-        return false;
-
-    }
-
-
-    data =
-        row?.data ||
-        defaultData();
-
-
-    normalize();
-
-
-    setStatus("READY");
-
-    return true;
 
 }
 
@@ -399,10 +386,8 @@ async function save() {
                 },
 
                 {
-
                     onConflict:
                         "user_id"
-
                 }
 
             );
@@ -414,7 +399,7 @@ async function save() {
     if (error) {
 
         console.error(
-            "SUPABASE SAVE ERROR:",
+            "SAVE ERROR:",
             error
         );
 
@@ -433,14 +418,18 @@ async function save() {
     setStatus("SAVED ✓");
 
 
-    setTimeout(
-        () => {
+    setTimeout(() => {
+
+        if (
+            saveStatus.textContent ===
+            "SAVED ✓"
+        ) {
 
             setStatus("READY");
 
-        },
-        1200
-    );
+        }
+
+    }, 1200);
 
 
     return true;
@@ -462,11 +451,7 @@ function queueSave() {
 
     saveTimer =
         setTimeout(
-            () => {
-
-                save();
-
-            },
+            save,
             700
         );
 
@@ -486,11 +471,96 @@ function setStatus(text) {
 
 
 /* =========================================
-   DAY TABS
+   PANELS
+========================================= */
+
+function closeGlobalPanels() {
+
+    gridPanel.classList.add(
+        "hidden"
+    );
+
+    pointerPanel.classList.add(
+        "hidden"
+    );
+
+}
+
+
+function openOnly(panel) {
+
+    const wasClosed =
+        panel.classList.contains(
+            "hidden"
+        );
+
+
+    closeGlobalPanels();
+
+
+    if (wasClosed) {
+
+        panel.classList.remove(
+            "hidden"
+        );
+
+    }
+
+}
+
+
+gridButton.addEventListener(
+    "click",
+    () => {
+
+        openOnly(gridPanel);
+
+    }
+);
+
+
+pointerButton.addEventListener(
+    "click",
+    () => {
+
+        openOnly(pointerPanel);
+
+    }
+);
+
+
+document
+    .querySelectorAll(
+        "[data-close-panel]"
+    )
+    .forEach(button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                document
+                    .getElementById(
+                        button.dataset.closePanel
+                    )
+                    .classList.add(
+                        "hidden"
+                    );
+
+            }
+        );
+
+    });
+
+
+/* =========================================
+   DAYS
 ========================================= */
 
 document
-    .querySelectorAll(".day-tabs button")
+    .querySelectorAll(
+        ".day-tabs button"
+    )
     .forEach(button => {
 
         button.addEventListener(
@@ -499,9 +569,6 @@ document
 
                 selectedDay =
                     button.dataset.day;
-
-                openedTaskId =
-                    null;
 
                 updateTabs();
 
@@ -516,7 +583,9 @@ document
 function updateTabs() {
 
     document
-        .querySelectorAll(".day-tabs button")
+        .querySelectorAll(
+            ".day-tabs button"
+        )
         .forEach(button => {
 
             button.classList.toggle(
@@ -526,10 +595,6 @@ function updateTabs() {
             );
 
         });
-
-
-    selectedDayTitle.textContent =
-        selectedDay;
 
 }
 
@@ -542,74 +607,190 @@ addTaskButton.addEventListener(
     "click",
     () => {
 
-        const task = {
+        /*
+         * Закрываем глобальные панели.
+         */
 
-            id:
-                crypto.randomUUID(),
-
-            time:
-                "08:00",
-
-            text:
-                "NEW TASK",
-
-            color:
-                data.global.taskColor,
-
-            fontSize:
-                data.global.taskSize,
-
-            fontFamily:
-                "Arial",
-
-            fontWeight:
-                500,
-
-            background:
-                "transparent",
-
-            radius:
-                data.global.taskRadius,
-
-            padding:
-                data.global.taskPadding,
-
-            timeColor:
-                data.global.timeColor,
-
-            timeSize:
-                data.global.timeSize,
-
-            timeWeight:
-                600,
-
-            gradient:
-                false,
-
-            gradientStart:
-                "#ff4ecd",
-
-            gradientEnd:
-                "#7c5cff"
-
-        };
+        closeGlobalPanels();
 
 
-        data.days[selectedDay].push(
-            task
-        );
+        /*
+         * Берём последнюю задачу
+         * из выбранного дня.
+         */
+
+        const current =
+            data.days[selectedDay];
 
 
-        openedTaskId =
-            task.id;
+        const last =
+            current.length
+                ? current[current.length - 1]
+                : null;
+
+
+        /*
+         * Новая задача получает
+         * все настройки последней.
+         */
+
+        const task =
+            createDefaultTask(last);
+
+
+        /*
+         * Если последняя задача есть,
+         * немного увеличиваем время,
+         * чтобы новые задачи
+         * не накладывались.
+         */
+
+        if (last) {
+
+            task.time =
+                addMinutes(
+                    last.time,
+                    30
+                );
+
+        }
+
+
+        current.push(task);
 
 
         renderTasks();
 
         queueSave();
 
+
+        /*
+         * Прокручиваем к новой задаче.
+         */
+
+        setTimeout(() => {
+
+            const cards =
+                tasks.querySelectorAll(
+                    ".task-card"
+                );
+
+            const lastCard =
+                cards[cards.length - 1];
+
+
+            if (lastCard) {
+
+                lastCard.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
+
+            }
+
+        }, 50);
+
     }
 );
+
+
+/* =========================================
+   DUPLICATE
+========================================= */
+
+function duplicateTask(item) {
+
+    const copy =
+        createDefaultTask(item);
+
+
+    copy.time =
+        addMinutes(
+            item.time,
+            30
+        );
+
+
+    data.days[selectedDay]
+        .push(copy);
+
+
+    renderTasks();
+
+    queueSave();
+
+
+    setTimeout(() => {
+
+        const cards =
+            tasks.querySelectorAll(
+                ".task-card"
+            );
+
+        const last =
+            cards[cards.length - 1];
+
+
+        if (last) {
+
+            last.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+
+        }
+
+    }, 50);
+
+}
+
+
+/* =========================================
+   ADD MINUTES
+========================================= */
+
+function addMinutes(
+    time,
+    minutes
+) {
+
+    const [h, m] =
+        time
+            .split(":")
+            .map(Number);
+
+
+    let total =
+        h * 60 +
+        m +
+        minutes;
+
+
+    total =
+        Math.max(
+            0,
+            Math.min(
+                1439,
+                total
+            )
+        );
+
+
+    const hh =
+        String(
+            Math.floor(total / 60)
+        ).padStart(2, "0");
+
+
+    const mm =
+        String(
+            total % 60
+        ).padStart(2, "0");
+
+
+    return `${hh}:${mm}`;
+
+}
 
 
 /* =========================================
@@ -623,31 +804,34 @@ function renderTasks() {
 
     const items =
         [...data.days[selectedDay]]
-        .sort(
-            (a, b) =>
-                timeToMinutes(a.time) -
-                timeToMinutes(b.time)
-        );
+            .sort(
+                (a, b) =>
+                    a.time.localeCompare(
+                        b.time
+                    )
+            );
 
 
     if (!items.length) {
 
         const empty =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
 
         empty.className =
-            "empty-state";
+            "empty";
 
 
-        empty.innerHTML =
-            `
-            Здесь пока ничего нет.<br>
-            Нажми <b>ADD TASK</b>, чтобы создать первую задачу.
-            `;
+        empty.textContent =
+            "Нажми + ADD TASK";
 
 
-        tasks.appendChild(empty);
+        tasks.appendChild(
+            empty
+        );
+
 
         return;
 
@@ -666,57 +850,29 @@ function renderTasks() {
 
 
 /* =========================================
-   TIME SORT
-========================================= */
-
-function timeToMinutes(time) {
-
-    const [
-        hours,
-        minutes
-    ] =
-        String(time || "00:00")
-        .split(":")
-        .map(Number);
-
-
-    return (
-        hours * 60 +
-        minutes
-    );
-
-}
-
-
-/* =========================================
-   CREATE TASK CARD
+   TASK CARD
 ========================================= */
 
 function createTaskCard(item) {
 
     const card =
-        document.createElement("article");
+        document.createElement(
+            "article"
+        );
 
 
     card.className =
         "task-card";
 
 
-    if (
-        openedTaskId === item.id
-    ) {
-
-        card.classList.add("open");
-
-    }
-
-
-    /* =====================================
-       PREVIEW
-    ===================================== */
+    /*
+     * PREVIEW
+     */
 
     const preview =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
 
     preview.className =
@@ -724,116 +880,54 @@ function createTaskCard(item) {
 
 
     const time =
-        document.createElement("div");
+        document.createElement(
+            "input"
+        );
 
+
+    time.type =
+        "time";
 
     time.className =
-        "preview-time";
+        "preview-time-input";
 
-
-    time.textContent =
+    time.value =
         item.time;
 
 
-    time.style.color =
-        item.timeColor;
-
-
-    time.style.fontSize =
-        `${item.timeSize}px`;
-
-
-    time.style.fontWeight =
-        item.timeWeight;
-
-
     const text =
-        document.createElement("div");
+        document.createElement(
+            "button"
+        );
 
+
+    text.type =
+        "button";
 
     text.className =
-        "preview-text";
+        "preview-task-button";
 
 
-    text.textContent =
-        item.text;
+    const remove =
+        document.createElement(
+            "button"
+        );
 
 
-    text.style.fontFamily =
-        item.fontFamily;
+    remove.type =
+        "button";
 
+    remove.className =
+        "delete-task";
 
-    text.style.fontSize =
-        `${item.fontSize}px`;
-
-
-    text.style.fontWeight =
-        item.fontWeight;
-
-
-    text.style.padding =
-        `${item.padding}px`;
-
-
-    text.style.borderRadius =
-        `${item.radius}px`;
-
-
-    if (item.gradient) {
-
-        text.style.color =
-            "transparent";
-
-        text.style.background =
-            `linear-gradient(
-                90deg,
-                ${item.gradientStart},
-                ${item.gradientEnd}
-            )`;
-
-        text.style.backgroundClip =
-            "text";
-
-        text.style.webkitBackgroundClip =
-            "text";
-
-    }
-
-    else {
-
-        text.style.color =
-            item.color;
-
-    }
-
-
-    if (
-        item.background !==
-        "transparent"
-    ) {
-
-        text.style.backgroundColor =
-            item.background;
-
-    }
-
-
-    const openIcon =
-        document.createElement("div");
-
-
-    openIcon.className =
-        "task-open-icon";
-
-
-    openIcon.textContent =
-        "⌄";
+    remove.textContent =
+        "×";
 
 
     preview.append(
         time,
         text,
-        openIcon
+        remove
     );
 
 
@@ -842,557 +936,32 @@ function createTaskCard(item) {
     );
 
 
-    /* =====================================
-       EDITOR
-    ===================================== */
-
-    const editor =
-        document.createElement("div");
-
-
-    editor.className =
-        "task-editor";
-
-
-    /* =====================================
-       TIME
-    ===================================== */
-
-    editor.appendChild(
-        createGroup(
-            "TIME",
-            [
-                createField(
-                    "TIME",
-                    createTimeInput(
-                        item.time,
-                        value => {
-
-                            item.time =
-                                value ||
-                                "00:00";
-
-                            renderTasks();
-
-                            openedTaskId =
-                                item.id;
-
-                            queueSave();
-
-                        }
-                    )
-                )
-            ]
-        )
-    );
-
-
-    /* =====================================
-       TEXT
-    ===================================== */
-
-    editor.appendChild(
-        createGroup(
-            "TEXT",
-            [
-
-                createField(
-                    "TASK NAME",
-                    createTextInput(
-                        item.text,
-                        value => {
-
-                            item.text =
-                                value;
-
-                            updatePreview();
-
-                            queueSave();
-
-                        }
-                    )
-                )
-
-            ]
-        )
-    );
-
-
-    /* =====================================
-       TEXT STYLE
-    ===================================== */
-
-    const textStyleGroup =
-        document.createElement("div");
-
-
-    textStyleGroup.className =
-        "editor-group";
-
-
-    textStyleGroup.innerHTML =
-        `
-        <div class="editor-group-title">
-            TEXT STYLE
-        </div>
-        `;
-
-
-    const fontField =
-        document.createElement("div");
-
-
-    fontField.className =
-        "field";
-
-
-    fontField.innerHTML =
-        `
-        <label class="field-label">
-            FONT
-        </label>
-        `;
-
-
-    const fontSelect =
-        document.createElement("select");
-
-
-    fontSelect.className =
-        "font-select";
-
-
-    const fonts = [
-
-        ["Arial", "Arial"],
-
-        ["Inter", "Inter, sans-serif"],
-
-        ["Helvetica", "Helvetica"],
-
-        ["Georgia", "Georgia"],
-
-        ["Times New Roman", "Times New Roman"],
-
-        ["Garamond", "Garamond"],
-
-        ["Courier New", "Courier New"],
-
-        ["Trebuchet MS", "Trebuchet MS"],
-
-        ["Verdana", "Verdana"],
-
-        ["Tahoma", "Tahoma"],
-
-        ["Impact", "Impact"],
-
-        ["Comic Sans MS", "Comic Sans MS"],
-
-        ["Lucida Console", "Lucida Console"],
-
-        ["Palatino", "Palatino"],
-
-        ["Brush Script MT", "Brush Script MT"],
-
-        ["Century Gothic", "Century Gothic"]
-
-    ];
-
-
-    fonts.forEach(
-        ([name, value]) => {
-
-            const option =
-                document.createElement("option");
-
-            option.value =
-                value;
-
-            option.textContent =
-                name;
-
-            if (
-                value ===
-                item.fontFamily
-            ) {
-
-                option.selected =
-                    true;
-
-            }
-
-            fontSelect.appendChild(
-                option
-            );
-
-        }
-    );
-
-
-    fontSelect.addEventListener(
-        "change",
-        () => {
-
-            item.fontFamily =
-                fontSelect.value;
-
-            updatePreview();
-
-            queueSave();
-
-        }
-    );
-
-
-    fontField.appendChild(
-        fontSelect
-    );
-
-
-    textStyleGroup.appendChild(
-        fontField
-    );
-
-
-    const styleGrid =
-        document.createElement("div");
-
-
-    styleGrid.className =
-        "control-grid";
-
-
-    styleGrid.append(
-
-        miniRange(
-            "SIZE",
-            8,
-            50,
-            item.fontSize,
-            value => {
-
-                item.fontSize =
-                    Number(value);
-
-                updatePreview();
-
-                queueSave();
-
-            }
-        ),
-
-        miniSelect(
-            "WEIGHT",
-            [
-                "300",
-                "400",
-                "500",
-                "600",
-                "700",
-                "800",
-                "900"
-            ],
-            String(item.fontWeight),
-            value => {
-
-                item.fontWeight =
-                    Number(value);
-
-                updatePreview();
-
-                queueSave();
-
-            }
-        ),
-
-        miniColor(
-            "COLOR",
-            item.color,
-            value => {
-
-                item.color =
-                    value;
-
-                updatePreview();
-
-                queueSave();
-
-            }
-        )
-
-    );
-
-
-    textStyleGroup.appendChild(
-        styleGrid
-    );
-
-
-    /* =====================================
-       GRADIENT
-    ===================================== */
-
-    const gradientSettings =
-        document.createElement("div");
-
-
-    gradientSettings.className =
-        "gradient-settings";
-
-
-    const gradientToggle =
-        document.createElement("label");
-
-
-    gradientToggle.className =
-        "toggle-row";
-
-
-    gradientToggle.innerHTML =
-        `
-        <span>
-            <strong>TEXT GRADIENT</strong>
-            <small>Make this task colorful.</small>
-        </span>
-
-        <input
-            type="checkbox"
-            ${item.gradient ? "checked" : ""}
-        >
-
-        <span class="toggle"></span>
-        `;
-
-
-    const gradientCheckbox =
-        gradientToggle.querySelector(
-            "input"
+    /*
+     * TIME SECTION
+     */
+
+    const timeSection =
+        createSection(
+            "TIME"
         );
 
 
-    gradientCheckbox.addEventListener(
-        "change",
-        () => {
+    const timeControls =
+        document.createElement(
+            "div"
+        );
 
-            item.gradient =
-                gradientCheckbox.checked;
 
-            updatePreview();
+    timeControls.className =
+        "compact-controls";
 
-            queueSave();
 
-        }
-    );
+    /*
+     * TIME SIZE
+     */
 
-
-    gradientSettings.appendChild(
-        gradientToggle
-    );
-
-
-    const gradientColors =
-        document.createElement("div");
-
-
-    gradientColors.className =
-        "gradient-colors";
-
-
-    gradientColors.style.marginTop =
-        "10px";
-
-
-    gradientColors.append(
-
-        miniColor(
-            "START",
-            item.gradientStart,
-            value => {
-
-                item.gradientStart =
-                    value;
-
-                updatePreview();
-
-                queueSave();
-
-            }
-        ),
-
-        miniColor(
-            "END",
-            item.gradientEnd,
-            value => {
-
-                item.gradientEnd =
-                    value;
-
-                updatePreview();
-
-                queueSave();
-
-            }
-        )
-
-    );
-
-
-    gradientSettings.appendChild(
-        gradientColors
-    );
-
-
-    textStyleGroup.appendChild(
-        gradientSettings
-    );
-
-
-    editor.appendChild(
-        textStyleGroup
-    );
-
-
-    /* =====================================
-       CARD STYLE
-    ===================================== */
-
-    const cardStyle =
-        document.createElement("div");
-
-
-    cardStyle.className =
-        "editor-group";
-
-
-    cardStyle.innerHTML =
-        `
-        <div class="editor-group-title">
-            CARD STYLE
-        </div>
-        `;
-
-
-    const cardGrid =
-        document.createElement("div");
-
-
-    cardGrid.className =
-        "control-grid";
-
-
-    cardGrid.append(
-
-        miniColor(
-            "BACKGROUND",
-            item.background ===
-                "transparent"
-                ? "#ffffff"
-                : item.background,
-            value => {
-
-                item.background =
-                    value;
-
-                updatePreview();
-
-                queueSave();
-
-            }
-        ),
-
-        miniRange(
-            "ROUNDING",
-            0,
-            40,
-            item.radius,
-            value => {
-
-                item.radius =
-                    Number(value);
-
-                updatePreview();
-
-                queueSave();
-
-            }
-        ),
-
-        miniRange(
-            "PADDING",
-            0,
-            30,
-            item.padding,
-            value => {
-
-                item.padding =
-                    Number(value);
-
-                updatePreview();
-
-                queueSave();
-
-            }
-        )
-
-    );
-
-
-    cardStyle.appendChild(
-        cardGrid
-    );
-
-
-    editor.appendChild(
-        cardStyle
-    );
-
-
-    /* =====================================
-       TIME STYLE
-    ===================================== */
-
-    const timeStyle =
-        document.createElement("div");
-
-
-    timeStyle.className =
-        "editor-group";
-
-
-    timeStyle.innerHTML =
-        `
-        <div class="editor-group-title">
-            TIME STYLE
-        </div>
-        `;
-
-
-    const timeGrid =
-        document.createElement("div");
-
-
-    timeGrid.className =
-        "control-grid";
-
-
-    timeGrid.append(
-
-        miniColor(
-            "COLOR",
-            item.timeColor,
-            value => {
-
-                item.timeColor =
-                    value;
-
-                updatePreview();
-
-                queueSave();
-
-            }
-        ),
-
-        miniRange(
+    timeControls.appendChild(
+        rangeControl(
             "SIZE",
             8,
             25,
@@ -1404,21 +973,38 @@ function createTaskCard(item) {
 
                 updatePreview();
 
-                queueSave();
+            }
+        )
+    );
+
+
+    /*
+     * TIME COLOR
+     */
+
+    timeControls.appendChild(
+        colorControl(
+            "COLOR",
+            item.timeColor,
+            value => {
+
+                item.timeColor =
+                    value;
+
+                updatePreview();
 
             }
-        ),
+        )
+    );
 
-        miniSelect(
-            "WEIGHT",
-            [
-                "400",
-                "500",
-                "600",
-                "700",
-                "800"
-            ],
-            String(item.timeWeight),
+
+    /*
+     * TIME WEIGHT
+     */
+
+    timeControls.appendChild(
+        weightControl(
+            item.timeWeight,
             value => {
 
                 item.timeWeight =
@@ -1426,57 +1012,433 @@ function createTaskCard(item) {
 
                 updatePreview();
 
-                queueSave();
+            }
+        )
+    );
+
+
+    const timeCardButton =
+        document.createElement(
+            "button"
+        );
+
+
+    timeCardButton.type =
+        "button";
+
+    timeCardButton.className =
+        "section-button";
+
+
+    timeCardButton.textContent =
+        "CARD";
+
+
+    const timeCardPopover =
+        document.createElement(
+            "div"
+        );
+
+
+    timeCardPopover.className =
+        "card-popover hidden";
+
+
+    buildTimeCardStyle(
+        timeCardPopover,
+        item,
+        updatePreview
+    );
+
+
+    timeCardButton.addEventListener(
+        "click",
+        () => {
+
+            timeCardPopover.classList.toggle(
+                "hidden"
+            );
+
+            timeCardButton.classList.toggle(
+                "active"
+            );
+
+        }
+    );
+
+
+    timeSection
+        .querySelector(".section-row")
+        .appendChild(
+            timeCardButton
+        );
+
+
+    timeSection.append(
+        timeControls,
+        timeCardPopover
+    );
+
+
+    card.appendChild(
+        timeSection
+    );
+
+
+    /*
+     * TEXT SECTION
+     */
+
+    const textSection =
+        createSection(
+            "TEXT"
+        );
+
+
+    const textControls =
+        document.createElement(
+            "div"
+        );
+
+
+    textControls.className =
+        "compact-controls";
+
+
+    /*
+     * TEXT SIZE
+     */
+
+    textControls.appendChild(
+        rangeControl(
+            "SIZE",
+            8,
+            50,
+            item.fontSize,
+            value => {
+
+                item.fontSize =
+                    Number(value);
+
+                updatePreview();
 
             }
         )
-
     );
 
 
-    timeStyle.appendChild(
-        timeGrid
+    /*
+     * TEXT COLOR
+     */
+
+    textControls.appendChild(
+        colorControl(
+            "COLOR",
+            item.color,
+            value => {
+
+                item.color =
+                    value;
+
+                updatePreview();
+
+            }
+        )
     );
 
 
-    editor.appendChild(
-        timeStyle
+    /*
+     * WEIGHT
+     */
+
+    textControls.appendChild(
+        weightControl(
+            item.fontWeight,
+            value => {
+
+                item.fontWeight =
+                    Number(value);
+
+                updatePreview();
+
+            }
+        )
     );
 
 
-    /* =====================================
-       ACTIONS
-    ===================================== */
+    /*
+     * FONT
+     */
 
-    const actions =
-        document.createElement("div");
+    const fontBox =
+        document.createElement(
+            "div"
+        );
 
 
-    actions.className =
-        "task-actions";
+    fontBox.className =
+        "compact-control";
 
+
+    fontBox.innerHTML = `
+        <label>FONT</label>
+    `;
+
+
+    const font =
+        document.createElement(
+            "select"
+        );
+
+
+    font.className =
+        "font-select";
+
+
+    const fonts = [
+
+        ["Arial", "Arial"],
+        ["Helvetica", "Helvetica"],
+        ["Verdana", "Verdana"],
+        ["Trebuchet MS", "Trebuchet"],
+        ["Georgia", "Georgia"],
+        ["Times New Roman", "Times"],
+        ["Courier New", "Mono"],
+        ["Impact", "Impact"],
+        ["Lucida Console", "Console"],
+        ["Tahoma", "Tahoma"],
+        ["Palatino Linotype", "Palatino"],
+        ["Garamond", "Garamond"]
+
+    ];
+
+
+    fonts.forEach(
+        ([value, label]) => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                value;
+
+            option.textContent =
+                label;
+
+            option.style.fontFamily =
+                value;
+
+
+            font.appendChild(
+                option
+            );
+
+        }
+    );
+
+
+    font.value =
+        item.fontFamily;
+
+
+    font.addEventListener(
+        "change",
+        () => {
+
+            item.fontFamily =
+                font.value;
+
+            updatePreview();
+
+        }
+    );
+
+
+    fontBox.appendChild(
+        font
+    );
+
+
+    textControls.appendChild(
+        fontBox
+    );
+
+
+    /*
+     * TEXT CARD
+     */
+
+    const textCardButton =
+        document.createElement(
+            "button"
+        );
+
+
+    textCardButton.type =
+        "button";
+
+    textCardButton.className =
+        "section-button";
+
+    textCardButton.textContent =
+        "CARD";
+
+
+    const textCardPopover =
+        document.createElement(
+            "div"
+        );
+
+
+    textCardPopover.className =
+        "card-popover hidden";
+
+
+    buildTextCardStyle(
+        textCardPopover,
+        item,
+        updatePreview
+    );
+
+
+    textCardButton.addEventListener(
+        "click",
+        () => {
+
+            textCardPopover.classList.toggle(
+                "hidden"
+            );
+
+            textCardButton.classList.toggle(
+                "active"
+            );
+
+        }
+    );
+
+
+    textSection
+        .querySelector(".section-row")
+        .appendChild(
+            textCardButton
+        );
+
+
+    textSection.append(
+        textControls,
+        textCardPopover
+    );
+
+
+    card.appendChild(
+        textSection
+    );
+
+
+    /*
+     * EVENTS
+     */
+
+    time.addEventListener(
+        "change",
+        () => {
+
+            item.time =
+                time.value ||
+                "00:00";
+
+            renderTasks();
+
+            queueSave();
+
+        }
+    );
+
+
+    text.addEventListener(
+        "click",
+        () => {
+
+            /*
+             * Клик по preview текста
+             * не нужен для редактирования —
+             * редактируем через prompt-like
+             * маленькое поле ниже.
+             */
+
+            const value =
+                window.prompt(
+                    "Текст задачи",
+                    item.text
+                );
+
+
+            if (value !== null) {
+
+                item.text =
+                    value;
+
+                updatePreview();
+
+                queueSave();
+
+            }
+
+        }
+    );
+
+
+    remove.addEventListener(
+        "click",
+        () => {
+
+            data.days[selectedDay] =
+                data.days[selectedDay]
+                    .filter(
+                        task =>
+                            task.id !==
+                            item.id
+                    );
+
+
+            renderTasks();
+
+            queueSave();
+
+        }
+    );
+
+
+    /*
+     * DUPLICATE
+     */
 
     const duplicate =
-        document.createElement("button");
+        document.createElement(
+            "button"
+        );
 
 
     duplicate.type =
         "button";
 
-
     duplicate.className =
-        "task-action duplicate-task";
-
+        "section-button";
 
     duplicate.textContent =
         "DUPLICATE";
 
 
+    duplicate.style.marginTop =
+        "7px";
+
+
     duplicate.addEventListener(
         "click",
-        event => {
-
-            event.stopPropagation();
+        () => {
 
             duplicateTask(item);
 
@@ -1484,134 +1446,111 @@ function createTaskCard(item) {
     );
 
 
-    const remove =
-        document.createElement("button");
-
-
-    remove.type =
-        "button";
-
-
-    remove.className =
-        "task-action delete-task";
-
-
-    remove.textContent =
-        "DELETE";
-
-
-    remove.addEventListener(
-        "click",
-        event => {
-
-            event.stopPropagation();
-
-            deleteTask(item);
-
-        }
-    );
-
-
-    actions.append(
-        duplicate,
-        remove
-    );
-
-
-    editor.appendChild(
-        actions
-    );
-
-
     card.appendChild(
-        editor
+        duplicate
     );
 
 
-    /* =====================================
-       OPEN / CLOSE
-    ===================================== */
-
-    preview.addEventListener(
-        "click",
-        () => {
-
-            if (
-                openedTaskId ===
-                item.id
-            ) {
-
-                openedTaskId =
-                    null;
-
-            }
-
-            else {
-
-                openedTaskId =
-                    item.id;
-
-            }
-
-
-            renderTasks();
-
-        }
-    );
-
-
-    /* =====================================
-       LIVE PREVIEW
-    ===================================== */
+    /*
+     * LIVE PREVIEW
+     */
 
     function updatePreview() {
 
-        time.textContent =
-            item.time;
+        text.textContent =
+            item.text || "TASK";
 
+
+        /*
+         * TIME
+         */
 
         time.style.color =
             item.timeColor;
 
-
         time.style.fontSize =
             `${item.timeSize}px`;
-
 
         time.style.fontWeight =
             item.timeWeight;
 
 
-        text.textContent =
-            item.text;
-
+        /*
+         * TEXT
+         */
 
         text.style.fontFamily =
             item.fontFamily;
 
-
         text.style.fontSize =
             `${item.fontSize}px`;
-
 
         text.style.fontWeight =
             item.fontWeight;
 
+        text.style.color =
+            item.color;
+
+
+        if (item.gradient) {
+
+            text.style.background =
+                `linear-gradient(
+                    90deg,
+                    ${item.gradientStart},
+                    ${item.gradientEnd}
+                )`;
+
+            text.style.webkitBackgroundClip =
+                "text";
+
+            text.style.webkitTextFillColor =
+                "transparent";
+
+        }
+
+        else {
+
+            text.style.background =
+                "none";
+
+            text.style.webkitBackgroundClip =
+                "initial";
+
+            text.style.webkitTextFillColor =
+                item.color;
+
+        }
+
+
+        /*
+         * CARD
+         */
+
+        text.style.backgroundColor =
+            item.background ===
+                "transparent"
+                ? "transparent"
+                : item.background;
+
+        text.style.borderRadius =
+            `${item.radius}px`;
 
         text.style.padding =
             `${item.padding}px`;
 
 
-        text.style.borderRadius =
-            `${item.radius}px`;
-
+        /*
+         * Если есть background,
+         * возвращаем gradient текста
+         * поверх него невозможно,
+         * поэтому сохраняем text gradient
+         * через background-image.
+         */
 
         if (item.gradient) {
 
-            text.style.color =
-                "transparent";
-
-            text.style.background =
+            text.style.backgroundImage =
                 `linear-gradient(
                     90deg,
                     ${item.gradientStart},
@@ -1624,41 +1563,27 @@ function createTaskCard(item) {
             text.style.webkitBackgroundClip =
                 "text";
 
-        }
-
-        else {
-
-            text.style.color =
-                item.color;
-
-            text.style.background =
-                "";
-
-            text.style.backgroundClip =
-                "";
-
-            text.style.webkitBackgroundClip =
-                "";
+            text.style.webkitTextFillColor =
+                "transparent";
 
         }
 
 
-        if (
-            item.background !==
-            "transparent"
-        ) {
+        /*
+         * TIME CARD
+         */
 
-            text.style.backgroundColor =
-                item.background;
+        time.style.backgroundColor =
+            item.timeBackground ||
+            "transparent";
 
-        }
 
-        else {
+        time.style.borderRadius =
+            `${item.timeRadius || 10}px`;
 
-            text.style.backgroundColor =
-                "";
 
-        }
+        time.style.padding =
+            `0 ${item.timePadding || 7}px`;
 
     }
 
@@ -1672,241 +1597,44 @@ function createTaskCard(item) {
 
 
 /* =========================================
-   FIELD HELPERS
+   SECTION
 ========================================= */
 
-function createGroup(
-    title,
-    children
-) {
+function createSection(title) {
 
-    const group =
-        document.createElement("div");
+    const section =
+        document.createElement(
+            "div"
+        );
 
 
-    group.className =
-        "editor-group";
+    section.className =
+        "task-section";
 
 
-    const titleElement =
-        document.createElement("div");
+    section.innerHTML = `
 
+        <div class="section-row">
 
-    titleElement.className =
-        "editor-group-title";
+            <div class="section-title">
+                ${title}
+            </div>
 
+        </div>
 
-    titleElement.textContent =
-        title;
+    `;
 
 
-    group.appendChild(
-        titleElement
-    );
-
-
-    children.forEach(
-        child => {
-
-            group.appendChild(
-                child
-            );
-
-        }
-    );
-
-
-    return group;
-
-}
-
-
-function createField(
-    label,
-    input
-) {
-
-    const field =
-        document.createElement("div");
-
-
-    field.className =
-        "field";
-
-
-    const labelElement =
-        document.createElement("label");
-
-
-    labelElement.className =
-        "field-label";
-
-
-    labelElement.textContent =
-        label;
-
-
-    field.append(
-        labelElement,
-        input
-    );
-
-
-    return field;
-
-}
-
-
-function createTextInput(
-    value,
-    callback
-) {
-
-    const input =
-        document.createElement("input");
-
-
-    input.type =
-        "text";
-
-
-    input.className =
-        "text-field";
-
-
-    input.value =
-        value;
-
-
-    input.addEventListener(
-        "input",
-        () => {
-
-            callback(
-                input.value
-            );
-
-        }
-    );
-
-
-    return input;
-
-}
-
-
-function createTimeInput(
-    value,
-    callback
-) {
-
-    const input =
-        document.createElement("input");
-
-
-    input.type =
-        "time";
-
-
-    input.className =
-        "time-field";
-
-
-    input.value =
-        value;
-
-
-    input.addEventListener(
-        "change",
-        () => {
-
-            callback(
-                input.value
-            );
-
-        }
-    );
-
-
-    return input;
+    return section;
 
 }
 
 
 /* =========================================
-   MINI COLOR
+   RANGE
 ========================================= */
 
-function miniColor(
-    title,
-    value,
-    callback
-) {
-
-    const box =
-        document.createElement("div");
-
-
-    box.className =
-        "mini-control";
-
-
-    const label =
-        document.createElement("label");
-
-
-    label.className =
-        "field-label";
-
-
-    label.textContent =
-        title;
-
-
-    const input =
-        document.createElement("input");
-
-
-    input.type =
-        "color";
-
-
-    input.className =
-        "mini-color";
-
-
-    input.value =
-        value || "#111111";
-
-
-    input.addEventListener(
-        "input",
-        () => {
-
-            callback(
-                input.value
-            );
-
-        }
-    );
-
-
-    box.append(
-        label,
-        input
-    );
-
-
-    return box;
-
-}
-
-
-/* =========================================
-   MINI RANGE
-========================================= */
-
-function miniRange(
+function rangeControl(
     title,
     min,
     max,
@@ -1915,36 +1643,48 @@ function miniRange(
 ) {
 
     const box =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
 
     box.className =
-        "mini-control";
+        "compact-control";
 
 
     const label =
-        document.createElement("label");
-
-
-    label.className =
-        "field-label";
+        document.createElement(
+            "label"
+        );
 
 
     label.textContent =
         title;
 
 
+    const output =
+        document.createElement(
+            "output"
+        );
+
+
+    output.textContent =
+        value;
+
+
+    label.appendChild(
+        output
+    );
+
+
     const input =
-        document.createElement("input");
+        document.createElement(
+            "input"
+        );
 
 
     input.type =
         "range";
-
-
-    input.className =
-        "mini-range";
-
 
     input.min =
         min;
@@ -1953,18 +1693,6 @@ function miniRange(
         max;
 
     input.value =
-        value;
-
-
-    const output =
-        document.createElement("span");
-
-
-    output.className =
-        "range-value";
-
-
-    output.textContent =
         value;
 
 
@@ -1979,14 +1707,15 @@ function miniRange(
                 input.value
             );
 
+            queueSave();
+
         }
     );
 
 
     box.append(
         label,
-        input,
-        output
+        input
     );
 
 
@@ -1996,79 +1725,57 @@ function miniRange(
 
 
 /* =========================================
-   MINI SELECT
+   COLOR
 ========================================= */
 
-function miniSelect(
+function colorControl(
     title,
-    options,
     value,
     callback
 ) {
 
     const box =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
 
     box.className =
-        "mini-control";
+        "compact-control";
 
 
     const label =
-        document.createElement("label");
-
-
-    label.className =
-        "field-label";
+        document.createElement(
+            "label"
+        );
 
 
     label.textContent =
         title;
 
 
-    const select =
-        document.createElement("select");
+    const input =
+        document.createElement(
+            "input"
+        );
 
 
-    select.className =
-        "font-select";
+    input.type =
+        "color";
+
+    input.value =
+        value || "#111111";
 
 
-    options.forEach(
-        optionValue => {
-
-            const option =
-                document.createElement("option");
-
-
-            option.value =
-                optionValue;
-
-
-            option.textContent =
-                optionValue;
-
-
-            option.selected =
-                optionValue ===
-                value;
-
-
-            select.appendChild(
-                option
-            );
-
-        }
-    );
-
-
-    select.addEventListener(
-        "change",
+    input.addEventListener(
+        "input",
         () => {
 
             callback(
-                select.value
+                input.value
             );
+
+            queueSave();
 
         }
     );
@@ -2076,7 +1783,7 @@ function miniSelect(
 
     box.append(
         label,
-        select
+        input
     );
 
 
@@ -2086,105 +1793,531 @@ function miniSelect(
 
 
 /* =========================================
-   DUPLICATE
+   WEIGHT
 ========================================= */
 
-function duplicateTask(item) {
+function weightControl(
+    value,
+    callback
+) {
 
-    const copy =
-        JSON.parse(
-            JSON.stringify(item)
+    const box =
+        document.createElement(
+            "div"
         );
 
 
-    copy.id =
-        crypto.randomUUID();
+    box.className =
+        "compact-control weight-control";
 
 
-    copy.text =
-        item.text +
-        " COPY";
+    const label =
+        document.createElement(
+            "label"
+        );
 
 
-    data.days[selectedDay].push(
-        copy
+    label.textContent =
+        "WEIGHT";
+
+
+    const output =
+        document.createElement(
+            "output"
+        );
+
+
+    output.textContent =
+        value;
+
+
+    label.appendChild(
+        output
     );
 
 
-    openedTaskId =
-        copy.id;
+    const input =
+        document.createElement(
+            "input"
+        );
 
 
-    renderTasks();
+    input.type =
+        "range";
 
-    queueSave();
+    input.min =
+        300;
+
+    input.max =
+        900;
+
+    input.step =
+        100;
+
+    input.value =
+        value;
 
 
-    setTimeout(
+    input.addEventListener(
+        "input",
         () => {
 
-            const opened =
-                document.querySelector(
-                    ".task-card.open"
-                );
+            output.textContent =
+                input.value;
 
+            callback(
+                input.value
+            );
 
-            if (opened) {
+            queueSave();
 
-                opened.scrollIntoView({
-                    behavior: "smooth",
-                    block: "center"
-                });
-
-            }
-
-        },
-        80
+        }
     );
+
+
+    box.append(
+        label,
+        input
+    );
+
+
+    return box;
 
 }
 
 
 /* =========================================
-   DELETE
+   TIME CARD STYLE
 ========================================= */
 
-function deleteTask(item) {
+function buildTimeCardStyle(
+    container,
+    item,
+    update
+) {
 
-    const confirmed =
-        window.confirm(
-            `Удалить задачу "${item.text}"?\n\nЭто действие нельзя отменить.`
+    container.innerHTML = `
+
+        <div class="card-grid">
+
+            <label>
+
+                <span>ROUND</span>
+
+                <input
+                    type="range"
+                    min="0"
+                    max="25"
+                    value="${item.timeRadius || 10}"
+                    data-time-radius
+                >
+
+            </label>
+
+
+            <label>
+
+                <span>PADDING</span>
+
+                <input
+                    type="range"
+                    min="0"
+                    max="20"
+                    value="${item.timePadding || 7}"
+                    data-time-padding
+                >
+
+            </label>
+
+
+            <label>
+
+                <span>BACKGROUND</span>
+
+                <input
+                    type="color"
+                    value="${item.timeBackground || "#fafafa"}"
+                    data-time-background
+                >
+
+            </label>
+
+        </div>
+
+
+        <button
+            type="button"
+            class="transparent-button"
+            data-time-transparent
+        >
+            TRANSPARENT
+        </button>
+
+    `;
+
+
+    const radius =
+        container.querySelector(
+            "[data-time-radius]"
         );
 
 
-    if (!confirmed) {
-        return;
-    }
-
-
-    data.days[selectedDay] =
-        data.days[selectedDay]
-        .filter(
-            task =>
-                task.id !==
-                item.id
+    const padding =
+        container.querySelector(
+            "[data-time-padding]"
         );
 
 
-    if (
-        openedTaskId ===
-        item.id
-    ) {
-
-        openedTaskId =
-            null;
-
-    }
+    const background =
+        container.querySelector(
+            "[data-time-background]"
+        );
 
 
-    renderTasks();
+    radius.addEventListener(
+        "input",
+        () => {
 
-    queueSave();
+            item.timeRadius =
+                Number(radius.value);
+
+            update();
+
+            queueSave();
+
+        }
+    );
+
+
+    padding.addEventListener(
+        "input",
+        () => {
+
+            item.timePadding =
+                Number(padding.value);
+
+            update();
+
+            queueSave();
+
+        }
+    );
+
+
+    background.addEventListener(
+        "input",
+        () => {
+
+            item.timeBackground =
+                background.value;
+
+            update();
+
+            queueSave();
+
+        }
+    );
+
+
+    container
+        .querySelector(
+            "[data-time-transparent]"
+        )
+        .addEventListener(
+            "click",
+            () => {
+
+                item.timeBackground =
+                    "transparent";
+
+                update();
+
+                queueSave();
+
+            }
+        );
+
+}
+
+
+/* =========================================
+   TEXT CARD STYLE
+========================================= */
+
+function buildTextCardStyle(
+    container,
+    item,
+    update
+) {
+
+    container.innerHTML = `
+
+        <div class="card-grid">
+
+            <label>
+
+                <span>ROUND</span>
+
+                <input
+                    type="range"
+                    min="0"
+                    max="35"
+                    value="${item.radius}"
+                    data-radius
+                >
+
+            </label>
+
+
+            <label>
+
+                <span>PADDING</span>
+
+                <input
+                    type="range"
+                    min="0"
+                    max="25"
+                    value="${item.padding}"
+                    data-padding
+                >
+
+            </label>
+
+
+            <label>
+
+                <span>BACKGROUND</span>
+
+                <input
+                    type="color"
+                    value="${
+                        item.background ===
+                        "transparent"
+                            ? "#ffffff"
+                            : item.background
+                    }"
+                    data-background
+                >
+
+            </label>
+
+        </div>
+
+
+        <button
+            type="button"
+            class="transparent-button"
+            data-transparent
+        >
+            TRANSPARENT
+        </button>
+
+
+        <div class="gradient-box">
+
+            <div class="gradient-header">
+
+                <label>
+
+                    <input
+                        type="checkbox"
+                        data-gradient
+                        ${item.gradient ? "checked" : ""}
+                    >
+
+                    GRADIENT
+
+                </label>
+
+            </div>
+
+
+            <div
+                class="gradient-colors ${
+                    item.gradient
+                        ? ""
+                        : "hidden"
+                }"
+                data-gradient-colors
+            >
+
+                <input
+                    type="color"
+                    value="${item.gradientStart}"
+                    data-gradient-start
+                >
+
+                <input
+                    type="color"
+                    value="${item.gradientEnd}"
+                    data-gradient-end
+                >
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    const radius =
+        container.querySelector(
+            "[data-radius]"
+        );
+
+
+    const padding =
+        container.querySelector(
+            "[data-padding]"
+        );
+
+
+    const background =
+        container.querySelector(
+            "[data-background]"
+        );
+
+
+    const transparent =
+        container.querySelector(
+            "[data-transparent]"
+        );
+
+
+    const gradient =
+        container.querySelector(
+            "[data-gradient]"
+        );
+
+
+    const gradientColors =
+        container.querySelector(
+            "[data-gradient-colors]"
+        );
+
+
+    const gradientStart =
+        container.querySelector(
+            "[data-gradient-start]"
+        );
+
+
+    const gradientEnd =
+        container.querySelector(
+            "[data-gradient-end]"
+        );
+
+
+    radius.addEventListener(
+        "input",
+        () => {
+
+            item.radius =
+                Number(radius.value);
+
+            update();
+
+            queueSave();
+
+        }
+    );
+
+
+    padding.addEventListener(
+        "input",
+        () => {
+
+            item.padding =
+                Number(padding.value);
+
+            update();
+
+            queueSave();
+
+        }
+    );
+
+
+    background.addEventListener(
+        "input",
+        () => {
+
+            item.background =
+                background.value;
+
+            update();
+
+            queueSave();
+
+        }
+    );
+
+
+    transparent.addEventListener(
+        "click",
+        () => {
+
+            item.background =
+                "transparent";
+
+            update();
+
+            queueSave();
+
+        }
+    );
+
+
+    gradient.addEventListener(
+        "change",
+        () => {
+
+            item.gradient =
+                gradient.checked;
+
+
+            gradientColors.classList.toggle(
+                "hidden",
+                !item.gradient
+            );
+
+
+            update();
+
+            queueSave();
+
+        }
+    );
+
+
+    gradientStart.addEventListener(
+        "input",
+        () => {
+
+            item.gradientStart =
+                gradientStart.value;
+
+            update();
+
+            queueSave();
+
+        }
+    );
+
+
+    gradientEnd.addEventListener(
+        "input",
+        () => {
+
+            item.gradientEnd =
+                gradientEnd.value;
+
+            update();
+
+            queueSave();
+
+        }
+    );
 
 }
 
@@ -2193,33 +2326,10 @@ function deleteTask(item) {
    GRID
 ========================================= */
 
-gridButton.addEventListener(
-    "click",
-    () => {
-
-        const shouldOpen =
-            gridPanel.classList.contains(
-                "hidden"
-            );
-
-
-        closeAllPanels();
-
-
-        if (shouldOpen) {
-
-            gridPanel.classList.remove(
-                "hidden"
-            );
-
-        }
-
-    }
-);
-
-
 document
-    .querySelectorAll("[data-grid]")
+    .querySelectorAll(
+        "[data-grid]"
+    )
     .forEach(button => {
 
         button.addEventListener(
@@ -2232,6 +2342,8 @@ document
 
                 updateGridButtons();
 
+                updateGridPreview();
+
                 queueSave();
 
             }
@@ -2239,251 +2351,6 @@ document
 
     });
 
-
-const gridColor =
-    document.getElementById(
-        "gridColor"
-    );
-
-
-const gridColorValue =
-    document.getElementById(
-        "gridColorValue"
-    );
-
-
-gridColor.addEventListener(
-    "input",
-    () => {
-
-        data.global.gridColor =
-            gridColor.value;
-
-
-        gridColorValue.textContent =
-            gridColor.value.toUpperCase();
-
-
-        queueSave();
-
-    }
-);
-
-
-/* =========================================
-   POINTER
-========================================= */
-
-pointerButton.addEventListener(
-    "click",
-    () => {
-
-        const shouldOpen =
-            pointerPanel.classList.contains(
-                "hidden"
-            );
-
-
-        closeAllPanels();
-
-
-        if (shouldOpen) {
-
-            pointerPanel.classList.remove(
-                "hidden"
-            );
-
-        }
-
-    }
-);
-
-
-document
-    .querySelectorAll(
-        "[data-close-panel]"
-    )
-    .forEach(button => {
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                closeAllPanels();
-
-            }
-        );
-
-    });
-
-
-function closeAllPanels() {
-
-    gridPanel.classList.add(
-        "hidden"
-    );
-
-    pointerPanel.classList.add(
-        "hidden"
-    );
-
-}
-
-
-/* =========================================
-   POINTER CONTROLS
-========================================= */
-
-const pointerSymbol =
-    document.getElementById(
-        "pointerSymbol"
-    );
-
-
-const pointerColor =
-    document.getElementById(
-        "pointerColor"
-    );
-
-
-const pointerColorValue =
-    document.getElementById(
-        "pointerColorValue"
-    );
-
-
-const pointerSize =
-    document.getElementById(
-        "pointerSize"
-    );
-
-
-const pointerSizeValue =
-    document.getElementById(
-        "pointerSizeValue"
-    );
-
-
-const pointerGradient =
-    document.getElementById(
-        "pointerGradient"
-    );
-
-
-const pointerGradientStart =
-    document.getElementById(
-        "pointerGradientStart"
-    );
-
-
-const pointerGradientEnd =
-    document.getElementById(
-        "pointerGradientEnd"
-    );
-
-
-const pointerGradientOptions =
-    document.getElementById(
-        "pointerGradientOptions"
-    );
-
-
-pointerSymbol.addEventListener(
-    "change",
-    () => {
-
-        data.pointer.symbol =
-            pointerSymbol.value;
-
-        queueSave();
-
-    }
-);
-
-
-pointerColor.addEventListener(
-    "input",
-    () => {
-
-        data.pointer.color =
-            pointerColor.value;
-
-        pointerColorValue.textContent =
-            pointerColor.value.toUpperCase();
-
-        queueSave();
-
-    }
-);
-
-
-pointerSize.addEventListener(
-    "input",
-    () => {
-
-        data.pointer.size =
-            Number(
-                pointerSize.value
-            );
-
-        pointerSizeValue.textContent =
-            pointerSize.value;
-
-        queueSave();
-
-    }
-);
-
-
-pointerGradient.addEventListener(
-    "change",
-    () => {
-
-        data.pointer.gradient =
-            pointerGradient.checked;
-
-
-        pointerGradientOptions.classList.toggle(
-            "hidden",
-            !pointerGradient.checked
-        );
-
-
-        queueSave();
-
-    }
-);
-
-
-pointerGradientStart.addEventListener(
-    "input",
-    () => {
-
-        data.pointer.gradientStart =
-            pointerGradientStart.value;
-
-        queueSave();
-
-    }
-);
-
-
-pointerGradientEnd.addEventListener(
-    "input",
-    () => {
-
-        data.pointer.gradientEnd =
-            pointerGradientEnd.value;
-
-        queueSave();
-
-    }
-);
-
-
-/* =========================================
-   SETTINGS UI
-========================================= */
 
 function updateGridButtons() {
 
@@ -2504,18 +2371,256 @@ function updateGridButtons() {
 }
 
 
+const gridColor =
+    document.getElementById(
+        "gridColor"
+    );
+
+
+gridColor.addEventListener(
+    "input",
+    () => {
+
+        data.global.gridColor =
+            gridColor.value;
+
+        updateGridPreview();
+
+        queueSave();
+
+    }
+);
+
+
+function updateGridPreview() {
+
+    const preview =
+        document.querySelector(
+            ".grid-preview"
+        );
+
+
+    preview.style.setProperty(
+        "--preview-grid-color",
+        data.global.gridColor
+    );
+
+
+    preview.dataset.grid =
+        data.global.grid;
+
+}
+
+
+/* =========================================
+   POINTER
+========================================= */
+
+const pointerSymbol =
+    document.getElementById(
+        "pointerSymbol"
+    );
+
+const pointerColor =
+    document.getElementById(
+        "pointerColor"
+    );
+
+const pointerSize =
+    document.getElementById(
+        "pointerSize"
+    );
+
+const pointerSizeValue =
+    document.getElementById(
+        "pointerSizeValue"
+    );
+
+const pointerGradient =
+    document.getElementById(
+        "pointerGradient"
+    );
+
+const pointerGradientStart =
+    document.getElementById(
+        "pointerGradientStart"
+    );
+
+const pointerGradientEnd =
+    document.getElementById(
+        "pointerGradientEnd"
+    );
+
+const pointerPreview =
+    document.getElementById(
+        "pointerPreview"
+    );
+
+
+function updatePointerPreview() {
+
+    pointerPreview.textContent =
+        data.pointer.symbol;
+
+
+    pointerPreview.style.fontSize =
+        `${data.pointer.size}px`;
+
+
+    if (data.pointer.gradient) {
+
+        pointerPreview.style.background =
+            `linear-gradient(
+                90deg,
+                ${data.pointer.gradientStart},
+                ${data.pointer.gradientEnd}
+            )`;
+
+        pointerPreview.style.webkitBackgroundClip =
+            "text";
+
+        pointerPreview.style.webkitTextFillColor =
+            "transparent";
+
+    }
+
+    else {
+
+        pointerPreview.style.background =
+            "none";
+
+        pointerPreview.style.webkitBackgroundClip =
+            "initial";
+
+        pointerPreview.style.webkitTextFillColor =
+            data.pointer.color;
+
+    }
+
+}
+
+
+pointerSymbol.addEventListener(
+    "change",
+    () => {
+
+        data.pointer.symbol =
+            pointerSymbol.value;
+
+        updatePointerPreview();
+
+        queueSave();
+
+    }
+);
+
+
+pointerColor.addEventListener(
+    "input",
+    () => {
+
+        data.pointer.color =
+            pointerColor.value;
+
+        updatePointerPreview();
+
+        queueSave();
+
+    }
+);
+
+
+pointerSize.addEventListener(
+    "input",
+    () => {
+
+        data.pointer.size =
+            Number(
+                pointerSize.value
+            );
+
+
+        pointerSizeValue.textContent =
+            pointerSize.value;
+
+
+        updatePointerPreview();
+
+        queueSave();
+
+    }
+);
+
+
+pointerGradient.addEventListener(
+    "change",
+    () => {
+
+        data.pointer.gradient =
+            pointerGradient.checked;
+
+
+        document
+            .getElementById(
+                "pointerGradientOptions"
+            )
+            .classList.toggle(
+                "hidden",
+                !data.pointer.gradient
+            );
+
+
+        updatePointerPreview();
+
+        queueSave();
+
+    }
+);
+
+
+pointerGradientStart.addEventListener(
+    "input",
+    () => {
+
+        data.pointer.gradientStart =
+            pointerGradientStart.value;
+
+        updatePointerPreview();
+
+        queueSave();
+
+    }
+);
+
+
+pointerGradientEnd.addEventListener(
+    "input",
+    () => {
+
+        data.pointer.gradientEnd =
+            pointerGradientEnd.value;
+
+        updatePointerPreview();
+
+        queueSave();
+
+    }
+);
+
+
+/* =========================================
+   LOAD UI
+========================================= */
+
 function loadSettingsUI() {
 
     gridColor.value =
         data.global.gridColor;
 
 
-    gridColorValue.textContent =
-        data.global.gridColor
-        .toUpperCase();
-
-
     updateGridButtons();
+
+    updateGridPreview();
 
 
     pointerSymbol.value =
@@ -2524,11 +2629,6 @@ function loadSettingsUI() {
 
     pointerColor.value =
         data.pointer.color;
-
-
-    pointerColorValue.textContent =
-        data.pointer.color
-        .toUpperCase();
 
 
     pointerSize.value =
@@ -2551,10 +2651,17 @@ function loadSettingsUI() {
         data.pointer.gradientEnd;
 
 
-    pointerGradientOptions.classList.toggle(
-        "hidden",
-        !data.pointer.gradient
-    );
+    document
+        .getElementById(
+            "pointerGradientOptions"
+        )
+        .classList.toggle(
+            "hidden",
+            !data.pointer.gradient
+        );
+
+
+    updatePointerPreview();
 
 }
 
@@ -2567,7 +2674,9 @@ saveButton.addEventListener(
     "click",
     async () => {
 
-        clearTimeout(saveTimer);
+        clearTimeout(
+            saveTimer
+        );
 
         await save();
 
@@ -2581,22 +2690,16 @@ saveButton.addEventListener(
 
 async function start() {
 
-    const ok =
+    const authenticated =
         await initUser();
 
 
-    if (!ok) {
+    if (!authenticated) {
         return;
     }
 
 
-    const loaded =
-        await loadData();
-
-
-    if (!loaded) {
-        return;
-    }
+    await loadData();
 
 
     updateTabs();
