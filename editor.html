@@ -7,7 +7,7 @@
 
     <meta
         name="viewport"
-        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+        content="width=device-width, initial-scale=1, viewport-fit=cover"
     >
 
     <title>Edit Schedule</title>
@@ -22,12 +22,11 @@
 
 <body>
 
-
 <header class="editor-header">
 
     <a
         href="index.html"
-        class="back"
+        class="back-button"
         aria-label="Back"
     >
         ‹
@@ -37,7 +36,7 @@
     <div class="header-info">
 
         <div class="editor-title">
-            EDIT SCHEDULE
+            EDITOR
         </div>
 
         <div
@@ -61,281 +60,298 @@
 </header>
 
 
-
 <main class="editor">
 
 
-    <!-- =========================================
+    <!-- =========================
          DAYS
-    ========================================== -->
+    ========================== -->
 
-    <div class="day-tabs">
+    <section class="days-section">
 
-        <button data-day="MONDAY">
-            MON
-        </button>
-
-        <button data-day="TUESDAY">
-            TUE
-        </button>
-
-        <button data-day="WEDNESDAY">
-            WED
-        </button>
-
-        <button data-day="THURSDAY">
-            THU
-        </button>
-
-        <button data-day="FRIDAY">
-            FRI
-        </button>
-
-        <button data-day="SATURDAY">
-            SAT
-        </button>
-
-        <button data-day="SUNDAY">
-            SUN
-        </button>
-
-    </div>
-
-
-
-    <!-- =========================================
-         LIVE PREVIEW
-    ========================================== -->
-
-    <section class="preview-section">
-
-        <div class="section-heading">
-
-            <div>
-                LIVE PREVIEW
-            </div>
-
-            <span id="previewDay">
-                MON
-            </span>
-
+        <div class="section-label">
+            DAY
         </div>
 
 
-        <div
-            class="preview"
-            id="preview"
-        >
+        <div class="day-tabs">
 
-            <div
-                class="preview-grid"
-                id="previewGrid"
-            ></div>
+            <button data-day="MONDAY">
+                MON
+            </button>
 
+            <button data-day="TUESDAY">
+                TUE
+            </button>
 
-            <div
-                class="preview-pointer"
-                id="previewPointer"
-            >
-                ▶
-            </div>
+            <button data-day="WEDNESDAY">
+                WED
+            </button>
 
+            <button data-day="THURSDAY">
+                THU
+            </button>
 
-            <div
-                class="preview-tasks"
-                id="previewTasks"
-            ></div>
+            <button data-day="FRIDAY">
+                FRI
+            </button>
+
+            <button data-day="SATURDAY">
+                SAT
+            </button>
+
+            <button data-day="SUNDAY">
+                SUN
+            </button>
 
         </div>
 
     </section>
 
 
+    <!-- =========================
+         QUICK ACTIONS
+    ========================== -->
 
-    <!-- =========================================
-         TOOLBAR
-    ========================================== -->
-
-    <section class="toolbar">
+    <section class="quick-actions">
 
         <button
             id="addTask"
-            class="primary-button"
+            class="quick-button add-button"
             type="button"
         >
-            + ADD TASK
+            <span class="quick-icon">＋</span>
+            <span>ADD TASK</span>
         </button>
 
 
         <button
             id="gridButton"
-            class="secondary-button"
+            class="quick-button"
             type="button"
         >
-            GRID
+            <span class="quick-icon">▦</span>
+            <span>GRID</span>
         </button>
 
 
         <button
             id="pointerButton"
-            class="secondary-button"
+            class="quick-button"
             type="button"
         >
-            POINTER
+            <span class="quick-icon">✦</span>
+            <span>POINTER</span>
         </button>
 
     </section>
 
 
-
-    <!-- =========================================
-         TASKS
-    ========================================== -->
-
-    <section
-        id="tasks"
-        class="tasks"
-    ></section>
-
-
-
-    <!-- =========================================
+    <!-- =========================
          GRID PANEL
-    ========================================== -->
+    ========================== -->
 
     <section
         id="gridPanel"
         class="settings-panel hidden"
     >
 
-        <div class="panel-title">
-            GRID STYLE
-        </div>
+        <div class="panel-header">
+
+            <div>
+
+                <div class="panel-title">
+                    GRID
+                </div>
+
+                <div class="panel-description">
+                    Choose the visual structure of your schedule.
+                </div>
+
+            </div>
 
 
-        <div class="choice-grid">
-
-            <button data-grid="clean">
-                CLEAN
-            </button>
-
-            <button data-grid="dots">
-                DOTS
-            </button>
-
-            <button data-grid="double">
-                DOUBLE
-            </button>
-
-            <button data-grid="soft">
-                SOFT
-            </button>
-
-            <button data-grid="wave">
-                WAVE
-            </button>
-
-        </div>
-
-
-        <div class="global-control">
-
-            <span>
-                GRID COLOR
-            </span>
-
-            <input
-                type="color"
-                id="gridColor"
+            <button
+                class="panel-close"
+                data-close-panel="grid"
+                type="button"
             >
+                ×
+            </button>
+
+        </div>
+
+
+        <div class="setting-block">
+
+            <div class="setting-title">
+                STYLE
+            </div>
+
+
+            <div class="grid-choices">
+
+                <button data-grid="clean">
+                    <span class="grid-preview clean-preview"></span>
+                    <span>CLEAN</span>
+                </button>
+
+
+                <button data-grid="dots">
+                    <span class="grid-preview dots-preview"></span>
+                    <span>DOTS</span>
+                </button>
+
+
+                <button data-grid="double">
+                    <span class="grid-preview double-preview"></span>
+                    <span>DOUBLE</span>
+                </button>
+
+
+                <button data-grid="soft">
+                    <span class="grid-preview soft-preview"></span>
+                    <span>SOFT</span>
+                </button>
+
+
+                <button data-grid="wave">
+                    <span class="grid-preview wave-preview"></span>
+                    <span>WAVE</span>
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="setting-block">
+
+            <label class="setting-title">
+                GRID COLOR
+            </label>
+
+            <div class="color-control">
+
+                <input
+                    type="color"
+                    id="gridColor"
+                >
+
+                <span id="gridColorValue">
+                    #E8E8E8
+                </span>
+
+            </div>
 
         </div>
 
     </section>
 
 
-
-    <!-- =========================================
+    <!-- =========================
          POINTER PANEL
-    ========================================== -->
+    ========================== -->
 
     <section
         id="pointerPanel"
         class="settings-panel hidden"
     >
 
-        <div class="panel-title">
-            TIME POINTER
+        <div class="panel-header">
+
+            <div>
+
+                <div class="panel-title">
+                    POINTER
+                </div>
+
+                <div class="panel-description">
+                    Customize the marker for the current time.
+                </div>
+
+            </div>
+
+
+            <button
+                class="panel-close"
+                data-close-panel="pointer"
+                type="button"
+            >
+                ×
+            </button>
+
         </div>
 
 
-        <div class="global-control">
+        <div class="setting-block">
 
-            <span>
+            <label class="setting-title">
                 SYMBOL
-            </span>
+            </label>
 
-            <select id="pointerSymbol">
 
-                <option value="▶">
-                    ▶ Triangle
-                </option>
+            <select
+                id="pointerSymbol"
+                class="full-select"
+            >
 
-                <option value="♥">
-                    ♥ Heart
-                </option>
-
-                <option value="✦">
-                    ✦ Star
-                </option>
-
-                <option value="✿">
-                    ✿ Flower
-                </option>
-
-                <option value="◆">
-                    ◆ Diamond
-                </option>
-
-                <option value="●">
-                    ● Circle
-                </option>
-
-                <option value="➜">
-                    ➜ Arrow
-                </option>
+                <option value="▶">▶ Triangle</option>
+                <option value="♥">♥ Heart</option>
+                <option value="✦">✦ Star</option>
+                <option value="✿">✿ Flower</option>
+                <option value="◆">◆ Diamond</option>
+                <option value="●">● Circle</option>
+                <option value="➜">➜ Arrow</option>
+                <option value="★">★ Star 2</option>
+                <option value="☀">☀ Sun</option>
+                <option value="☁">☁ Cloud</option>
+                <option value="♡">♡ Heart outline</option>
+                <option value="✧">✧ Spark</option>
+                <option value="❖">❖ Crystal</option>
+                <option value="◈">◈ Diamond 2</option>
 
             </select>
 
         </div>
 
 
-        <div class="global-control">
+        <div class="setting-block">
 
-            <span>
+            <label class="setting-title">
                 COLOR
-            </span>
+            </label>
 
-            <input
-                type="color"
-                id="pointerColor"
-            >
+
+            <div class="color-control">
+
+                <input
+                    type="color"
+                    id="pointerColor"
+                >
+
+                <span id="pointerColorValue">
+                    #111111
+                </span>
+
+            </div>
 
         </div>
 
 
-        <div class="global-control">
+        <div class="setting-block">
 
-            <span>
+            <label class="setting-title">
                 SIZE
-            </span>
+            </label>
+
 
             <div class="range-line">
 
                 <input
                     type="range"
                     id="pointerSize"
-                    min="12"
+                    min="16"
                     max="80"
                     step="1"
                 >
@@ -349,48 +365,65 @@
         </div>
 
 
-        <label class="switch-row">
+        <div class="setting-block">
 
-            <input
-                type="checkbox"
-                id="pointerGradient"
-            >
+            <label class="toggle-row">
 
-            <span>
-                GRADIENT
-            </span>
+                <span>
 
-        </label>
+                    <strong>
+                        GRADIENT
+                    </strong>
+
+                    <small>
+                        Use a two-color gradient.
+                    </small>
+
+                </span>
+
+
+                <input
+                    type="checkbox"
+                    id="pointerGradient"
+                >
+
+                <span class="toggle"></span>
+
+            </label>
+
+        </div>
 
 
         <div
             id="pointerGradientOptions"
-            class="gradient-options"
+            class="gradient-options hidden"
         >
 
-            <div class="global-control">
+            <div>
 
-                <span>
+                <div class="setting-title">
                     START
-                </span>
+                </div>
 
                 <input
                     type="color"
                     id="pointerGradientStart"
+                    class="big-color"
                 >
 
             </div>
 
 
-            <div class="global-control">
+            <div>
 
-                <span>
+                <div class="setting-title">
                     END
-                </span>
+                </div>
 
                 <input
                     type="color"
                     id="pointerGradientEnd"
+                    class="big-color"
                 >
 
             </div>
@@ -400,63 +433,47 @@
     </section>
 
 
-</main>
+    <!-- =========================
+         TASKS
+    ========================== -->
 
+    <section class="tasks-section">
 
+        <div class="tasks-heading">
 
-<!-- =========================================
-     DELETE MODAL
-========================================== -->
+            <div>
 
-<div
-    class="modal-backdrop hidden"
-    id="deleteModal"
->
+                <div class="section-label">
+                    SCHEDULE
+                </div>
 
-    <div class="confirm-modal">
+                <div
+                    class="selected-day-title"
+                    id="selectedDayTitle"
+                >
+                    MONDAY
+                </div>
 
-        <div class="confirm-title">
-            DELETE TASK?
+            </div>
+
         </div>
+
 
         <div
-            class="confirm-text"
-            id="deleteText"
-        >
-            Are you sure?
-        </div>
+            id="tasks"
+            class="tasks"
+        ></div>
+
+    </section>
 
 
-        <div class="confirm-buttons">
-
-            <button
-                id="cancelDelete"
-                type="button"
-            >
-                CANCEL
-            </button>
-
-            <button
-                id="confirmDelete"
-                class="danger"
-                type="button"
-            >
-                DELETE
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
-
+</main>
 
 
 <script
     type="module"
     src="editor.js"
 ></script>
-
 
 </body>
 
