@@ -1,12 +1,10 @@
 * {
     box-sizing: border-box;
-
     margin: 0;
     padding: 0;
 
     -webkit-tap-highlight-color: transparent;
 }
-
 
 html,
 body {
@@ -29,7 +27,6 @@ body {
 
     -webkit-text-size-adjust: 100%;
 }
-
 
 body {
     -webkit-font-smoothing: antialiased;
@@ -114,7 +111,6 @@ body {
     gap: 5px;
 }
 
-
 .menu-button span {
     width: 18px;
     height: 2px;
@@ -152,7 +148,6 @@ body {
     gap: 4px;
 }
 
-
 .nav-button {
     width: 39px;
     height: 39px;
@@ -180,7 +175,6 @@ body {
             .055
         );
 }
-
 
 .selected-day {
     width: 106px;
@@ -214,7 +208,6 @@ body {
         );
 }
 
-
 .selected-day-label {
     font-size: 7px;
 
@@ -224,7 +217,6 @@ body {
 
     opacity: .55;
 }
-
 
 .selected-day-name {
     margin-top: 3px;
@@ -280,7 +272,6 @@ body {
 ========================================================= */
 
 .schedule-board {
-
     position: relative;
 
     width: 100%;
@@ -290,8 +281,8 @@ body {
     margin: 0 auto;
 
     /*
-     * Левая зона:
-     * pointer + небольшой воздух.
+     * Отдельная зона для pointer.
+     * Размер задаётся JS.
      */
 
     padding-top: 18px;
@@ -331,7 +322,6 @@ body {
 ========================================================= */
 
 .schedule-row {
-
     position: relative;
 
     width: 100%;
@@ -339,6 +329,11 @@ body {
     min-height: 62px;
 
     display: grid;
+
+    /*
+     * TIME занимает ровно столько,
+     * сколько реально требует его текст.
+     */
 
     grid-template-columns:
         max-content
@@ -354,37 +349,32 @@ body {
     padding:
         9px 0;
 
-    /*
-     * Никакой подсветки текущей строки.
-     */
+    background:
+        transparent !important;
 
-    background: transparent !important;
-
-    box-shadow: none !important;
+    box-shadow:
+        none !important;
 
     border-bottom:
-        var(
-            --grid-thickness
-        )
-        solid
-        var(
-            --grid-color
-        );
+        none !important;
 }
 
 
 /*
- * На всякий случай полностью
- * отменяем старое затемнение.
+ * Никакого выделения текущей строки.
  */
 
 .schedule-row.current-row,
 .schedule-row.current-row::before,
 .schedule-row.current-row::after {
+    background:
+        transparent !important;
 
-    background: transparent !important;
+    box-shadow:
+        none !important;
 
-    box-shadow: none !important;
+    filter:
+        none !important;
 }
 
 
@@ -393,7 +383,6 @@ body {
 ========================================================= */
 
 .schedule-time {
-
     width:
         max-content;
 
@@ -460,6 +449,7 @@ body {
 ========================================================= */
 
 .schedule-task {
+    position: relative;
 
     min-width:
         0;
@@ -471,8 +461,7 @@ body {
         100%;
 
     padding:
-        7px
-        9px;
+        7px 9px;
 
     border-radius:
         9px;
@@ -519,72 +508,158 @@ body {
 
 
 /* =========================================================
-   GRID — ROWS
+   MODERN GRID
 ========================================================= */
 
-.schedule-board.grid-rows
-.schedule-row {
 
-    border-bottom:
-        var(
-            --grid-thickness
-        )
-        solid
-        var(
-            --grid-color
-        );
+/*
+ * ВАЖНО:
+ * никаких background-image у board.
+ */
+
+.schedule-board::before,
+.schedule-board::after {
+    content: none !important;
+
+    display: none !important;
 }
 
 
 /* =========================================================
-   GRID — NONE
+   ROWS
+   Мягкая горизонтальная линия
 ========================================================= */
 
-.schedule-board.grid-none
+.schedule-board.grid-rows
 .schedule-row {
+    border-bottom:
+        none !important;
+}
 
+.schedule-board.grid-rows
+.schedule-row::after {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    right: 0;
+
+    bottom: 0;
+
+    height:
+        max(
+            1px,
+            var(--grid-thickness)
+        );
+
+    background:
+        linear-gradient(
+            90deg,
+
+            transparent 0%,
+
+            rgba(
+                0,
+                0,
+                0,
+                .015
+            ) 3%,
+
+            var(--grid-color) 18%,
+
+            var(--grid-color) 82%,
+
+            rgba(
+                0,
+                0,
+                0,
+                .015
+            ) 97%,
+
+            transparent 100%
+        );
+
+    opacity: .9;
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   GRID
+   Горизонтальная + вертикальная линия
+========================================================= */
+
+.schedule-board.grid-grid
+.schedule-row {
     border-bottom:
         none !important;
 }
 
 
-/* =========================================================
-   GRID — GRID
-========================================================= */
+/*
+ * Горизонтальная линия.
+ */
 
 .schedule-board.grid-grid
-.schedule-row {
+.schedule-row::after {
+    content: "";
 
-    border-bottom:
-        var(
-            --grid-thickness
-        )
-        solid
-        var(
-            --grid-color
+    position: absolute;
+
+    left: 0;
+    right: 0;
+
+    bottom: 0;
+
+    height:
+        max(
+            1px,
+            var(--grid-thickness)
         );
+
+    background:
+        linear-gradient(
+            90deg,
+
+            transparent 0%,
+
+            rgba(
+                0,
+                0,
+                0,
+                .015
+            ) 3%,
+
+            var(--grid-color) 18%,
+
+            var(--grid-color) 82%,
+
+            rgba(
+                0,
+                0,
+                0,
+                .015
+            ) 97%,
+
+            transparent 100%
+        );
+
+    opacity: .9;
+
+    pointer-events: none;
 }
 
 
 /*
- * Разделитель находится прямо
- * перед TEXT.
- *
- * Поэтому он автоматически
- * перемещается вместе с TIME.
+ * Убираем обычную границу у текста.
  */
 
 .schedule-board.grid-grid
 .schedule-task {
-
     border-left:
-        var(
-            --grid-thickness
-        )
-        solid
-        var(
-            --grid-color
-        );
+        none !important;
 
     border-radius:
         0;
@@ -595,16 +670,96 @@ body {
 
 
 /*
- * Старые фоновые сетки полностью отключены.
+ * Вертикальная линия.
+ *
+ * Она находится именно между
+ * TIME и TEXT и сама исчезает
+ * сверху и снизу.
  */
 
-.schedule-board::before,
-.schedule-board::after,
+.schedule-board.grid-grid
+.schedule-task::before {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+
+    top: 0;
+    bottom: 0;
+
+    width:
+        max(
+            1px,
+            var(--grid-thickness)
+        );
+
+    background:
+        linear-gradient(
+            180deg,
+
+            transparent 0%,
+
+            rgba(
+                0,
+                0,
+                0,
+                .015
+            ) 7%,
+
+            var(--grid-color) 22%,
+
+            var(--grid-color) 78%,
+
+            rgba(
+                0,
+                0,
+                0,
+                .015
+            ) 93%,
+
+            transparent 100%
+        );
+
+    opacity: .9;
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   NONE
+========================================================= */
+
+.schedule-board.grid-none
+.schedule-row {
+    border-bottom:
+        none !important;
+}
+
+.schedule-board.grid-none
+.schedule-row::after {
+    display:
+        none !important;
+}
+
+.schedule-board.grid-none
+.schedule-task::before {
+    display:
+        none !important;
+}
+
+
+/* =========================================================
+   OLD GRID CLASSES
+========================================================= */
 
 .schedule-board.grid-dots,
 .schedule-board.grid-double,
 .schedule-board.grid-soft,
 .schedule-board.grid-wave {
+    background:
+        transparent !important;
 
     background-image:
         none !important;
@@ -616,7 +771,6 @@ body {
 ========================================================= */
 
 .time-pointer {
-
     position: absolute;
 
     z-index: 450;
@@ -660,10 +814,6 @@ body {
     filter:
         none !important;
 
-    /*
-     * Маленькая тень.
-     */
-
     box-shadow:
         0 4px 12px
         rgba(
@@ -672,10 +822,6 @@ body {
             0,
             .10
         );
-
-    /*
-     * iOS Safari mask.
-     */
 
     -webkit-mask-repeat:
         no-repeat;
@@ -698,11 +844,10 @@ body {
 
 
 /*
- * Gradient pointer запрещён.
+ * Pointer никогда не становится градиентным.
  */
 
 .time-pointer.gradient {
-
     background-image:
         none !important;
 
@@ -711,8 +856,11 @@ body {
 }
 
 
-#pointerSymbol {
+/*
+ * Старый символ ▶ не используется.
+ */
 
+#pointerSymbol {
     display:
         none !important;
 }
@@ -723,10 +871,8 @@ body {
 ========================================================= */
 
 .empty-state {
-
     padding:
-        75px
-        20px;
+        75px 20px;
 
     text-align:
         center;
@@ -747,7 +893,6 @@ body {
 ========================================================= */
 
 .bottom-navigation {
-
     position: fixed;
 
     left: 0;
@@ -794,7 +939,6 @@ body {
 ========================================================= */
 
 .days-scroll {
-
     width: 100%;
 
     display: grid !important;
@@ -808,7 +952,8 @@ body {
             )
         ) !important;
 
-    gap: 3px;
+    gap:
+        3px;
 
     padding:
         0 2px;
@@ -820,16 +965,13 @@ body {
         none;
 }
 
-
 .days-scroll::-webkit-scrollbar {
-
     display:
         none;
 }
 
 
 .day-button {
-
     width:
         100%;
 
@@ -884,7 +1026,6 @@ body {
 
 
 .day-button.active {
-
     background:
         #111;
 
@@ -894,7 +1035,6 @@ body {
 
 
 .day-button span {
-
     width:
         3px;
 
@@ -914,7 +1054,6 @@ body {
 
 .day-button.today:not(.active)
 span {
-
     opacity:
         .45;
 }
@@ -925,15 +1064,11 @@ span {
 ========================================================= */
 
 .menu-overlay {
+    position: fixed;
 
-    position:
-        fixed;
+    inset: 0;
 
-    inset:
-        0;
-
-    z-index:
-        600;
+    z-index: 600;
 
     background:
         rgba(
@@ -955,7 +1090,6 @@ span {
 
 
 .menu-overlay.open {
-
     opacity:
         1;
 
@@ -969,15 +1103,10 @@ span {
 ========================================================= */
 
 .side-menu {
+    position: fixed;
 
-    position:
-        fixed;
-
-    top:
-        0;
-
-    left:
-        0;
+    top: 0;
+    left: 0;
 
     width:
         min(
@@ -1040,7 +1169,6 @@ span {
 
 
 .side-menu.open {
-
     transform:
         translate3d(
             0,
@@ -1051,7 +1179,6 @@ span {
 
 
 .menu-top {
-
     display:
         flex;
 
@@ -1061,7 +1188,6 @@ span {
 
 
 .close-menu {
-
     width:
         42px;
 
@@ -1083,7 +1209,6 @@ span {
 
 
 .menu-profile {
-
     margin-top:
         40px;
 
@@ -1099,7 +1224,6 @@ span {
 
 
 .menu-avatar {
-
     width:
         55px;
 
@@ -1133,7 +1257,6 @@ span {
 
 
 .menu-username {
-
     font-size:
         15px;
 
@@ -1143,7 +1266,6 @@ span {
 
 
 .menu-email {
-
     margin-top:
         5px;
 
@@ -1168,7 +1290,6 @@ span {
 
 
 .menu-links {
-
     margin-top:
         40px;
 
@@ -1179,7 +1300,6 @@ span {
 
 
 .menu-link {
-
     height:
         62px;
 
@@ -1214,7 +1334,6 @@ span {
 
 
 .logout-button {
-
     margin-top:
         auto;
 
@@ -1249,15 +1368,6 @@ span {
 @media (max-width: 767px) {
 
     .schedule-board {
-
-        /*
-         * На iPhone таблица начинается
-         * после отдельного pointer-gutter.
-         *
-         * Это предотвращает налезание
-         * pointer на TIME.
-         */
-
         padding-left:
             var(
                 --pointer-gutter,
@@ -1265,16 +1375,7 @@ span {
             );
     }
 
-
-    .time-pointer {
-
-        z-index:
-            450;
-    }
-
-
     .schedule-row {
-
         min-height:
             62px;
 
@@ -1282,17 +1383,18 @@ span {
             11px;
     }
 
-
     .schedule-task {
-
         padding:
             7px
             8px;
     }
 
+    .time-pointer {
+        z-index:
+            450;
+    }
 
     .days-scroll {
-
         gap:
             3px;
 
@@ -1300,9 +1402,7 @@ span {
             0 2px;
     }
 
-
     .day-button {
-
         height:
             38px;
 
@@ -1312,7 +1412,6 @@ span {
         font-size:
             7px;
     }
-
 }
 
 
@@ -1327,11 +1426,9 @@ span {
 ) {
 
     .day-button {
-
         font-size:
             8px;
     }
-
 }
 
 
@@ -1342,11 +1439,9 @@ span {
 @media (max-width: 389px) {
 
     .day-button {
-
         font-size:
             7px;
     }
-
 }
 
 
@@ -1357,7 +1452,6 @@ span {
 @media (min-width: 768px) {
 
     .menu-button {
-
         top:
             25px;
 
@@ -1365,16 +1459,12 @@ span {
             25px;
     }
 
-
     .day-navigation {
-
         top:
             25px;
     }
 
-
     .schedule {
-
         padding-top:
             78px;
 
@@ -1382,9 +1472,7 @@ span {
             80px;
     }
 
-
     .schedule-board {
-
         width:
             720px;
 
@@ -1398,9 +1486,7 @@ span {
             );
     }
 
-
     .schedule-row {
-
         min-height:
             66px;
 
@@ -1408,14 +1494,11 @@ span {
             16px;
     }
 
-
     .schedule-task {
-
         padding:
             9px
             11px;
     }
-
 }
 
 
@@ -1426,9 +1509,7 @@ span {
 @media (min-width: 1200px) {
 
     .schedule-board {
-
         width:
             760px;
     }
-
 }
