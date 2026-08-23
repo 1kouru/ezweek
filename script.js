@@ -96,29 +96,17 @@ function defaultSchedule() {
 
         global: {
 
-            grid: "clean",
+            gridType: "rows",
 
-            gridColor: "#e8e8e8",
+            gridThickness: 1,
 
-            timeColor: "#999999",
-
-            timeSize: 11,
-
-            taskSize: 15,
-
-            taskColor: "#111111",
-
-            taskBackground: "transparent",
-
-            taskRadius: 12,
-
-            taskPadding: 10
+            gridColor: "#e8e8e8"
 
         },
 
         pointer: {
 
-            symbol: "▶",
+            icon: 1,
 
             color: "#111111",
 
@@ -131,6 +119,64 @@ function defaultSchedule() {
             gradientEnd: "#7c5cff"
 
         }
+
+    };
+
+}
+
+
+/* =========================================
+   DEFAULT TASK
+========================================= */
+
+function defaultTask() {
+
+    return {
+
+        id:
+            crypto.randomUUID(),
+
+        time: "08:00",
+
+        text: "NEW TASK",
+
+
+        /* TIME */
+
+        timeColor: "#999999",
+
+        timeSize: 11,
+
+        timeWeight: 600,
+
+        timeGradient: false,
+
+        timeGradientStart: "#ff4ecd",
+
+        timeGradientEnd: "#7c5cff",
+
+        timeBackground: "transparent",
+
+        timeRadius: 10,
+
+        timePadding: 7,
+
+
+        /* TEXT */
+
+        color: "#111111",
+
+        fontSize: 15,
+
+        fontFamily: "Arial",
+
+        fontWeight: 500,
+
+        gradient: false,
+
+        gradientStart: "#ff4ecd",
+
+        gradientEnd: "#7c5cff"
 
     };
 
@@ -292,6 +338,29 @@ function normalizeSchedule(data) {
     };
 
 
+    /*
+     * Совместимость со старой
+     * версией редактора.
+     */
+
+    if (
+        data.global?.grid &&
+        !data.global?.gridType
+    ) {
+
+        if (
+            data.global.grid ===
+            "clean"
+        ) {
+
+            result.global.gridType =
+                "rows";
+
+        }
+
+    }
+
+
     DAYS.forEach(day => {
 
         if (
@@ -303,6 +372,20 @@ function normalizeSchedule(data) {
             result.days[day] = [];
 
         }
+
+
+        result.days[day] =
+            result.days[day].map(item => {
+
+                return {
+
+                    ...defaultTask(),
+
+                    ...item
+
+                };
+
+            });
 
     });
 
@@ -413,7 +496,9 @@ function getAlmatyTime() {
 
 
     if (hour === 24) {
+
         hour = 0;
+
     }
 
 
@@ -505,22 +590,13 @@ function sortItems(items) {
 function render() {
 
     if (!selectedDay) {
+
         return;
+
     }
 
 
-    const global =
-        scheduleData.global;
-
-
     board.innerHTML = "";
-
-
-    board.style
-        .setProperty(
-            "--grid-color",
-            global.gridColor
-        );
 
 
     const items =
@@ -541,7 +617,6 @@ function render() {
             "block";
 
     }
-
 
     else {
 
@@ -565,69 +640,77 @@ function render() {
                 item.time;
 
 
+            /*
+             * TIME STYLE
+             */
+
             row.style.setProperty(
                 "--time-color",
-                item.timeColor ||
-                global.timeColor
+                item.timeColor
             );
 
 
             row.style.setProperty(
                 "--time-size",
-                `${item.timeSize || global.timeSize}px`
+                `${item.timeSize}px`
             );
 
 
             row.style.setProperty(
                 "--time-weight",
-                item.timeWeight ||
-                600
+                item.timeWeight
             );
 
 
             row.style.setProperty(
+                "--time-background",
+
+                item.timeBackground ===
+                "transparent"
+
+                    ? "transparent"
+
+                    : item.timeBackground
+            );
+
+
+            row.style.setProperty(
+                "--time-radius",
+                `${item.timeRadius}px`
+            );
+
+
+            row.style.setProperty(
+                "--time-padding",
+                `${item.timePadding}px`
+            );
+
+
+            /*
+             * TASK STYLE
+             */
+
+            row.style.setProperty(
                 "--task-size",
-                `${item.fontSize || global.taskSize}px`
+                `${item.fontSize}px`
             );
 
 
             row.style.setProperty(
                 "--task-color",
-                item.color ||
-                global.taskColor
-            );
-
-
-            row.style.setProperty(
-                "--task-background",
-                item.background ||
-                global.taskBackground
-            );
-
-
-            row.style.setProperty(
-                "--task-radius",
-                `${item.radius ?? global.taskRadius}px`
-            );
-
-
-            row.style.setProperty(
-                "--task-padding",
-                `${item.padding ?? global.taskPadding}px`
+                item.color
             );
 
 
             row.style.setProperty(
                 "--task-weight",
-                item.fontWeight ||
-                500
+                item.fontWeight
             );
 
 
             row.style.setProperty(
                 "--task-font",
-                item.fontFamily ||
-                "Arial"
+                item.fontFamily
             );
 
 
@@ -656,15 +739,22 @@ function render() {
 
 
             task.textContent =
-                item.text;
+                item.text ||
+                "TASK";
 
 
-            if (
-                item.gradient
-            ) {
+            /*
+             * TEXT GRADIENT
+             */
 
-                task.style.background =
-                    `linear-gradient(90deg, ${item.gradientStart}, ${item.gradientEnd})`;
+            if (item.gradient) {
+
+                task.style.backgroundImage =
+                    `linear-gradient(
+                        90deg,
+                        ${item.gradientStart},
+                        ${item.gradientEnd}
+                    )`;
 
                 task.style.webkitBackgroundClip =
                     "text";
@@ -672,8 +762,62 @@ function render() {
                 task.style.backgroundClip =
                     "text";
 
+                task.style.webkitTextFillColor =
+                    "transparent";
+
                 task.style.color =
                     "transparent";
+
+            }
+
+            else {
+
+                task.style.backgroundImage =
+                    "none";
+
+                task.style.webkitTextFillColor =
+                    item.color;
+
+                task.style.color =
+                    item.color;
+
+            }
+
+
+            /*
+             * TIME GRADIENT
+             */
+
+            if (item.timeGradient) {
+
+                time.style.backgroundImage =
+                    `linear-gradient(
+                        90deg,
+                        ${item.timeGradientStart},
+                        ${item.timeGradientEnd}
+                    )`;
+
+                time.style.webkitBackgroundClip =
+                    "text";
+
+                time.style.backgroundClip =
+                    "text";
+
+                time.style.webkitTextFillColor =
+                    "transparent";
+
+            }
+
+            else {
+
+                time.style.backgroundImage =
+                    "none";
+
+                time.style.webkitTextFillColor =
+                    item.timeColor;
+
+                time.style.color =
+                    item.timeColor;
 
             }
 
@@ -704,54 +848,51 @@ function render() {
 
 function renderGridStyle() {
 
+    const global =
+        scheduleData.global;
+
+
+    /*
+     * Цвет и толщина
+     */
+
+    board.style.setProperty(
+        "--grid-color",
+        global.gridColor
+    );
+
+
+    board.style.setProperty(
+        "--grid-thickness",
+        `${global.gridThickness}px`
+    );
+
+
+    /*
+     * Тип сетки
+     */
+
     board.classList.remove(
-        "grid-dots",
-        "grid-double",
-        "grid-soft",
-        "grid-wave"
+        "grid-rows",
+        "grid-full"
     );
 
 
     if (
-        scheduleData.global.grid ===
-        "dots"
+        global.gridType ===
+        "grid"
     ) {
 
         board.classList.add(
-            "grid-dots"
+            "grid-full"
         );
 
     }
 
-    if (
-        scheduleData.global.grid ===
-        "double"
-    ) {
+    else {
 
         board.classList.add(
-            "grid-double"
-        );
-
-    }
-
-    if (
-        scheduleData.global.grid ===
-        "soft"
-    ) {
-
-        board.classList.add(
-            "grid-soft"
-        );
-
-    }
-
-    if (
-        scheduleData.global.grid ===
-        "wave"
-    ) {
-
-        board.classList.add(
-            "grid-wave"
+            "grid-rows"
         );
 
     }
@@ -769,35 +910,68 @@ function renderPointerStyle() {
         scheduleData.pointer;
 
 
-    pointerSymbol.textContent =
-        p.symbol || "▶";
+    /*
+     * Размер контейнера
+     */
+
+    pointer.style.width =
+        `${p.size}px`;
+
+    pointer.style.height =
+        `${p.size}px`;
 
 
-    pointer.style.fontSize =
-        `${p.size || 28}px`;
+    /*
+     * PNG ИКОНКА
+     */
+
+    pointerSymbol.innerHTML =
+        "";
 
 
-    pointer.style.color =
-        p.color ||
-        "#111";
+    pointerSymbol.style.width =
+        "100%";
+
+    pointerSymbol.style.height =
+        "100%";
 
 
-    pointer.classList.remove(
-        "gradient"
-    );
+    pointerSymbol.style.display =
+        "block";
+
+
+    /*
+     * Одноцветный указатель
+     * через CSS mask.
+     */
+
+    pointerSymbol.style.mask =
+        `url("icons/${p.icon}.png")
+        center / contain
+        no-repeat`;
+
+
+    pointerSymbol.style.webkitMask =
+        `url("icons/${p.icon}.png")
+        center / contain
+        no-repeat`;
 
 
     if (p.gradient) {
 
-        pointer.classList.add(
-            "gradient"
-        );
+        pointerSymbol.style.background =
+            `linear-gradient(
+                90deg,
+                ${p.gradientStart},
+                ${p.gradientEnd}
+            )`;
 
+    }
 
-        pointer.style.setProperty(
-            "--pointer-gradient",
-            `linear-gradient(90deg, ${p.gradientStart}, ${p.gradientEnd})`
-        );
+    else {
+
+        pointerSymbol.style.background =
+            p.color;
 
     }
 
@@ -805,10 +979,15 @@ function renderPointerStyle() {
 
 
 /* =========================================
-   EXACT POINTER POSITION
+   POINTER POSITION
 ========================================= */
 
 function updatePointer() {
+
+    /*
+     * Показываем указатель
+     * только на сегодняшнем дне.
+     */
 
     if (
         selectedDay !==
@@ -851,6 +1030,10 @@ function updatePointer() {
         now.second;
 
 
+    /*
+     * Ищем ближайшую задачу.
+     */
+
     let nearest =
         null;
 
@@ -889,7 +1072,8 @@ function updatePointer() {
         );
 
 
-    let targetRow = null;
+    let targetRow =
+        null;
 
 
     rows.forEach(row => {
@@ -899,7 +1083,8 @@ function updatePointer() {
             nearest.time
         ) {
 
-            targetRow = row;
+            targetRow =
+                row;
 
         }
 
@@ -920,13 +1105,17 @@ function updatePointer() {
         targetRow.getBoundingClientRect();
 
 
-    const boardRect =
+    const scheduleRect =
         schedule.getBoundingClientRect();
 
 
+    /*
+     * Центр строки.
+     */
+
     const y =
         rowRect.top -
-        boardRect.top +
+        scheduleRect.top +
         rowRect.height / 2;
 
 
@@ -1023,7 +1212,7 @@ function updateClock() {
 
 
     currentTime.textContent =
-        `${String(time.hour).padStart(2,"0")}:${String(time.minute).padStart(2,"0")}`;
+        `${String(time.hour).padStart(2, "0")}:${String(time.minute).padStart(2, "0")}`;
 
 }
 
@@ -1148,10 +1337,12 @@ schedule.addEventListener(
 
 
         const dx =
-            endX - startX;
+            endX -
+            startX;
 
         const dy =
-            endY - startY;
+            endY -
+            startY;
 
 
         if (
@@ -1164,16 +1355,20 @@ schedule.addEventListener(
         }
 
 
-        if (dx < 0) {
+        const index =
+            DAYS.indexOf(
+                selectedDay
+            );
 
-            const index =
-                DAYS.indexOf(
-                    selectedDay
-                );
+
+        if (dx < 0) {
 
             selectDay(
                 DAYS[
-                    (index + 1) % 7
+                    (
+                        index +
+                        1
+                    ) % 7
                 ]
             );
 
@@ -1181,14 +1376,13 @@ schedule.addEventListener(
 
         else {
 
-            const index =
-                DAYS.indexOf(
-                    selectedDay
-                );
-
             selectDay(
                 DAYS[
-                    (index - 1 + 7) % 7
+                    (
+                        index -
+                        1 +
+                        7
+                    ) % 7
                 ]
             );
 
@@ -1222,7 +1416,9 @@ async function start() {
 
 
     if (!user) {
+
         return;
+
     }
 
 
