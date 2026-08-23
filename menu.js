@@ -1,124 +1,67 @@
+import { supabase } from "./supabase.js";
+
+
 const menuButton =
-    document.getElementById("menuButton");
+    document.getElementById(
+        "menuButton"
+    );
 
-const sideMenu =
-    document.getElementById("sideMenu");
+const closeButton =
+    document.getElementById(
+        "closeMenu"
+    );
 
-const menuOverlay =
-    document.getElementById("menuOverlay");
+const menu =
+    document.getElementById(
+        "sideMenu"
+    );
 
-const closeMenuButton =
-    document.getElementById("closeMenu");
+const overlay =
+    document.getElementById(
+        "menuOverlay"
+    );
 
 const logoutButton =
-    document.getElementById("logoutButton");
+    document.getElementById(
+        "logoutButton"
+    );
 
-const menuUsername =
-    document.getElementById("menuUsername");
+const username =
+    document.getElementById(
+        "menuUsername"
+    );
 
-const menuEmail =
-    document.getElementById("menuEmail");
+const email =
+    document.getElementById(
+        "menuEmail"
+    );
 
-const menuAvatar =
-    document.getElementById("menuAvatar");
+const avatar =
+    document.getElementById(
+        "menuAvatar"
+    );
 
-
-/* =========================================
-   AUTH
-========================================= */
-
-async function loadMenuUser() {
-
-    const {
-        data
-    } =
-        await supabaseClient
-        .auth
-        .getUser();
-
-
-    const user =
-        data.user;
-
-
-    if (!user) {
-
-        window.location.href =
-            "auth.html";
-
-        return;
-
-    }
-
-
-    menuEmail.textContent =
-        user.email;
-
-
-    const {
-        data: profile
-    } =
-        await supabaseClient
-        .from("profiles")
-        .select("*")
-        .eq(
-            "id",
-            user.id
-        )
-        .single();
-
-
-    const username =
-        profile?.username ||
-        user.user_metadata?.username ||
-        "USER";
-
-
-    menuUsername.textContent =
-        username;
-
-
-    menuAvatar.textContent =
-        username
-        .charAt(0)
-        .toUpperCase();
-
-}
-
-
-loadMenuUser();
-
-
-/* =========================================
-   OPEN
-========================================= */
 
 function openMenu() {
 
-    sideMenu.classList.add(
+    menu.classList.add(
         "open"
     );
 
-
-    menuOverlay.classList.add(
+    overlay.classList.add(
         "open"
     );
 
 }
 
 
-/* =========================================
-   CLOSE
-========================================= */
-
 function closeMenu() {
 
-    sideMenu.classList.remove(
+    menu.classList.remove(
         "open"
     );
 
-
-    menuOverlay.classList.remove(
+    overlay.classList.remove(
         "open"
     );
 
@@ -131,39 +74,86 @@ menuButton.addEventListener(
 );
 
 
-closeMenuButton.addEventListener(
+closeButton.addEventListener(
     "click",
     closeMenu
 );
 
 
-menuOverlay.addEventListener(
+overlay.addEventListener(
     "click",
     closeMenu
 );
 
 
-/* =========================================
-   LOGOUT
-========================================= */
+document.addEventListener(
+    "keydown",
+    e => {
+
+        if (
+            e.key === "Escape"
+        ) {
+
+            closeMenu();
+
+        }
+
+    }
+);
+
 
 logoutButton.addEventListener(
     "click",
-
     async () => {
 
-        logoutButton.textContent =
-            "LOGGING OUT...";
-
-
-        await supabaseClient
-        .auth
-        .signOut();
-
+        await supabase.auth.signOut();
 
         window.location.href =
             "auth.html";
 
     }
-
 );
+
+
+async function loadProfile() {
+
+    const {
+        data
+    } =
+        await supabase.auth.getUser();
+
+
+    const user =
+        data.user;
+
+
+    if (!user) {
+        return;
+    }
+
+
+    email.textContent =
+        user.email ||
+        "";
+
+
+    const name =
+        user.user_metadata?.username ||
+        user.user_metadata?.name ||
+        user.email?.split("@")[0] ||
+        "USER";
+
+
+    username.textContent =
+        name.toUpperCase();
+
+
+    avatar.textContent =
+        name
+            .charAt(0)
+            .toUpperCase();
+
+}
+
+
+loadProfile();

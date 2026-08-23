@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    >
+
+    <title>Edit Schedule</title>
+
+    <link
+        rel="stylesheet"
+        href="editor.css"
+    >
+
+</head>
+
+
+<body>
+
+<header class="editor-header">
+
+    <a
+        href="index.html"
+        class="back"
+    >
+        ‹
+    </a>
+
+
+    <div>
+
+        <div class="editor-title">
+            EDIT SCHEDULE
+        </div>
+
+        <div
+            class="editor-subtitle"
+            id="saveStatus"
+        >
+            READY
+        </div>
+
+    </div>
+
+
+    <button
+        id="saveButton"
+        class="save-button"
+    >
+        SAVE
+    </button>
+
+</header>
+
+
+<main class="editor">
+
+
+    <!-- DAYS -->
+
+    <div class="day-tabs">
+
+        <button data-day="MONDAY">
+            MON
+        </button>
+
+        <button data-day="TUESDAY">
+            TUE
+        </button>
+
+        <button data-day="WEDNESDAY">
+            WED
+        </button>
+
+        <button data-day="THURSDAY">
+            THU
+        </button>
+
+        <button data-day="FRIDAY">
+            FRI
+        </button>
+
+        <button data-day="SATURDAY">
+            SAT
+        </button>
+
+        <button data-day="SUNDAY">
+            SUN
+        </button>
+
+    </div>
+
+
+    <!-- TOOLBAR -->
+
+    <section class="toolbar">
+
+        <button
+            id="addTask"
+            class="primary-button"
+        >
+            + ADD TASK
+        </button>
+
+
+        <button
+            id="gridButton"
+            class="secondary-button"
+        >
+            GRID
+        </button>
+
+
+        <button
+            id="pointerButton"
+            class="secondary-button"
+        >
+            POINTER
+        </button>
+
+    </section>
+
+
+    <!-- TASKS -->
+
+    <section
+        id="tasks"
+        class="tasks"
+    ></section>
+
+
+    <!-- GRID PANEL -->
+
+    <section
+        id="gridPanel"
+        class="settings-panel hidden"
+    >
+
+        <h2>
+            GRID STYLE
+        </h2>
+
+
+        <div class="choice-grid">
+
+            <button data-grid="clean">
+                CLEAN
+            </button>
+
+            <button data-grid="dots">
+                DOTS
+            </button>
+
+            <button data-grid="double">
+                DOUBLE
+            </button>
+
+            <button data-grid="soft">
+                SOFT
+            </button>
+
+            <button data-grid="wave">
+                WAVE
+            </button>
+
+        </div>
+
+
+        <label>
+            GRID COLOR
+
+            <input
+                type="color"
+                id="gridColor"
+            >
+
+        </label>
+
+    </section>
+
+
+    <!-- POINTER PANEL -->
+
+    <section
+        id="pointerPanel"
+        class="settings-panel hidden"
+    >
+
+        <h2>
+            TIME POINTER
+        </h2>
+
+
+        <label>
+            SYMBOL
+
+            <select id="pointerSymbol">
+
+                <option value="▶">▶ Triangle</option>
+
+                <option value="♥">♥ Heart</option>
+
+                <option value="✦">✦ Star</option>
+
+                <option value="✿">✿ Flower</option>
+
+                <option value="◆">◆ Diamond</option>
+
+                <option value="●">● Circle</option>
+
+                <option value="➜">➜ Arrow</option>
+
+            </select>
+
+        </label>
+
+
+        <label>
+            COLOR
+
+            <input
+                type="color"
+                id="pointerColor"
+            >
+
+        </label>
+
+
+        <label>
+
+            SIZE
+
+            <input
+                type="range"
+                id="pointerSize"
+                min="14"
+                max="70"
+                step="1"
+            >
+
+            <output id="pointerSizeValue">
+                28
+            </output>
+
+        </label>
+
+
+        <label class="check-row">
+
+            <input
+                type="checkbox"
+                id="pointerGradient"
+            >
+
+            GRADIENT
+
+        </label>
+
+
+        <div id="pointerGradientOptions">
+
+            <label>
+
+                START
+
+                <input
+                    type="color"
+                    id="pointerGradientStart"
+                >
+
+            </label>
+
+
+            <label>
+
+                END
+
+                <input
+                    type="color"
+                    id="pointerGradientEnd"
+                >
+
+            </label>
+
+        </div>
+
+    </section>
+
+
+</main>
+
+
+<script
+    type="module"
+    src="editor.js"
+></script>
+
+</body>
+
+</html>

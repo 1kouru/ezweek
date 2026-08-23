@@ -1,0 +1,572 @@
+* {
+    box-sizing: border-box;
+
+    margin: 0;
+    padding: 0;
+
+    -webkit-tap-highlight-color:
+        transparent;
+}
+
+
+html,
+body {
+    min-height: 100%;
+
+    background: #f6f6f6;
+
+    color: #111;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+}
+
+
+body {
+    padding-bottom:
+        env(safe-area-inset-bottom);
+}
+
+
+button,
+input,
+select {
+    font-family: inherit;
+}
+
+
+/* HEADER */
+
+.editor-header {
+    position: sticky;
+
+    top: 0;
+
+    z-index: 100;
+
+    min-height: 68px;
+
+    padding:
+        max(
+            10px,
+            env(safe-area-inset-top)
+        )
+        14px;
+
+    background:
+        rgba(255,255,255,.95);
+
+    backdrop-filter:
+        blur(15px);
+
+    border-bottom:
+        1px solid #e8e8e8;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.back {
+    width: 42px;
+    height: 42px;
+
+    border-radius: 50%;
+
+    background: #f1f1f1;
+
+    color: #111;
+
+    text-decoration: none;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 30px;
+}
+
+
+.editor-title {
+    font-size: 11px;
+
+    font-weight: 800;
+
+    letter-spacing: 1.5px;
+}
+
+
+.editor-subtitle {
+    margin-top: 3px;
+
+    color: #999;
+
+    font-size: 9px;
+
+    letter-spacing: 1px;
+}
+
+
+.save-button {
+    margin-left: auto;
+
+    height: 40px;
+
+    padding:
+        0 15px;
+
+    border: 0;
+
+    border-radius: 12px;
+
+    background: #111;
+
+    color: #fff;
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: 1px;
+}
+
+
+/* MAIN */
+
+.editor {
+    width: 100%;
+
+    max-width: 850px;
+
+    margin: auto;
+
+    padding:
+        14px
+        12px
+        50px;
+}
+
+
+/* DAYS */
+
+.day-tabs {
+    display: flex;
+
+    gap: 6px;
+
+    overflow-x: auto;
+
+    scrollbar-width: none;
+
+    margin-bottom: 12px;
+}
+
+
+.day-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+
+.day-tabs button {
+    flex: 0 0 auto;
+
+    min-width: 55px;
+
+    height: 42px;
+
+    border: 0;
+
+    border-radius: 12px;
+
+    background: #e9e9e9;
+
+    color: #999;
+
+    font-size: 9px;
+
+    font-weight: 800;
+}
+
+
+.day-tabs button.active {
+    background: #111;
+
+    color: #fff;
+}
+
+
+/* TOOLBAR */
+
+.toolbar {
+    display: grid;
+
+    grid-template-columns:
+        1fr
+        1fr
+        1fr;
+
+    gap: 7px;
+
+    margin-bottom: 15px;
+}
+
+
+.primary-button,
+.secondary-button {
+    min-height: 45px;
+
+    border: 0;
+
+    border-radius: 13px;
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: .8px;
+}
+
+
+.primary-button {
+    background: #111;
+
+    color: #fff;
+}
+
+
+.secondary-button {
+    background: #fff;
+
+    color: #555;
+
+    border:
+        1px solid #e6e6e6;
+}
+
+
+/* TASK */
+
+.task-card {
+    background: #fff;
+
+    border:
+        1px solid #e7e7e7;
+
+    border-radius: 18px;
+
+    padding: 13px;
+
+    margin-bottom: 10px;
+
+    box-shadow:
+        0 4px 20px
+        rgba(0,0,0,.025);
+}
+
+
+.task-top {
+    display: grid;
+
+    grid-template-columns:
+        85px
+        minmax(0,1fr)
+        42px;
+
+    gap: 8px;
+}
+
+
+.time-input,
+.text-input {
+    height: 44px;
+
+    border:
+        1px solid #ddd;
+
+    border-radius: 11px;
+
+    background: #fafafa;
+
+    outline: none;
+
+    padding:
+        0 11px;
+
+    font-size: 13px;
+}
+
+
+.time-input {
+    font-weight: 700;
+}
+
+
+.text-input {
+    width: 100%;
+}
+
+
+.delete-task {
+    width: 42px;
+    height: 44px;
+
+    border: 0;
+
+    border-radius: 11px;
+
+    background: #f3f3f3;
+
+    color: #999;
+
+    font-size: 18px;
+}
+
+
+/* CONTROLS */
+
+.task-controls {
+    display: grid;
+
+    grid-template-columns:
+        1fr
+        1fr;
+
+    gap: 8px;
+
+    margin-top: 10px;
+}
+
+
+.control {
+    background: #fafafa;
+
+    border:
+        1px solid #eee;
+
+    border-radius: 12px;
+
+    padding: 9px;
+}
+
+
+.control-title {
+    margin-bottom: 6px;
+
+    color: #999;
+
+    font-size: 8px;
+
+    font-weight: 700;
+
+    letter-spacing: 1px;
+}
+
+
+.control input[type="color"] {
+    width: 100%;
+
+    height: 35px;
+
+    border: 0;
+
+    background: transparent;
+}
+
+
+.control input[type="range"] {
+    width: 100%;
+}
+
+
+.control select {
+    width: 100%;
+
+    height: 34px;
+
+    border: 0;
+
+    background: transparent;
+
+    outline: none;
+
+    font-size: 11px;
+}
+
+
+.range-row {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+}
+
+
+.range-row output {
+    min-width: 25px;
+
+    font-size: 10px;
+
+    color: #777;
+}
+
+
+/* GRADIENT */
+
+.gradient-row {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 8px;
+
+    font-size: 9px;
+
+    font-weight: 700;
+}
+
+
+/* PANELS */
+
+.settings-panel {
+    margin-top: 12px;
+
+    padding: 16px;
+
+    border-radius: 18px;
+
+    background: #fff;
+
+    border:
+        1px solid #e7e7e7;
+}
+
+
+.settings-panel h2 {
+    margin-bottom: 14px;
+
+    font-size: 10px;
+
+    letter-spacing: 1.3px;
+}
+
+
+.settings-panel > label {
+    display: block;
+
+    margin-top: 12px;
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    color: #777;
+}
+
+
+.settings-panel input[type="color"],
+.settings-panel select {
+    display: block;
+
+    width: 100%;
+
+    height: 40px;
+
+    margin-top: 7px;
+
+    border:
+        1px solid #ddd;
+
+    border-radius: 10px;
+
+    background: #fafafa;
+}
+
+
+.settings-panel select {
+    padding: 0 10px;
+}
+
+
+.choice-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2,1fr);
+
+    gap: 7px;
+}
+
+
+.choice-grid button {
+    min-height: 45px;
+
+    border: 0;
+
+    border-radius: 11px;
+
+    background: #f1f1f1;
+
+    font-size: 9px;
+
+    font-weight: 800;
+}
+
+
+.choice-grid button.active {
+    background: #111;
+
+    color: #fff;
+}
+
+
+.check-row {
+    display: flex !important;
+
+    align-items: center;
+
+    gap: 8px;
+
+    color: #333 !important;
+}
+
+
+#pointerGradientOptions {
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 8px;
+}
+
+
+.hidden {
+    display: none !important;
+}
+
+
+/* DESKTOP */
+
+@media (min-width: 700px) {
+
+    .editor {
+        padding: 25px;
+    }
+
+
+    .task-controls {
+        grid-template-columns:
+            repeat(4,1fr);
+    }
+
+}

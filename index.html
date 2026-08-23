@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
@@ -7,7 +8,7 @@
 
     <meta
         name="viewport"
-        content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     >
 
     <title>Routine</title>
@@ -33,14 +34,14 @@
             class="day"
             id="dayName"
         >
-            MONDAY
+            LOADING
         </div>
 
         <div
             class="time"
             id="currentTime"
         >
-            00:00
+            --:--
         </div>
 
     </header>
@@ -52,7 +53,7 @@
         class="menu-button"
         id="menuButton"
         type="button"
-        aria-label="Menu"
+        aria-label="Open menu"
     >
 
         <span></span>
@@ -62,7 +63,7 @@
     </button>
 
 
-    <!-- DAY NAVIGATION -->
+    <!-- DAY SWITCHER -->
 
     <div class="day-navigation">
 
@@ -82,17 +83,17 @@
         >
 
             <span
-                class="selected-day-label"
                 id="selectedDayLabel"
+                class="selected-day-label"
             >
                 TODAY
             </span>
 
             <span
-                class="selected-day-name"
                 id="selectedDayName"
+                class="selected-day-name"
             >
-                MONDAY
+                LOADING
             </span>
 
         </button>
@@ -109,18 +110,7 @@
     </div>
 
 
-    <!-- TODAY -->
-
-    <button
-        class="today-button"
-        id="todayButton"
-        type="button"
-    >
-        TODAY
-    </button>
-
-
-    <!-- REAL SCHEDULE -->
+    <!-- SCHEDULE -->
 
     <section
         class="schedule"
@@ -128,25 +118,30 @@
     >
 
         <div
-            class="schedule-wrapper"
-            id="scheduleWrapper"
+            class="schedule-board"
+            id="scheduleBoard"
         >
 
             <div
-                class="schedule-grid"
-                id="scheduleGrid"
-            ></div>
+                class="empty-state"
+                id="emptyState"
+            >
+                Your schedule is empty
+            </div>
+
+        </div>
 
 
-<div
-    class="current-time-pointer"
-    id="currentTimePointer"
->
-    <div
-        class="pointer-triangle"
-        id="pointerSymbol"
-    >➜</div>
-</div>
+        <!-- CURRENT TIME POINTER -->
+
+        <div
+            class="time-pointer"
+            id="timePointer"
+        >
+
+            <span id="pointerSymbol">
+                ▶
+            </span>
 
         </div>
 
@@ -159,39 +154,60 @@
 
         <div class="days-scroll">
 
-            <button class="day-button" data-day="MONDAY">
+            <button
+                class="day-button"
+                data-day="MONDAY"
+            >
                 MON
-                <span class="day-indicator"></span>
+                <span></span>
             </button>
 
-            <button class="day-button" data-day="TUESDAY">
+            <button
+                class="day-button"
+                data-day="TUESDAY"
+            >
                 TUE
-                <span class="day-indicator"></span>
+                <span></span>
             </button>
 
-            <button class="day-button" data-day="WEDNESDAY">
+            <button
+                class="day-button"
+                data-day="WEDNESDAY"
+            >
                 WED
-                <span class="day-indicator"></span>
+                <span></span>
             </button>
 
-            <button class="day-button" data-day="THURSDAY">
+            <button
+                class="day-button"
+                data-day="THURSDAY"
+            >
                 THU
-                <span class="day-indicator"></span>
+                <span></span>
             </button>
 
-            <button class="day-button" data-day="FRIDAY">
+            <button
+                class="day-button"
+                data-day="FRIDAY"
+            >
                 FRI
-                <span class="day-indicator"></span>
+                <span></span>
             </button>
 
-            <button class="day-button" data-day="SATURDAY">
+            <button
+                class="day-button"
+                data-day="SATURDAY"
+            >
                 SAT
-                <span class="day-indicator"></span>
+                <span></span>
             </button>
 
-            <button class="day-button" data-day="SUNDAY">
+            <button
+                class="day-button"
+                data-day="SUNDAY"
+            >
                 SUN
-                <span class="day-indicator"></span>
+                <span></span>
             </button>
 
         </div>
@@ -237,7 +253,7 @@
             </div>
 
 
-            <div class="menu-user-info">
+            <div>
 
                 <div
                     class="menu-username"
@@ -250,7 +266,7 @@
                     class="menu-email"
                     id="menuEmail"
                 >
-                    user@email.com
+                    --
                 </div>
 
             </div>
@@ -265,25 +281,16 @@
                 class="menu-link"
             >
                 <span>PROFILE</span>
-                <span class="menu-arrow">›</span>
+                <span>›</span>
             </a>
 
 
             <a
-                href="schedule-editor.html"
+                href="editor.html"
                 class="menu-link"
             >
                 <span>EDIT SCHEDULE</span>
-                <span class="menu-arrow">›</span>
-            </a>
-
-
-            <a
-                href="index.html"
-                class="menu-link active"
-            >
-                <span>SCHEDULE</span>
-                <span class="menu-arrow">›</span>
+                <span>›</span>
             </a>
 
         </div>
@@ -292,17 +299,27 @@
         <button
             class="logout-button"
             id="logoutButton"
-            type="button"
         >
             LOG OUT
         </button>
 
     </aside>
 
+
 </main>
 
 
-<script type="module" src="script.js"></script>
+<script
+    type="module"
+    src="script.js"
+></script>
+
+
+<script
+    type="module"
+    src="menu.js"
+></script>
+
 
 </body>
 
