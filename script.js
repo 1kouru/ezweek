@@ -307,7 +307,9 @@ function normalizeSchedule(input) {
     };
 
 
-    /* old versions */
+    /*
+     * Old versions compatibility.
+     */
 
     if (
         !source.global?.gridMode &&
@@ -370,7 +372,9 @@ function normalizeSchedule(input) {
     }
 
 
-    /* pointer */
+    /*
+     * Pointer
+     */
 
     result.pointer.icon =
         Math.max(
@@ -407,7 +411,9 @@ function normalizeSchedule(input) {
     }
 
 
-    /* tasks */
+    /*
+     * Tasks
+     */
 
     DAYS.forEach(day => {
 
@@ -537,7 +543,8 @@ function getAlmatyTime() {
         Number(
             parts.find(
                 part =>
-                    part.type === "hour"
+                    part.type ===
+                    "hour"
             )?.value || 0
         );
 
@@ -555,7 +562,8 @@ function getAlmatyTime() {
             Number(
                 parts.find(
                     part =>
-                        part.type === "minute"
+                        part.type ===
+                        "minute"
                 )?.value || 0
             ),
 
@@ -563,7 +571,8 @@ function getAlmatyTime() {
             Number(
                 parts.find(
                     part =>
-                        part.type === "second"
+                        part.type ===
+                        "second"
                 )?.value || 0
             )
 
@@ -630,75 +639,103 @@ function sortItems(items) {
 
 
 /* =========================================================
-   CURRENT ITEM
+   MEASURE TIME COLUMN
 ========================================================= */
 
-function getCurrentItem() {
+function measureTimeColumn() {
 
-    if (
-        selectedDay !==
-        getAlmatyDay()
-    ) {
-
-        return null;
-    }
-
-
-    const items =
-        sortItems(
-            scheduleData.days[
-                selectedDay
-            ]
+    const times =
+        board.querySelectorAll(
+            ".schedule-time"
         );
 
 
-    if (!items.length) {
-        return null;
+    if (!times.length) {
+
+        board.style.setProperty(
+            "--time-column-width",
+            "52px"
+        );
+
+        return;
     }
 
 
-    const now =
-        getAlmatyTime();
+    /*
+     * Canvas нужен, чтобы измерять
+     * реальную ширину текста,
+     * а не ширину уже ограниченного
+     * элемента.
+     */
+
+    const canvas =
+        document.createElement(
+            "canvas"
+        );
 
 
-    const currentSeconds =
-        now.hour * 3600 +
-        now.minute * 60 +
-        now.second;
+    const context =
+        canvas.getContext("2d");
 
 
-    let nearest = null;
+    if (!context) {
 
-    let smallest =
-        Infinity;
+        board.style.setProperty(
+            "--time-column-width",
+            "52px"
+        );
+
+        return;
+    }
 
 
-    items.forEach(item => {
+    let maxWidth = 0;
 
-        const difference =
-            Math.abs(
-                seconds(item.time) -
-                currentSeconds
+
+    times.forEach(element => {
+
+        const style =
+            getComputedStyle(
+                element
             );
 
 
-        if (
-            difference <
-            smallest
-        ) {
+        context.font =
+            `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
 
-            smallest =
-                difference;
 
-            nearest =
-                item;
+        const width =
+            context.measureText(
+                element.textContent
+            ).width;
 
-        }
+
+        maxWidth =
+            Math.max(
+                maxWidth,
+                width
+            );
 
     });
 
 
-    return nearest;
+    /*
+     * Немного воздуха по бокам.
+     */
+
+    const result =
+        Math.max(
+            48,
+            Math.ceil(
+                maxWidth + 12
+            )
+        );
+
+
+    board.style.setProperty(
+        "--time-column-width",
+        `${result}px`
+    );
 }
 
 
@@ -713,12 +750,12 @@ function render() {
     }
 
 
-    board.innerHTML = "";
+    board.innerHTML =
+        "";
 
 
     /*
-     * Important:
-     * никакой фоновой сетки.
+     * Никаких фоновых изображений.
      */
 
     board.style.background =
@@ -737,16 +774,6 @@ function render() {
     board.style.setProperty(
         "--grid-thickness",
         `${scheduleData.global.gridThickness}px`
-    );
-
-
-    /*
-     * Pointer space.
-     */
-
-    board.style.setProperty(
-        "--pointer-space",
-        `${scheduleData.pointer.size + 30}px`
     );
 
 
@@ -771,6 +798,7 @@ function render() {
             emptyState
         );
 
+
     }
     else {
 
@@ -779,27 +807,19 @@ function render() {
 
 
         items.forEach(
-            item => {
-
+            item =>
                 createScheduleRow(
                     item
-                );
-
-            }
+                )
         );
 
     }
 
 
-    /*
-     * После создания строк
-     * вычисляем реальную ширину TIME.
-     */
-
     requestAnimationFrame(
         () => {
 
-            updateTimeColumnWidth();
+            measureTimeColumn();
 
             renderPointer();
 
@@ -829,7 +849,7 @@ function createScheduleRow(item) {
 
 
     /*
-     * TIME
+     * Time settings
      */
 
     row.style.setProperty(
@@ -855,7 +875,7 @@ function createScheduleRow(item) {
 
 
     /*
-     * TEXT
+     * Text settings
      */
 
     row.style.setProperty(
@@ -923,7 +943,7 @@ function createScheduleRow(item) {
 
 
     /*
-     * Gradient текста
+     * Gradient только текста.
      */
 
     if (
@@ -991,64 +1011,6 @@ function createScheduleRow(item) {
 
 
 /* =========================================================
-   DYNAMIC TIME COLUMN
-========================================================= */
-
-function updateTimeColumnWidth() {
-
-    const times =
-        board.querySelectorAll(
-            ".schedule-time"
-        );
-
-
-    let maxWidth =
-        0;
-
-
-    times.forEach(
-        timeElement => {
-
-            const width =
-                timeElement
-                    .getBoundingClientRect()
-                    .width;
-
-
-            maxWidth =
-                Math.max(
-                    maxWidth,
-                    width
-                );
-
-        }
-    );
-
-
-    /*
-     * Минимальная ширина.
-     *
-     * Если размер TIME маленький,
-     * колонка всё равно остаётся аккуратной.
-     */
-
-    const timeColumn =
-        Math.max(
-            48,
-            Math.ceil(
-                maxWidth + 2
-            )
-        );
-
-
-    board.style.setProperty(
-        "--time-column-width",
-        `${timeColumn}px`
-    );
-}
-
-
-/* =========================================================
    GRID
 ========================================================= */
 
@@ -1061,38 +1023,37 @@ function applyGrid() {
     );
 
 
-    switch (
-        scheduleData.global.gridMode
+    const mode =
+        scheduleData.global.gridMode;
+
+
+    if (
+        mode === "grid"
     ) {
 
-        case "grid":
+        board.classList.add(
+            "grid-grid"
+        );
 
-            board.classList.add(
-                "grid-grid"
-            );
-
-            break;
-
-
-        case "none":
-
-            board.classList.add(
-                "grid-none"
-            );
-
-            break;
-
-
-        case "rows":
-        default:
-
-            board.classList.add(
-                "grid-rows"
-            );
-
-            break;
-
+        return;
     }
+
+
+    if (
+        mode === "none"
+    ) {
+
+        board.classList.add(
+            "grid-none"
+        );
+
+        return;
+    }
+
+
+    board.classList.add(
+        "grid-rows"
+    );
 }
 
 
@@ -1107,18 +1068,6 @@ function renderPointer() {
     }
 
 
-    const size =
-        Math.max(
-            10,
-            Math.min(
-                70,
-                Number(
-                    scheduleData.pointer.size
-                ) || 28
-            )
-        );
-
-
     const icon =
         Math.max(
             1,
@@ -1131,14 +1080,25 @@ function renderPointer() {
         );
 
 
+    const size =
+        Math.max(
+            10,
+            Math.min(
+                70,
+                Number(
+                    scheduleData.pointer.size
+                ) || 28
+            )
+        );
+
+
     const color =
         scheduleData.pointer.color ||
         "#111111";
 
 
     /*
-     * Уничтожаем старые градиентные
-     * правила.
+     * Clear old gradient.
      */
 
     pointer.classList.remove(
@@ -1171,28 +1131,20 @@ function renderPointer() {
         "none";
 
 
-    pointer.style.color =
-        "transparent";
-
-
-    pointer.style.fontSize =
-        "0";
-
-
     /*
-     * PNG как mask.
+     * PNG as mask.
      */
 
-    const iconUrl =
+    const image =
         `url("icons/${icon}.png")`;
 
 
     pointer.style.webkitMaskImage =
-        iconUrl;
+        image;
 
 
     pointer.style.maskImage =
-        iconUrl;
+        image;
 
 
     pointer.style.webkitMaskRepeat =
@@ -1220,7 +1172,7 @@ function renderPointer() {
 
 
     /*
-     * Старый символ скрываем.
+     * Hide old symbol.
      */
 
     if (pointerSymbol) {
@@ -1230,7 +1182,6 @@ function renderPointer() {
 
         pointerSymbol.style.display =
             "none";
-
     }
 
 
@@ -1249,6 +1200,22 @@ function updatePointerPosition() {
     }
 
 
+    /*
+     * Only today.
+     */
+
+    if (
+        selectedDay !==
+        getAlmatyDay()
+    ) {
+
+        pointer.style.display =
+            "none";
+
+        return;
+    }
+
+
     const current =
         getCurrentItem();
 
@@ -1257,8 +1224,6 @@ function updatePointerPosition() {
 
         pointer.style.display =
             "none";
-
-        removeCurrentRow();
 
         return;
     }
@@ -1279,18 +1244,30 @@ function updatePointerPosition() {
     }
 
 
-    removeCurrentRow();
-
-
     /*
-     * Подсвечиваем текущую строку
-     * очень аккуратно.
+     * Highlight current row.
      */
+
+    board
+        .querySelectorAll(
+            ".current-row"
+        )
+        .forEach(
+            element =>
+                element.classList.remove(
+                    "current-row"
+                )
+        );
+
 
     targetRow.classList.add(
         "current-row"
     );
 
+
+    /*
+     * Get positions.
+     */
 
     const rowRect =
         targetRow.getBoundingClientRect();
@@ -1304,8 +1281,14 @@ function updatePointerPosition() {
         board.getBoundingClientRect();
 
 
+    const size =
+        Number(
+            scheduleData.pointer.size
+        ) || 28;
+
+
     /*
-     * Y.
+     * Vertical position.
      */
 
     const y =
@@ -1315,25 +1298,15 @@ function updatePointerPosition() {
         +
         schedule.scrollTop
         +
-        (
-            rowRect.height /
-            2
-        );
+        rowRect.height / 2;
 
 
     /*
-     * X.
+     * Horizontal position.
      *
-     * Pointer располагается
-     * слева от реальной области
-     * расписания.
+     * The pointer sits in the margin,
+     * not inside the table.
      */
-
-    const size =
-        Number(
-            scheduleData.pointer.size
-        ) || 28;
-
 
     const x =
         boardRect.left
@@ -1342,12 +1315,12 @@ function updatePointerPosition() {
         -
         size
         -
-        10;
+        9;
 
 
     pointer.style.left =
         `${Math.max(
-            3,
+            4,
             x
         )}px`;
 
@@ -1357,26 +1330,81 @@ function updatePointerPosition() {
 
 
     pointer.style.display =
-        "block";
+        "flex";
 }
 
 
 /* =========================================================
-   CURRENT ROW
+   CURRENT ITEM
 ========================================================= */
 
-function removeCurrentRow() {
+function getCurrentItem() {
 
-    board
-        .querySelectorAll(
-            ".current-row"
-        )
-        .forEach(
-            row =>
-                row.classList.remove(
-                    "current-row"
-                )
+    if (
+        selectedDay !==
+        getAlmatyDay()
+    ) {
+
+        return null;
+    }
+
+
+    const items =
+        sortItems(
+            scheduleData.days[
+                selectedDay
+            ]
         );
+
+
+    if (!items.length) {
+
+        return null;
+    }
+
+
+    const now =
+        getAlmatyTime();
+
+
+    const currentSeconds =
+        now.hour * 3600 +
+        now.minute * 60 +
+        now.second;
+
+
+    let nearest = null;
+
+    let difference =
+        Infinity;
+
+
+    items.forEach(item => {
+
+        const currentDifference =
+            Math.abs(
+                seconds(item.time) -
+                currentSeconds
+            );
+
+
+        if (
+            currentDifference <
+            difference
+        ) {
+
+            difference =
+                currentDifference;
+
+            nearest =
+                item;
+
+        }
+
+    });
+
+
+    return nearest;
 }
 
 
@@ -1390,10 +1418,12 @@ function updateDayUI() {
         getAlmatyDay();
 
 
-    if (dayName) {
+    /*
+     * Старую надпись DAY/TIME сверху
+     * не показываем.
+     */
 
-        dayName.textContent =
-            "";
+    if (dayName) {
 
         dayName.style.display =
             "none";
@@ -1402,9 +1432,6 @@ function updateDayUI() {
 
 
     if (currentTime) {
-
-        currentTime.textContent =
-            "";
 
         currentTime.style.display =
             "none";
@@ -1474,9 +1501,6 @@ function selectDay(day) {
 function updateClock() {
 
     if (currentTime) {
-
-        currentTime.textContent =
-            "";
 
         currentTime.style.display =
             "none";
@@ -1580,6 +1604,7 @@ dayButtons.forEach(
 ========================================================= */
 
 let startX = 0;
+
 let startY = 0;
 
 
@@ -1703,7 +1728,7 @@ window.addEventListener(
         requestAnimationFrame(
             () => {
 
-                updateTimeColumnWidth();
+                measureTimeColumn();
 
                 updatePointerPosition();
 
