@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
@@ -23,17 +22,19 @@
 
 <body>
 
+
 <header class="editor-header">
 
     <a
         href="index.html"
         class="back"
+        aria-label="Back"
     >
         ‹
     </a>
 
 
-    <div>
+    <div class="header-info">
 
         <div class="editor-title">
             EDIT SCHEDULE
@@ -52,6 +53,7 @@
     <button
         id="saveButton"
         class="save-button"
+        type="button"
     >
         SAVE
     </button>
@@ -59,10 +61,13 @@
 </header>
 
 
+
 <main class="editor">
 
 
-    <!-- DAYS -->
+    <!-- =========================================
+         DAYS
+    ========================================== -->
 
     <div class="day-tabs">
 
@@ -97,13 +102,66 @@
     </div>
 
 
-    <!-- TOOLBAR -->
+
+    <!-- =========================================
+         LIVE PREVIEW
+    ========================================== -->
+
+    <section class="preview-section">
+
+        <div class="section-heading">
+
+            <div>
+                LIVE PREVIEW
+            </div>
+
+            <span id="previewDay">
+                MON
+            </span>
+
+        </div>
+
+
+        <div
+            class="preview"
+            id="preview"
+        >
+
+            <div
+                class="preview-grid"
+                id="previewGrid"
+            ></div>
+
+
+            <div
+                class="preview-pointer"
+                id="previewPointer"
+            >
+                ▶
+            </div>
+
+
+            <div
+                class="preview-tasks"
+                id="previewTasks"
+            ></div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================================
+         TOOLBAR
+    ========================================== -->
 
     <section class="toolbar">
 
         <button
             id="addTask"
             class="primary-button"
+            type="button"
         >
             + ADD TASK
         </button>
@@ -112,6 +170,7 @@
         <button
             id="gridButton"
             class="secondary-button"
+            type="button"
         >
             GRID
         </button>
@@ -120,6 +179,7 @@
         <button
             id="pointerButton"
             class="secondary-button"
+            type="button"
         >
             POINTER
         </button>
@@ -127,7 +187,10 @@
     </section>
 
 
-    <!-- TASKS -->
+
+    <!-- =========================================
+         TASKS
+    ========================================== -->
 
     <section
         id="tasks"
@@ -135,16 +198,19 @@
     ></section>
 
 
-    <!-- GRID PANEL -->
+
+    <!-- =========================================
+         GRID PANEL
+    ========================================== -->
 
     <section
         id="gridPanel"
         class="settings-panel hidden"
     >
 
-        <h2>
+        <div class="panel-title">
             GRID STYLE
-        </h2>
+        </div>
 
 
         <div class="choice-grid">
@@ -172,121 +238,162 @@
         </div>
 
 
-        <label>
-            GRID COLOR
+        <div class="global-control">
+
+            <span>
+                GRID COLOR
+            </span>
 
             <input
                 type="color"
                 id="gridColor"
             >
 
-        </label>
+        </div>
 
     </section>
 
 
-    <!-- POINTER PANEL -->
+
+    <!-- =========================================
+         POINTER PANEL
+    ========================================== -->
 
     <section
         id="pointerPanel"
         class="settings-panel hidden"
     >
 
-        <h2>
+        <div class="panel-title">
             TIME POINTER
-        </h2>
+        </div>
 
 
-        <label>
-            SYMBOL
+        <div class="global-control">
+
+            <span>
+                SYMBOL
+            </span>
 
             <select id="pointerSymbol">
 
-                <option value="▶">▶ Triangle</option>
+                <option value="▶">
+                    ▶ Triangle
+                </option>
 
-                <option value="♥">♥ Heart</option>
+                <option value="♥">
+                    ♥ Heart
+                </option>
 
-                <option value="✦">✦ Star</option>
+                <option value="✦">
+                    ✦ Star
+                </option>
 
-                <option value="✿">✿ Flower</option>
+                <option value="✿">
+                    ✿ Flower
+                </option>
 
-                <option value="◆">◆ Diamond</option>
+                <option value="◆">
+                    ◆ Diamond
+                </option>
 
-                <option value="●">● Circle</option>
+                <option value="●">
+                    ● Circle
+                </option>
 
-                <option value="➜">➜ Arrow</option>
+                <option value="➜">
+                    ➜ Arrow
+                </option>
 
             </select>
 
-        </label>
+        </div>
 
 
-        <label>
-            COLOR
+        <div class="global-control">
+
+            <span>
+                COLOR
+            </span>
 
             <input
                 type="color"
                 id="pointerColor"
             >
 
-        </label>
+        </div>
 
 
-        <label>
+        <div class="global-control">
 
-            SIZE
+            <span>
+                SIZE
+            </span>
 
-            <input
-                type="range"
-                id="pointerSize"
-                min="14"
-                max="70"
-                step="1"
-            >
+            <div class="range-line">
 
-            <output id="pointerSizeValue">
-                28
-            </output>
+                <input
+                    type="range"
+                    id="pointerSize"
+                    min="12"
+                    max="80"
+                    step="1"
+                >
 
-        </label>
+                <output id="pointerSizeValue">
+                    28
+                </output>
+
+            </div>
+
+        </div>
 
 
-        <label class="check-row">
+        <label class="switch-row">
 
             <input
                 type="checkbox"
                 id="pointerGradient"
             >
 
-            GRADIENT
+            <span>
+                GRADIENT
+            </span>
 
         </label>
 
 
-        <div id="pointerGradientOptions">
+        <div
+            id="pointerGradientOptions"
+            class="gradient-options"
+        >
 
-            <label>
+            <div class="global-control">
 
-                START
+                <span>
+                    START
+                </span>
 
                 <input
                     type="color"
                     id="pointerGradientStart"
                 >
 
-            </label>
+            </div>
 
 
-            <label>
+            <div class="global-control">
 
-                END
+                <span>
+                    END
+                </span>
 
                 <input
                     type="color"
                     id="pointerGradientEnd"
                 >
 
-            </label>
+            </div>
 
         </div>
 
@@ -296,10 +403,60 @@
 </main>
 
 
+
+<!-- =========================================
+     DELETE MODAL
+========================================== -->
+
+<div
+    class="modal-backdrop hidden"
+    id="deleteModal"
+>
+
+    <div class="confirm-modal">
+
+        <div class="confirm-title">
+            DELETE TASK?
+        </div>
+
+        <div
+            class="confirm-text"
+            id="deleteText"
+        >
+            Are you sure?
+        </div>
+
+
+        <div class="confirm-buttons">
+
+            <button
+                id="cancelDelete"
+                type="button"
+            >
+                CANCEL
+            </button>
+
+            <button
+                id="confirmDelete"
+                class="danger"
+                type="button"
+            >
+                DELETE
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
 <script
     type="module"
     src="editor.js"
 ></script>
+
 
 </body>
 

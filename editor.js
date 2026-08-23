@@ -16,13 +16,26 @@ const DAYS = [
 ];
 
 
-let selectedDay =
-    "MONDAY";
+const SHORT = {
+    MONDAY: "MON",
+    TUESDAY: "TUE",
+    WEDNESDAY: "WED",
+    THURSDAY: "THU",
+    FRIDAY: "FRI",
+    SATURDAY: "SAT",
+    SUNDAY: "SUN"
+};
 
+
+let selectedDay = "MONDAY";
 
 let user = null;
 
 let data = null;
+
+let deleteTarget = null;
+
+let saveTimer = null;
 
 
 /* =========================================
@@ -30,48 +43,96 @@ let data = null;
 ========================================= */
 
 const tasks =
-    document.getElementById(
-        "tasks"
-    );
+    document.getElementById("tasks");
+
+const preview =
+    document.getElementById("preview");
+
+const previewTasks =
+    document.getElementById("previewTasks");
+
+const previewGrid =
+    document.getElementById("previewGrid");
+
+const previewPointer =
+    document.getElementById("previewPointer");
+
+const previewDay =
+    document.getElementById("previewDay");
 
 const saveButton =
-    document.getElementById(
-        "saveButton"
-    );
+    document.getElementById("saveButton");
 
 const saveStatus =
-    document.getElementById(
-        "saveStatus"
-    );
+    document.getElementById("saveStatus");
 
 const addTask =
-    document.getElementById(
-        "addTask"
-    );
+    document.getElementById("addTask");
 
 const gridButton =
-    document.getElementById(
-        "gridButton"
-    );
+    document.getElementById("gridButton");
 
 const pointerButton =
-    document.getElementById(
-        "pointerButton"
-    );
+    document.getElementById("pointerButton");
 
 const gridPanel =
-    document.getElementById(
-        "gridPanel"
-    );
+    document.getElementById("gridPanel");
 
 const pointerPanel =
+    document.getElementById("pointerPanel");
+
+const gridColor =
+    document.getElementById("gridColor");
+
+const pointerSymbol =
+    document.getElementById("pointerSymbol");
+
+const pointerColor =
+    document.getElementById("pointerColor");
+
+const pointerSize =
+    document.getElementById("pointerSize");
+
+const pointerSizeValue =
+    document.getElementById("pointerSizeValue");
+
+const pointerGradient =
+    document.getElementById("pointerGradient");
+
+const pointerGradientStart =
+    document.getElementById("pointerGradientStart");
+
+const pointerGradientEnd =
+    document.getElementById("pointerGradientEnd");
+
+const pointerGradientOptions =
     document.getElementById(
-        "pointerPanel"
+        "pointerGradientOptions"
+    );
+
+const deleteModal =
+    document.getElementById(
+        "deleteModal"
+    );
+
+const deleteText =
+    document.getElementById(
+        "deleteText"
+    );
+
+const cancelDelete =
+    document.getElementById(
+        "cancelDelete"
+    );
+
+const confirmDelete =
+    document.getElementById(
+        "confirmDelete"
     );
 
 
 /* =========================================
-   DEFAULT
+   DEFAULT DATA
 ========================================= */
 
 function defaultData() {
@@ -93,22 +154,7 @@ function defaultData() {
 
             grid: "clean",
 
-            gridColor: "#e8e8e8",
-
-            timeColor: "#999999",
-
-            timeSize: 11,
-
-            taskSize: 15,
-
-            taskColor: "#111111",
-
-            taskBackground:
-                "transparent",
-
-            taskRadius: 12,
-
-            taskPadding: 10
+            gridColor: "#e8e8e8"
 
         },
 
@@ -127,6 +173,70 @@ function defaultData() {
             gradientEnd: "#7c5cff"
 
         }
+
+    };
+
+}
+
+
+/* =========================================
+   DEFAULT TASK
+========================================= */
+
+function createDefaultTask() {
+
+    return {
+
+        id:
+            crypto.randomUUID(),
+
+        time:
+            "08:00",
+
+        text:
+            "NEW TASK",
+
+        color:
+            "#111111",
+
+        fontSize:
+            15,
+
+        fontFamily:
+            "Arial",
+
+        fontWeight:
+            500,
+
+        italic:
+            false,
+
+        background:
+            "transparent",
+
+        radius:
+            12,
+
+        padding:
+            10,
+
+        timeColor:
+            "#999999",
+
+        timeSize:
+            11,
+
+        timeWeight:
+            600,
+
+        gradient:
+            false,
+
+        gradientStart:
+            "#ff4ecd",
+
+        gradientEnd:
+            "#7c5cff"
 
     };
 
@@ -172,9 +282,7 @@ async function initUser() {
 
 async function loadData() {
 
-    setStatus(
-        "LOADING..."
-    );
+    setStatus("LOADING...");
 
 
     const {
@@ -199,16 +307,14 @@ async function loadData() {
 
         console.error(error);
 
-        setStatus(
-            "LOAD ERROR"
-        );
+        setStatus("LOAD ERROR");
 
         alert(
             "Не удалось загрузить расписание:\n\n" +
             error.message
         );
 
-        return;
+        return false;
 
     }
 
@@ -221,9 +327,9 @@ async function loadData() {
     normalize();
 
 
-    setStatus(
-        "READY"
-    );
+    setStatus("READY");
+
+    return true;
 
 }
 
@@ -283,6 +389,20 @@ function normalize() {
 
         }
 
+
+        data.days[day] =
+            data.days[day].map(task => {
+
+                return {
+
+                    ...createDefaultTask(),
+
+                    ...task
+
+                };
+
+            });
+
     });
 
 }
@@ -294,13 +414,14 @@ function normalize() {
 
 async function save() {
 
-    setStatus(
-        "SAVING..."
-    );
+    if (!user || !data) {
+        return false;
+    }
 
 
-    saveButton.disabled =
-        true;
+    setStatus("SAVING...");
+
+    saveButton.disabled = true;
 
 
     const {
@@ -327,61 +448,83 @@ async function save() {
                 },
 
                 {
+
                     onConflict:
                         "user_id"
+
                 }
 
             );
 
 
-    saveButton.disabled =
-        false;
+    saveButton.disabled = false;
 
 
     if (error) {
 
         console.error(
-            "SUPABASE SAVE:",
+            "SAVE ERROR:",
             error
         );
 
-
-        setStatus(
-            "ERROR"
-        );
-
+        setStatus("ERROR");
 
         alert(
             "Ошибка сохранения:\n\n" +
-            error.message +
-            "\n\nCode: " +
-            (error.code || "-")
+            error.message
         );
-
 
         return false;
 
     }
 
 
-    setStatus(
-        "SAVED ✓"
-    );
+    setStatus("SAVED ✓");
 
 
     setTimeout(
         () => {
 
-            setStatus(
-                "READY"
-            );
+            if (
+                saveStatus.textContent ===
+                "SAVED ✓"
+            ) {
+
+                setStatus("READY");
+
+            }
 
         },
-        1500
+        1600
     );
 
 
     return true;
+
+}
+
+
+/* =========================================
+   AUTOSAVE
+========================================= */
+
+function queueSave() {
+
+    setStatus("UNSAVED");
+
+
+    clearTimeout(saveTimer);
+
+
+    saveTimer =
+        setTimeout(
+            () => {
+
+                save();
+
+            },
+            700
+        );
 
 }
 
@@ -419,6 +562,13 @@ document
 
                 renderTasks();
 
+                renderPreview();
+
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth"
+                });
+
             }
         );
 
@@ -452,64 +602,93 @@ addTask.addEventListener(
     "click",
     () => {
 
-        data.days[
-            selectedDay
-        ].push({
+        const task =
+            createDefaultTask();
 
-            id:
-                crypto.randomUUID(),
 
-            time:
-                "08:00",
+        const dayTasks =
+            data.days[
+                selectedDay
+            ];
 
-            text:
-                "NEW TASK",
 
-            color:
-                data.global.taskColor,
+        /*
+         * Ищем ближайшее свободное время.
+         */
 
-            fontSize:
-                data.global.taskSize,
+        const used =
+            new Set(
+                dayTasks.map(
+                    x => x.time
+                )
+            );
 
-            fontFamily:
-                "Arial",
 
-            fontWeight:
-                500,
+        let hour = 8;
 
-            background:
-                "transparent",
+        while (
+            used.has(
+                `${String(hour)
+                    .padStart(2,"0")}:00`
+            )
+            &&
+            hour < 24
+        ) {
 
-            radius:
-                data.global.taskRadius,
+            hour++;
 
-            padding:
-                data.global.taskPadding,
+        }
 
-            timeColor:
-                data.global.timeColor,
 
-            timeSize:
-                data.global.timeSize,
+        task.time =
+            `${String(hour)
+                .padStart(2,"0")}:00`;
 
-            timeWeight:
-                600,
 
-            gradient:
-                false,
-
-            gradientStart:
-                "#ff4ecd",
-
-            gradientEnd:
-                "#7c5cff"
-
-        });
+        dayTasks.push(task);
 
 
         renderTasks();
 
-        save();
+        renderPreview();
+
+        queueSave();
+
+
+        /*
+         * Автоматически раскрываем
+         * новую задачу.
+         */
+
+        setTimeout(
+            () => {
+
+                const cards =
+                    document.querySelectorAll(
+                        ".task-card"
+                    );
+
+                const last =
+                    cards[
+                        cards.length - 1
+                    ];
+
+                if (last) {
+
+                    last.classList.add(
+                        "expanded"
+                    );
+
+                    last.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center"
+                    });
+
+                }
+
+            },
+            50
+        );
 
     }
 );
@@ -542,20 +721,13 @@ function renderTasks() {
             );
 
 
-        empty.style.padding =
-            "50px 10px";
+        empty.className =
+            "empty-state";
 
-        empty.style.textAlign =
-            "center";
-
-        empty.style.color =
-            "#aaa";
-
-        empty.style.fontSize =
-            "12px";
 
         empty.textContent =
             "Нажми + ADD TASK";
+
 
         tasks.appendChild(
             empty
@@ -578,7 +750,7 @@ function renderTasks() {
 
 
 /* =========================================
-   CREATE CARD
+   CREATE TASK CARD
 ========================================= */
 
 function createTaskCard(item) {
@@ -593,7 +765,9 @@ function createTaskCard(item) {
         "task-card";
 
 
-    /* TOP */
+    /* -------------------------------------
+       TOP
+    -------------------------------------- */
 
     const top =
         document.createElement(
@@ -643,6 +817,9 @@ function createTaskCard(item) {
         );
 
 
+    remove.type =
+        "button";
+
     remove.className =
         "delete-task";
 
@@ -657,12 +834,82 @@ function createTaskCard(item) {
     );
 
 
-    card.appendChild(
-        top
+    card.appendChild(top);
+
+
+    /* -------------------------------------
+       STYLE PREVIEW
+    -------------------------------------- */
+
+    const stylePreview =
+        document.createElement(
+            "div"
+        );
+
+
+    stylePreview.className =
+        "task-style-preview";
+
+
+    const styleTime =
+        document.createElement(
+            "span"
+        );
+
+
+    styleTime.className =
+        "task-style-time";
+
+
+    const styleText =
+        document.createElement(
+            "span"
+        );
+
+
+    styleText.className =
+        "task-style-text";
+
+
+    stylePreview.append(
+        styleTime,
+        styleText
     );
 
 
-    /* CONTROLS */
+    card.appendChild(
+        stylePreview
+    );
+
+
+    /* -------------------------------------
+       EXPAND HINT
+    -------------------------------------- */
+
+    const expandHint =
+        document.createElement(
+            "div"
+        );
+
+
+    expandHint.className =
+        "expand-hint";
+
+
+    expandHint.innerHTML = `
+        <span>EDIT STYLE</span>
+        <span class="expand-arrow">⌄</span>
+    `;
+
+
+    card.appendChild(
+        expandHint
+    );
+
+
+    /* -------------------------------------
+       CONTROLS
+    -------------------------------------- */
 
     const controls =
         document.createElement(
@@ -674,7 +921,9 @@ function createTaskCard(item) {
         "task-controls";
 
 
-    /* COLOR */
+    /*
+     * TEXT COLOR
+     */
 
     controls.appendChild(
         colorControl(
@@ -685,30 +934,38 @@ function createTaskCard(item) {
                 item.color =
                     value;
 
+                refreshCard();
+
             }
         )
     );
 
 
-    /* FONT SIZE */
+    /*
+     * TEXT SIZE
+     */
 
     controls.appendChild(
         rangeControl(
             "TEXT SIZE",
             8,
-            50,
+            60,
             item.fontSize,
             value => {
 
                 item.fontSize =
                     Number(value);
 
+                refreshCard();
+
             }
         )
     );
 
 
-    /* FONT */
+    /*
+     * FONT
+     */
 
     controls.appendChild(
         selectControl(
@@ -728,12 +985,16 @@ function createTaskCard(item) {
                 item.fontFamily =
                     value;
 
+                refreshCard();
+
             }
         )
     );
 
 
-    /* WEIGHT */
+    /*
+     * WEIGHT
+     */
 
     controls.appendChild(
         selectControl(
@@ -746,20 +1007,42 @@ function createTaskCard(item) {
                 "800",
                 "900"
             ],
-            String(
-                item.fontWeight
-            ),
+            String(item.fontWeight),
             value => {
 
                 item.fontWeight =
                     Number(value);
+
+                refreshCard();
 
             }
         )
     );
 
 
-    /* BACKGROUND */
+    /*
+     * ITALIC
+     */
+
+    controls.appendChild(
+        checkboxControl(
+            "ITALIC",
+            item.italic,
+            value => {
+
+                item.italic =
+                    value;
+
+                refreshCard();
+
+            }
+        )
+    );
+
+
+    /*
+     * BACKGROUND
+     */
 
     controls.appendChild(
         colorControl(
@@ -773,12 +1056,16 @@ function createTaskCard(item) {
                 item.background =
                     value;
 
+                refreshCard();
+
             }
         )
     );
 
 
-    /* RADIUS */
+    /*
+     * ROUND
+     */
 
     controls.appendChild(
         rangeControl(
@@ -791,12 +1078,16 @@ function createTaskCard(item) {
                 item.radius =
                     Number(value);
 
+                refreshCard();
+
             }
         )
     );
 
 
-    /* PADDING */
+    /*
+     * PADDING
+     */
 
     controls.appendChild(
         rangeControl(
@@ -809,12 +1100,16 @@ function createTaskCard(item) {
                 item.padding =
                     Number(value);
 
+                refreshCard();
+
             }
         )
     );
 
 
-    /* TIME COLOR */
+    /*
+     * TIME COLOR
+     */
 
     controls.appendChild(
         colorControl(
@@ -825,30 +1120,65 @@ function createTaskCard(item) {
                 item.timeColor =
                     value;
 
+                refreshCard();
+
             }
         )
     );
 
 
-    /* TIME SIZE */
+    /*
+     * TIME SIZE
+     */
 
     controls.appendChild(
         rangeControl(
             "TIME SIZE",
             8,
-            25,
+            30,
             item.timeSize,
             value => {
 
                 item.timeSize =
                     Number(value);
 
+                refreshCard();
+
             }
         )
     );
 
 
-    /* GRADIENT */
+    /*
+     * TIME WEIGHT
+     */
+
+    controls.appendChild(
+        selectControl(
+            "TIME WEIGHT",
+            [
+                "400",
+                "500",
+                "600",
+                "700",
+                "800"
+            ],
+            String(item.timeWeight),
+            value => {
+
+                item.timeWeight =
+                    Number(value);
+
+                refreshCard();
+
+            }
+        )
+    );
+
+
+    /*
+     * TEXT GRADIENT
+     */
 
     const gradient =
         document.createElement(
@@ -862,28 +1192,29 @@ function createTaskCard(item) {
 
     gradient.innerHTML = `
         <div class="control-title">
-            GRADIENT
+            TEXT GRADIENT
         </div>
 
         <div class="gradient-row">
 
-            <label>
+            <label class="switch-line">
+
                 <input
                     type="checkbox"
-                    ${item.gradient ? "checked" : ""}
+                    data-gradient-toggle
                 >
+
                 ON
+
             </label>
 
             <input
                 type="color"
-                value="${item.gradientStart}"
                 data-gradient-start
             >
 
             <input
                 type="color"
-                value="${item.gradientEnd}"
                 data-gradient-end
             >
 
@@ -891,58 +1222,70 @@ function createTaskCard(item) {
     `;
 
 
-    const checkbox =
+    const gradientToggle =
         gradient.querySelector(
-            "input[type=checkbox]"
+            "[data-gradient-toggle]"
         );
 
 
-    const start =
+    const gradientStart =
         gradient.querySelector(
             "[data-gradient-start]"
         );
 
 
-    const end =
+    const gradientEnd =
         gradient.querySelector(
             "[data-gradient-end]"
         );
 
 
-    checkbox.addEventListener(
+    gradientToggle.checked =
+        !!item.gradient;
+
+
+    gradientStart.value =
+        item.gradientStart;
+
+
+    gradientEnd.value =
+        item.gradientEnd;
+
+
+    gradientToggle.addEventListener(
         "change",
         () => {
 
             item.gradient =
-                checkbox.checked;
+                gradientToggle.checked;
 
-            previewAndSave();
+            refreshCard();
 
         }
     );
 
 
-    start.addEventListener(
+    gradientStart.addEventListener(
         "input",
         () => {
 
             item.gradientStart =
-                start.value;
+                gradientStart.value;
 
-            previewAndSave();
+            refreshCard();
 
         }
     );
 
 
-    end.addEventListener(
+    gradientEnd.addEventListener(
         "input",
         () => {
 
             item.gradientEnd =
-                end.value;
+                gradientEnd.value;
 
-            previewAndSave();
+            refreshCard();
 
         }
     );
@@ -953,12 +1296,115 @@ function createTaskCard(item) {
     );
 
 
+    /* -------------------------------------
+       DUPLICATE
+    -------------------------------------- */
+
+    const duplicate =
+        document.createElement(
+            "button"
+        );
+
+
+    duplicate.type =
+        "button";
+
+    duplicate.className =
+        "secondary-button";
+
+    duplicate.textContent =
+        "DUPLICATE TASK";
+
+
+    duplicate.style.gridColumn =
+        "1 / -1";
+
+
+    duplicate.addEventListener(
+        "click",
+        event => {
+
+            event.stopPropagation();
+
+
+            const copy =
+                JSON.parse(
+                    JSON.stringify(item)
+                );
+
+
+            copy.id =
+                crypto.randomUUID();
+
+
+            copy.text =
+                item.text;
+
+
+            /*
+             * Ставим копию на +10 минут.
+             */
+
+            copy.time =
+                addMinutes(
+                    item.time,
+                    10
+                );
+
+
+            data.days[
+                selectedDay
+            ].push(copy);
+
+
+            renderTasks();
+
+            renderPreview();
+
+            queueSave();
+
+        }
+    );
+
+
+    controls.appendChild(
+        duplicate
+    );
+
+
     card.appendChild(
         controls
     );
 
 
-    /* EVENTS */
+    /* -------------------------------------
+       EXPAND / COLLAPSE
+    -------------------------------------- */
+
+    function toggleCard() {
+
+        card.classList.toggle(
+            "expanded"
+        );
+
+    }
+
+
+    expandHint.addEventListener(
+        "click",
+        toggleCard
+    );
+
+
+    stylePreview.addEventListener(
+        "click",
+        toggleCard
+    );
+
+
+    /* -------------------------------------
+       INPUT EVENTS
+    -------------------------------------- */
 
     time.addEventListener(
         "change",
@@ -968,9 +1414,12 @@ function createTaskCard(item) {
                 time.value ||
                 "00:00";
 
+
             renderTasks();
 
-            previewAndSave();
+            renderPreview();
+
+            queueSave();
 
         }
     );
@@ -983,7 +1432,7 @@ function createTaskCard(item) {
             item.text =
                 text.value;
 
-            previewAndSave();
+            refreshCard();
 
         }
     );
@@ -991,56 +1440,159 @@ function createTaskCard(item) {
 
     remove.addEventListener(
         "click",
-        () => {
+        event => {
 
-            data.days[
-                selectedDay
-            ] =
-                data.days[
-                    selectedDay
-                ].filter(
-                    x =>
-                        x.id !==
-                        item.id
-                );
+            event.stopPropagation();
 
-
-            renderTasks();
-
-            save();
+            openDeleteModal(item);
 
         }
     );
 
 
-    return card;
+    /*
+     * Не даём клику по input
+     * раскрывать карточку.
+     */
+
+    time.addEventListener(
+        "click",
+        event =>
+            event.stopPropagation()
+    );
 
 
-    /* LIVE */
+    text.addEventListener(
+        "click",
+        event =>
+            event.stopPropagation()
+    );
 
-    function previewAndSave() {
 
-        renderTasksPreview(card);
+    /* -------------------------------------
+       REFRESH CARD
+    -------------------------------------- */
+
+    function refreshCard() {
+
+        applyStylePreview();
+
+        renderPreview();
 
         queueSave();
 
     }
 
 
-    function renderTasksPreview() {
+    function applyStylePreview() {
 
-        // Controls are intentionally
-        // kept in-place on mobile.
-        // The values update immediately.
-        // Full persistence is debounced.
+        styleTime.textContent =
+            item.time;
+
+
+        styleText.textContent =
+            item.text;
+
+
+        styleTime.style.color =
+            item.timeColor;
+
+
+        styleTime.style.fontSize =
+            `${item.timeSize}px`;
+
+
+        styleTime.style.fontWeight =
+            item.timeWeight;
+
+
+        styleText.style.fontFamily =
+            item.fontFamily;
+
+
+        styleText.style.fontSize =
+            `${item.fontSize}px`;
+
+
+        styleText.style.fontWeight =
+            item.fontWeight;
+
+
+        styleText.style.fontStyle =
+            item.italic
+                ? "italic"
+                : "normal";
+
+
+        styleText.style.padding =
+            `${item.padding}px`;
+
+
+        styleText.style.borderRadius =
+            `${item.radius}px`;
+
+
+        if (
+            item.background ===
+            "transparent"
+        ) {
+
+            styleText.style.background =
+                "transparent";
+
+        }
+
+        else {
+
+            styleText.style.background =
+                item.background;
+
+        }
+
+
+        if (item.gradient) {
+
+            styleText.style.background =
+                `linear-gradient(
+                    90deg,
+                    ${item.gradientStart},
+                    ${item.gradientEnd}
+                )`;
+
+            styleText.style.webkitBackgroundClip =
+                "text";
+
+            styleText.style.webkitTextFillColor =
+                "transparent";
+
+        }
+
+        else {
+
+            styleText.style.webkitBackgroundClip =
+                "";
+
+            styleText.style.webkitTextFillColor =
+                "";
+
+            styleText.style.color =
+                item.color;
+
+        }
 
     }
+
+
+    applyStylePreview();
+
+
+    return card;
 
 }
 
 
 /* =========================================
-   CONTROL HELPERS
+   COLOR CONTROL
 ========================================= */
 
 function colorControl(
@@ -1059,22 +1611,34 @@ function colorControl(
         "control";
 
 
-    box.innerHTML = `
-        <div class="control-title">
-            ${title}
-        </div>
+    const titleElement =
+        document.createElement(
+            "div"
+        );
 
-        <input
-            type="color"
-            value="${value || "#111111"}"
-        >
-    `;
+
+    titleElement.className =
+        "control-title";
+
+
+    titleElement.textContent =
+        title;
 
 
     const input =
-        box.querySelector(
+        document.createElement(
             "input"
         );
+
+
+    input.type =
+        "color";
+
+
+    input.value =
+        isValidColor(value)
+            ? value
+            : "#111111";
 
 
     input.addEventListener(
@@ -1085,9 +1649,13 @@ function colorControl(
                 input.value
             );
 
-            queueSave();
-
         }
+    );
+
+
+    box.append(
+        titleElement,
+        input
     );
 
 
@@ -1095,6 +1663,10 @@ function colorControl(
 
 }
 
+
+/* =========================================
+   RANGE CONTROL
+========================================= */
 
 function rangeControl(
     title,
@@ -1155,11 +1727,10 @@ function rangeControl(
             output.textContent =
                 input.value;
 
+
             callback(
                 input.value
             );
-
-            queueSave();
 
         }
     );
@@ -1169,6 +1740,10 @@ function rangeControl(
 
 }
 
+
+/* =========================================
+   SELECT CONTROL
+========================================= */
 
 function selectControl(
     title,
@@ -1209,24 +1784,32 @@ function selectControl(
 
     options.forEach(option => {
 
-        const item =
+        const optionElement =
             document.createElement(
                 "option"
             );
 
 
-        item.value =
+        optionElement.value =
             option;
 
-        item.textContent =
+
+        optionElement.textContent =
             option;
 
-        item.selected =
-            option === value;
+
+        if (
+            option === value
+        ) {
+
+            optionElement.selected =
+                true;
+
+        }
 
 
         select.appendChild(
-            item
+            optionElement
         );
 
     });
@@ -1239,8 +1822,6 @@ function selectControl(
             callback(
                 select.value
             );
-
-            queueSave();
 
         }
     );
@@ -1258,39 +1839,466 @@ function selectControl(
 
 
 /* =========================================
-   AUTOSAVE
+   CHECKBOX CONTROL
 ========================================= */
 
-let saveTimer = null;
+function checkboxControl(
+    title,
+    value,
+    callback
+) {
 
-
-function queueSave() {
-
-    setStatus(
-        "UNSAVED"
-    );
-
-
-    clearTimeout(
-        saveTimer
-    );
-
-
-    saveTimer =
-        setTimeout(
-            () => {
-
-                save();
-
-            },
-            1000
+    const box =
+        document.createElement(
+            "div"
         );
+
+
+    box.className =
+        "control";
+
+
+    box.innerHTML = `
+        <div class="control-title">
+            ${title}
+        </div>
+
+        <label class="switch-line">
+
+            <input
+                type="checkbox"
+                ${value ? "checked" : ""}
+            >
+
+            ON
+
+        </label>
+    `;
+
+
+    const input =
+        box.querySelector(
+            "input"
+        );
+
+
+    input.addEventListener(
+        "change",
+        () => {
+
+            callback(
+                input.checked
+            );
+
+        }
+    );
+
+
+    return box;
+
+}
+
+
+/* =========================================
+   PREVIEW
+========================================= */
+
+function renderPreview() {
+
+    previewDay.textContent =
+        SHORT[selectedDay];
+
+
+    renderGrid();
+
+    renderPreviewTasks();
+
+    renderPreviewPointer();
 
 }
 
 
 /* =========================================
    GRID
+========================================= */
+
+function renderGrid() {
+
+    previewGrid.className =
+        "preview-grid " +
+        data.global.grid;
+
+
+    previewGrid.style
+        .setProperty(
+            "--grid-color",
+            data.global.gridColor
+        );
+
+}
+
+
+/* =========================================
+   PREVIEW TASKS
+========================================= */
+
+function renderPreviewTasks() {
+
+    previewTasks.innerHTML =
+        "";
+
+
+    const items =
+        [...data.days[selectedDay]]
+        .sort(
+            (a,b) =>
+                timeToMinutes(a.time) -
+                timeToMinutes(b.time)
+        );
+
+
+    if (!items.length) {
+        return;
+    }
+
+
+    const height =
+        preview.clientHeight;
+
+
+    const start =
+        6 * 60;
+
+
+    const end =
+        24 * 60;
+
+
+    const range =
+        end - start;
+
+
+    items.forEach(item => {
+
+        const row =
+            document.createElement(
+                "div"
+            );
+
+
+        row.className =
+            "preview-task";
+
+
+        const position =
+            (
+                timeToMinutes(
+                    item.time
+                ) -
+                start
+            )
+            /
+            range;
+
+
+        const safePosition =
+            Math.max(
+                0,
+                Math.min(
+                    1,
+                    position
+                )
+            );
+
+
+        row.style.top =
+            `${safePosition * 100}%`;
+
+
+        const time =
+            document.createElement(
+                "span"
+            );
+
+
+        time.className =
+            "preview-time";
+
+
+        time.textContent =
+            item.time;
+
+
+        time.style.color =
+            item.timeColor;
+
+
+        time.style.fontSize =
+            `${item.timeSize}px`;
+
+
+        time.style.fontWeight =
+            item.timeWeight;
+
+
+        const text =
+            document.createElement(
+                "span"
+            );
+
+
+        text.className =
+            "preview-label";
+
+
+        text.textContent =
+            item.text;
+
+
+        text.style.fontFamily =
+            item.fontFamily;
+
+
+        text.style.fontSize =
+            `${item.fontSize}px`;
+
+
+        text.style.fontWeight =
+            item.fontWeight;
+
+
+        text.style.fontStyle =
+            item.italic
+                ? "italic"
+                : "normal";
+
+
+        text.style.padding =
+            `${item.padding}px`;
+
+
+        text.style.borderRadius =
+            `${item.radius}px`;
+
+
+        if (
+            item.background !==
+            "transparent"
+        ) {
+
+            text.style.background =
+                item.background;
+
+        }
+
+
+        if (item.gradient) {
+
+            text.style.background =
+                `linear-gradient(
+                    90deg,
+                    ${item.gradientStart},
+                    ${item.gradientEnd}
+                )`;
+
+            text.style.webkitBackgroundClip =
+                "text";
+
+            text.style.webkitTextFillColor =
+                "transparent";
+
+        }
+
+        else {
+
+            text.style.color =
+                item.color;
+
+        }
+
+
+        row.append(
+            time,
+            text
+        );
+
+
+        previewTasks.appendChild(
+            row
+        );
+
+    });
+
+}
+
+
+/* =========================================
+   POINTER PREVIEW
+========================================= */
+
+function renderPreviewPointer() {
+
+    previewPointer.textContent =
+        data.pointer.symbol;
+
+
+    previewPointer.style.fontSize =
+        `${data.pointer.size}px`;
+
+
+    if (
+        data.pointer.gradient
+    ) {
+
+        previewPointer.style.background =
+            `linear-gradient(
+                90deg,
+                ${data.pointer.gradientStart},
+                ${data.pointer.gradientEnd}
+            )`;
+
+        previewPointer.style.webkitBackgroundClip =
+            "text";
+
+        previewPointer.style.webkitTextFillColor =
+            "transparent";
+
+    }
+
+    else {
+
+        previewPointer.style.background =
+            "";
+
+        previewPointer.style.webkitBackgroundClip =
+            "";
+
+        previewPointer.style.webkitTextFillColor =
+            "";
+
+        previewPointer.style.color =
+            data.pointer.color;
+
+    }
+
+
+    /*
+     * Preview показывает стрелку
+     * примерно на 14:00.
+     *
+     * На главной странице её реальная
+     * позиция будет вычисляться
+     * по текущему времени.
+     */
+
+    const demoTime =
+        14 * 60;
+
+
+    const start =
+        6 * 60;
+
+
+    const end =
+        24 * 60;
+
+
+    const position =
+        (
+            demoTime - start
+        )
+        /
+        (
+            end - start
+        );
+
+
+    previewPointer.style.top =
+        `${position * 100}%`;
+
+}
+
+
+/* =========================================
+   TIME HELPERS
+========================================= */
+
+function timeToMinutes(time) {
+
+    if (!time) {
+        return 0;
+    }
+
+
+    const [
+        hours,
+        minutes
+    ] =
+        time
+        .split(":")
+        .map(Number);
+
+
+    return (
+        hours * 60 +
+        minutes
+    );
+
+}
+
+
+function addMinutes(
+    time,
+    amount
+) {
+
+    let total =
+        timeToMinutes(time) +
+        amount;
+
+
+    total =
+        Math.min(
+            total,
+            23 * 60 + 59
+        );
+
+
+    const hours =
+        Math.floor(
+            total / 60
+        );
+
+
+    const minutes =
+        total % 60;
+
+
+    return (
+        String(hours)
+            .padStart(2,"0")
+        +
+        ":"
+        +
+        String(minutes)
+            .padStart(2,"0")
+    );
+
+}
+
+
+function isValidColor(value) {
+
+    return (
+        typeof value === "string" &&
+        /^#[0-9A-F]{6}$/i.test(value)
+    );
+
+}
+
+
+/* =========================================
+   GRID PANEL
 ========================================= */
 
 gridButton.addEventListener(
@@ -1304,6 +2312,8 @@ gridButton.addEventListener(
         pointerPanel.classList.add(
             "hidden"
         );
+
+        renderGrid();
 
     }
 );
@@ -1327,15 +2337,17 @@ document
                     .querySelectorAll(
                         "[data-grid]"
                     )
-                    .forEach(x => {
+                    .forEach(item => {
 
-                        x.classList.toggle(
+                        item.classList.toggle(
                             "active",
-                            x === button
+                            item === button
                         );
 
                     });
 
+
+                renderPreview();
 
                 queueSave();
 
@@ -1345,18 +2357,15 @@ document
     });
 
 
-const gridColor =
-    document.getElementById(
-        "gridColor"
-    );
-
-
 gridColor.addEventListener(
     "input",
     () => {
 
         data.global.gridColor =
             gridColor.value;
+
+
+        renderPreview();
 
         queueSave();
 
@@ -1365,7 +2374,7 @@ gridColor.addEventListener(
 
 
 /* =========================================
-   POINTER
+   POINTER PANEL
 ========================================= */
 
 pointerButton.addEventListener(
@@ -1384,48 +2393,15 @@ pointerButton.addEventListener(
 );
 
 
-const pointerSymbol =
-    document.getElementById(
-        "pointerSymbol"
-    );
-
-const pointerColor =
-    document.getElementById(
-        "pointerColor"
-    );
-
-const pointerSize =
-    document.getElementById(
-        "pointerSize"
-    );
-
-const pointerSizeValue =
-    document.getElementById(
-        "pointerSizeValue"
-    );
-
-const pointerGradient =
-    document.getElementById(
-        "pointerGradient"
-    );
-
-const pointerGradientStart =
-    document.getElementById(
-        "pointerGradientStart"
-    );
-
-const pointerGradientEnd =
-    document.getElementById(
-        "pointerGradientEnd"
-    );
-
-
 pointerSymbol.addEventListener(
     "change",
     () => {
 
         data.pointer.symbol =
             pointerSymbol.value;
+
+
+        renderPreview();
 
         queueSave();
 
@@ -1439,6 +2415,9 @@ pointerColor.addEventListener(
 
         data.pointer.color =
             pointerColor.value;
+
+
+        renderPreview();
 
         queueSave();
 
@@ -1455,8 +2434,12 @@ pointerSize.addEventListener(
                 pointerSize.value
             );
 
+
         pointerSizeValue.textContent =
             pointerSize.value;
+
+
+        renderPreview();
 
         queueSave();
 
@@ -1471,6 +2454,11 @@ pointerGradient.addEventListener(
         data.pointer.gradient =
             pointerGradient.checked;
 
+
+        updateGradientOptions();
+
+        renderPreview();
+
         queueSave();
 
     }
@@ -1483,6 +2471,9 @@ pointerGradientStart.addEventListener(
 
         data.pointer.gradientStart =
             pointerGradientStart.value;
+
+
+        renderPreview();
 
         queueSave();
 
@@ -1497,14 +2488,27 @@ pointerGradientEnd.addEventListener(
         data.pointer.gradientEnd =
             pointerGradientEnd.value;
 
+
+        renderPreview();
+
         queueSave();
 
     }
 );
 
 
+function updateGradientOptions() {
+
+    pointerGradientOptions.style.opacity =
+        data.pointer.gradient
+            ? "1"
+            : ".45";
+
+}
+
+
 /* =========================================
-   LOAD UI
+   LOAD SETTINGS
 ========================================= */
 
 function loadSettingsUI() {
@@ -1555,7 +2559,97 @@ function loadSettingsUI() {
     pointerGradientEnd.value =
         data.pointer.gradientEnd;
 
+
+    updateGradientOptions();
+
 }
+
+
+/* =========================================
+   DELETE MODAL
+========================================= */
+
+function openDeleteModal(item) {
+
+    deleteTarget =
+        item;
+
+
+    deleteText.textContent =
+        `Удалить «${item.text || "NEW TASK"}»?`;
+
+
+    deleteModal.classList.remove(
+        "hidden"
+    );
+
+}
+
+
+function closeDeleteModal() {
+
+    deleteTarget =
+        null;
+
+
+    deleteModal.classList.add(
+        "hidden"
+    );
+
+}
+
+
+cancelDelete.addEventListener(
+    "click",
+    closeDeleteModal
+);
+
+
+deleteModal.addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target ===
+            deleteModal
+        ) {
+
+            closeDeleteModal();
+
+        }
+
+    }
+);
+
+
+confirmDelete.addEventListener(
+    "click",
+    () => {
+
+        if (!deleteTarget) {
+            return;
+        }
+
+
+        data.days[selectedDay] =
+            data.days[selectedDay]
+            .filter(
+                task =>
+                    task.id !==
+                    deleteTarget.id
+            );
+
+
+        closeDeleteModal();
+
+        renderTasks();
+
+        renderPreview();
+
+        queueSave();
+
+    }
+);
 
 
 /* =========================================
@@ -1564,7 +2658,13 @@ function loadSettingsUI() {
 
 saveButton.addEventListener(
     "click",
-    save
+    () => {
+
+        clearTimeout(saveTimer);
+
+        save();
+
+    }
 );
 
 
@@ -1583,7 +2683,13 @@ async function start() {
     }
 
 
-    await loadData();
+    const loaded =
+        await loadData();
+
+
+    if (!loaded) {
+        return;
+    }
 
 
     updateTabs();
@@ -1591,6 +2697,8 @@ async function start() {
     loadSettingsUI();
 
     renderTasks();
+
+    renderPreview();
 
 }
 
