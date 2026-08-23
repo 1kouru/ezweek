@@ -68,16 +68,16 @@ body {
 
     top:
         max(
-            10px,
+            9px,
             env(safe-area-inset-top)
         );
 
-    left: 10px;
+    left: 9px;
 
     z-index: 500;
 
-    width: 42px;
-    height: 42px;
+    width: 40px;
+    height: 40px;
 
     border: 0;
 
@@ -88,16 +88,16 @@ body {
             255,
             255,
             255,
-            .96
+            .97
         );
 
     box-shadow:
-        0 5px 24px
+        0 4px 18px
         rgba(
             0,
             0,
             0,
-            .08
+            .07
         );
 
     display: flex;
@@ -108,11 +108,11 @@ body {
 
     justify-content: center;
 
-    gap: 5px;
+    gap: 4px;
 }
 
 .menu-button span {
-    width: 18px;
+    width: 17px;
     height: 2px;
 
     border-radius: 20px;
@@ -130,7 +130,7 @@ body {
 
     top:
         max(
-            10px,
+            9px,
             env(safe-area-inset-top)
         );
 
@@ -149,10 +149,10 @@ body {
 }
 
 .nav-button {
-    width: 39px;
-    height: 39px;
+    width: 37px;
+    height: 37px;
 
-    flex: 0 0 39px;
+    flex: 0 0 37px;
 
     border: 0;
 
@@ -162,29 +162,29 @@ body {
 
     color: #111;
 
-    font-size: 23px;
+    font-size: 21px;
 
     line-height: 1;
 
     box-shadow:
-        0 5px 18px
+        0 4px 15px
         rgba(
             0,
             0,
             0,
-            .055
+            .05
         );
 }
 
 .selected-day {
-    width: 106px;
-    min-width: 106px;
+    width: 100px;
+    min-width: 100px;
 
-    height: 39px;
+    height: 37px;
 
     border: 0;
 
-    border-radius: 22px;
+    border-radius: 20px;
 
     background: #111;
 
@@ -197,37 +197,28 @@ body {
     align-items: center;
 
     justify-content: center;
-
-    box-shadow:
-        0 7px 22px
-        rgba(
-            0,
-            0,
-            0,
-            .10
-        );
 }
 
 .selected-day-label {
-    font-size: 7px;
+    font-size: 6px;
 
     line-height: 1;
 
-    letter-spacing: 1.5px;
+    letter-spacing: 1.3px;
 
     opacity: .55;
 }
 
 .selected-day-name {
-    margin-top: 3px;
+    margin-top: 2px;
 
-    font-size: 10px;
+    font-size: 9px;
 
     line-height: 1;
 
     font-weight: 700;
 
-    letter-spacing: 1.25px;
+    letter-spacing: 1.1px;
 }
 
 
@@ -242,13 +233,13 @@ body {
 
     padding-top:
         calc(
-            62px +
+            59px +
             env(safe-area-inset-top)
         );
 
     padding-bottom:
         calc(
-            68px +
+            64px +
             env(safe-area-inset-bottom)
         );
 
@@ -256,14 +247,11 @@ body {
 
     overflow-x: hidden;
 
-    -webkit-overflow-scrolling:
-        touch;
+    -webkit-overflow-scrolling: touch;
 
-    touch-action:
-        pan-y;
+    touch-action: pan-y;
 
-    overscroll-behavior-y:
-        contain;
+    overscroll-behavior-y: contain;
 }
 
 
@@ -281,39 +269,32 @@ body {
     margin: 0 auto;
 
     /*
-     * Отдельная зона для pointer.
-     * Размер задаётся JS.
+     * Маленькая отдельная зона pointer.
      */
 
-    padding-top: 18px;
+    padding-top: 12px;
 
-    padding-right: 12px;
+    padding-right: 8px;
 
-    padding-bottom: 90px;
+    padding-bottom: 78px;
 
     padding-left:
         var(
             --pointer-gutter,
-            62px
+            55px
         );
 
-    background:
-        transparent !important;
+    background: transparent !important;
 
-    background-image:
-        none !important;
+    background-image: none !important;
 
-    --grid-color:
-        #e8e8e8;
+    --grid-color: #e8e8e8;
 
-    --grid-thickness:
-        1px;
+    --grid-thickness: 1px;
 
-    --pointer-size:
-        28px;
+    --pointer-size: 28px;
 
-    --pointer-gutter:
-        62px;
+    --pointer-gutter: 55px;
 }
 
 
@@ -326,13 +307,12 @@ body {
 
     width: 100%;
 
-    min-height: 62px;
+    min-height: 52px;
 
     display: grid;
 
     /*
-     * TIME занимает ровно столько,
-     * сколько реально требует его текст.
+     * Время занимает только необходимую ширину.
      */
 
     grid-template-columns:
@@ -342,12 +322,12 @@ body {
             1fr
         );
 
-    column-gap: 12px;
+    column-gap: 8px;
 
     align-items: center;
 
     padding:
-        9px 0;
+        6px 0;
 
     background:
         transparent !important;
@@ -355,13 +335,12 @@ body {
     box-shadow:
         none !important;
 
-    border-bottom:
-        none !important;
+    border: 0 !important;
 }
 
 
 /*
- * Никакого выделения текущей строки.
+ * Полностью убираем старое выделение.
  */
 
 .schedule-row.current-row,
@@ -383,40 +362,34 @@ body {
 ========================================================= */
 
 .schedule-time {
-    width:
-        max-content;
+    width: max-content;
 
-    min-width:
-        max-content;
+    min-width: max-content;
 
-    max-width:
-        none;
+    max-width: none;
 
-    display:
-        flex;
+    display: flex;
 
-    align-items:
-        center;
+    align-items: center;
 
-    justify-content:
-        center;
+    justify-content: center;
 
-    text-align:
-        center;
+    text-align: center;
 
-    white-space:
-        nowrap;
+    white-space: nowrap;
 
-    overflow:
-        visible;
+    overflow: visible;
 
-    line-height:
-        1.1;
+    line-height: 1;
+
+    /*
+     * Компактнее для iPhone.
+     */
 
     font-size:
         var(
             --time-size,
-            11px
+            10px
         ) !important;
 
     font-weight:
@@ -445,31 +418,28 @@ body {
 
 
 /* =========================================================
-   TEXT
+   TASK TEXT
 ========================================================= */
 
 .schedule-task {
     position: relative;
 
-    min-width:
-        0;
+    min-width: 0;
 
-    width:
-        100%;
+    width: 100%;
 
-    max-width:
-        100%;
+    max-width: 100%;
 
     padding:
-        7px 9px;
+        5px 6px;
 
     border-radius:
-        9px;
+        7px;
 
     font-size:
         var(
             --task-size,
-            15px
+            14px
         ) !important;
 
     font-family:
@@ -491,7 +461,7 @@ body {
         );
 
     line-height:
-        1.22;
+        1.15;
 
     overflow-wrap:
         anywhere;
@@ -511,12 +481,6 @@ body {
    MODERN GRID
 ========================================================= */
 
-
-/*
- * ВАЖНО:
- * никаких background-image у board.
- */
-
 .schedule-board::before,
 .schedule-board::after {
     content: none !important;
@@ -527,14 +491,7 @@ body {
 
 /* =========================================================
    ROWS
-   Мягкая горизонтальная линия
 ========================================================= */
-
-.schedule-board.grid-rows
-.schedule-row {
-    border-bottom:
-        none !important;
-}
 
 .schedule-board.grid-rows
 .schedule-row::after {
@@ -542,8 +499,13 @@ body {
 
     position: absolute;
 
-    left: 0;
-    right: 0;
+    /*
+     * Сетка теперь короче самой строки.
+     * Она не идет от края до края.
+     */
+
+    left: 4px;
+    right: 4px;
 
     bottom: 0;
 
@@ -559,28 +521,14 @@ body {
 
             transparent 0%,
 
-            rgba(
-                0,
-                0,
-                0,
-                .015
-            ) 3%,
+            var(--grid-color) 15%,
 
-            var(--grid-color) 18%,
-
-            var(--grid-color) 82%,
-
-            rgba(
-                0,
-                0,
-                0,
-                .015
-            ) 97%,
+            var(--grid-color) 85%,
 
             transparent 100%
         );
 
-    opacity: .9;
+    opacity: .72;
 
     pointer-events: none;
 }
@@ -588,19 +536,7 @@ body {
 
 /* =========================================================
    GRID
-   Горизонтальная + вертикальная линия
 ========================================================= */
-
-.schedule-board.grid-grid
-.schedule-row {
-    border-bottom:
-        none !important;
-}
-
-
-/*
- * Горизонтальная линия.
- */
 
 .schedule-board.grid-grid
 .schedule-row::after {
@@ -608,8 +544,8 @@ body {
 
     position: absolute;
 
-    left: 0;
-    right: 0;
+    left: 4px;
+    right: 4px;
 
     bottom: 0;
 
@@ -625,57 +561,33 @@ body {
 
             transparent 0%,
 
-            rgba(
-                0,
-                0,
-                0,
-                .015
-            ) 3%,
+            var(--grid-color) 15%,
 
-            var(--grid-color) 18%,
-
-            var(--grid-color) 82%,
-
-            rgba(
-                0,
-                0,
-                0,
-                .015
-            ) 97%,
+            var(--grid-color) 85%,
 
             transparent 100%
         );
 
-    opacity: .9;
+    opacity: .72;
 
     pointer-events: none;
 }
 
 
 /*
- * Убираем обычную границу у текста.
+ * Вертикальный разделитель
+ * находится на границе TEXT.
  */
 
 .schedule-board.grid-grid
 .schedule-task {
-    border-left:
-        none !important;
+    border-left: 0 !important;
 
-    border-radius:
-        0;
+    border-radius: 0;
 
-    padding-left:
-        14px;
+    padding-left: 9px;
 }
 
-
-/*
- * Вертикальная линия.
- *
- * Она находится именно между
- * TIME и TEXT и сама исчезает
- * сверху и снизу.
- */
 
 .schedule-board.grid-grid
 .schedule-task::before {
@@ -685,8 +597,8 @@ body {
 
     left: 0;
 
-    top: 0;
-    bottom: 0;
+    top: 3px;
+    bottom: 3px;
 
     width:
         max(
@@ -700,28 +612,14 @@ body {
 
             transparent 0%,
 
-            rgba(
-                0,
-                0,
-                0,
-                .015
-            ) 7%,
+            var(--grid-color) 20%,
 
-            var(--grid-color) 22%,
-
-            var(--grid-color) 78%,
-
-            rgba(
-                0,
-                0,
-                0,
-                .015
-            ) 93%,
+            var(--grid-color) 80%,
 
             transparent 100%
         );
 
-    opacity: .9;
+    opacity: .7;
 
     pointer-events: none;
 }
@@ -732,26 +630,18 @@ body {
 ========================================================= */
 
 .schedule-board.grid-none
-.schedule-row {
-    border-bottom:
-        none !important;
-}
-
-.schedule-board.grid-none
 .schedule-row::after {
-    display:
-        none !important;
+    display: none !important;
 }
 
 .schedule-board.grid-none
 .schedule-task::before {
-    display:
-        none !important;
+    display: none !important;
 }
 
 
 /* =========================================================
-   OLD GRID CLASSES
+   OLD GRID MODES
 ========================================================= */
 
 .schedule-board.grid-dots,
@@ -815,12 +705,12 @@ body {
         none !important;
 
     box-shadow:
-        0 4px 12px
+        0 3px 9px
         rgba(
             0,
             0,
             0,
-            .10
+            .08
         );
 
     -webkit-mask-repeat:
@@ -843,10 +733,6 @@ body {
 }
 
 
-/*
- * Pointer никогда не становится градиентным.
- */
-
 .time-pointer.gradient {
     background-image:
         none !important;
@@ -855,10 +741,6 @@ body {
         none !important;
 }
 
-
-/*
- * Старый символ ▶ не используется.
- */
 
 #pointerSymbol {
     display:
@@ -872,7 +754,7 @@ body {
 
 .empty-state {
     padding:
-        75px 20px;
+        65px 15px;
 
     text-align:
         center;
@@ -881,15 +763,15 @@ body {
         #aaa;
 
     font-size:
-        13px;
+        11px;
 
     letter-spacing:
-        .4px;
+        .3px;
 }
 
 
 /* =========================================================
-   BOTTOM NAVIGATION
+   BOTTOM DAYS
 ========================================================= */
 
 .bottom-navigation {
@@ -902,10 +784,10 @@ body {
     z-index: 300;
 
     padding:
-        6px
-        6px
+        5px
+        5px
         max(
-            7px,
+            6px,
             env(safe-area-inset-bottom)
         );
 
@@ -918,10 +800,10 @@ body {
         );
 
     -webkit-backdrop-filter:
-        blur(18px);
+        blur(15px);
 
     backdrop-filter:
-        blur(18px);
+        blur(15px);
 
     border-top:
         1px solid
@@ -929,14 +811,10 @@ body {
             0,
             0,
             0,
-            .055
+            .05
         );
 }
 
-
-/* =========================================================
-   DAYS
-========================================================= */
 
 .days-scroll {
     width: 100%;
@@ -952,11 +830,10 @@ body {
             )
         ) !important;
 
-    gap:
-        3px;
+    gap: 3px;
 
     padding:
-        0 2px;
+        0 1px;
 
     overflow:
         hidden !important;
@@ -965,27 +842,22 @@ body {
         none;
 }
 
+
 .days-scroll::-webkit-scrollbar {
-    display:
-        none;
+    display: none;
 }
 
 
 .day-button {
-    width:
-        100%;
+    width: 100%;
 
-    min-width:
-        0;
+    min-width: 0;
 
-    height:
-        38px;
+    height: 35px;
 
-    border:
-        0;
+    border: 0;
 
-    border-radius:
-        9px;
+    border-radius: 8px;
 
     background:
         #f0f0f0;
@@ -994,7 +866,7 @@ body {
         #999;
 
     font-size:
-        7px;
+        6.5px;
 
     font-weight:
         700;
@@ -1035,27 +907,21 @@ body {
 
 
 .day-button span {
-    width:
-        3px;
+    width: 3px;
+    height: 3px;
 
-    height:
-        3px;
-
-    border-radius:
-        50%;
+    border-radius: 50%;
 
     background:
         currentColor;
 
-    opacity:
-        0;
+    opacity: 0;
 }
 
 
 .day-button.today:not(.active)
 span {
-    opacity:
-        .45;
+    opacity: .45;
 }
 
 
@@ -1078,8 +944,7 @@ span {
             .28
         );
 
-    opacity:
-        0;
+    opacity: 0;
 
     pointer-events:
         none;
@@ -1090,8 +955,7 @@ span {
 
 
 .menu-overlay.open {
-    opacity:
-        1;
+    opacity: 1;
 
     pointer-events:
         auto;
@@ -1362,84 +1226,259 @@ span {
 
 
 /* =========================================================
-   MOBILE
+   IPHONE
 ========================================================= */
 
 @media (max-width: 767px) {
 
+    /*
+     * Самая важная часть.
+     */
+
     .schedule-board {
+
+        /*
+         * Pointer занимает совсем немного места.
+         * Таблица после него остается компактной.
+         */
+
         padding-left:
             var(
                 --pointer-gutter,
-                62px
+                55px
             );
+
+        padding-right:
+            7px;
     }
+
 
     .schedule-row {
+
+        /*
+         * Еще чуть компактнее.
+         */
+
         min-height:
-            62px;
+            50px;
 
         column-gap:
-            11px;
+            7px;
+
+        padding:
+            5px 0;
     }
 
+
+    .schedule-time {
+
+        /*
+         * Даже если editor имеет большой
+         * размер, на iPhone сохраняем
+         * читабельность и помещаем время.
+         */
+
+        font-size:
+            min(
+                var(
+                    --time-size,
+                    10px
+                ),
+                12px
+            ) !important;
+    }
+
+
     .schedule-task {
+
+        font-size:
+            min(
+                var(
+                    --task-size,
+                    14px
+                ),
+                15px
+            ) !important;
+
         padding:
-            7px
+            4px
+            5px;
+    }
+
+
+    .schedule-board.grid-grid
+    .schedule-task {
+
+        padding-left:
             8px;
     }
+
+
+    .schedule-board.grid-grid
+    .schedule-task::before {
+
+        top:
+            2px;
+
+        bottom:
+            2px;
+    }
+
+
+    /*
+     * Минимальный красивый отступ
+     * между pointer и TIME.
+     */
 
     .time-pointer {
         z-index:
             450;
     }
 
-    .days-scroll {
-        gap:
-            3px;
 
-        padding:
-            0 2px;
+    .days-scroll {
+
+        grid-template-columns:
+            repeat(
+                7,
+                minmax(
+                    0,
+                    1fr
+                )
+            ) !important;
     }
 
-    .day-button {
-        height:
-            38px;
 
-        border-radius:
-            9px;
+    .day-button {
+
+        height:
+            35px;
 
         font-size:
-            7px;
+            6.5px;
     }
 }
 
 
 /* =========================================================
-   IPHONE 14+
+   IPHONE 14 / 15 / 16 / 17
 ========================================================= */
 
 @media (
     min-width: 390px
 ) and (
-    max-width: 767px
+    max-width: 430px
 ) {
 
-    .day-button {
+    .schedule-board {
+
+        padding-left:
+            var(
+                --pointer-gutter,
+                55px
+            );
+
+        padding-right:
+            7px;
+    }
+
+
+    .schedule-row {
+
+        min-height:
+            50px;
+
+        column-gap:
+            7px;
+    }
+
+
+    .schedule-time {
+
         font-size:
-            8px;
+            min(
+                var(
+                    --time-size,
+                    10px
+                ),
+                12px
+            ) !important;
+    }
+
+
+    .schedule-task {
+
+        font-size:
+            min(
+                var(
+                    --task-size,
+                    14px
+                ),
+                15px
+            ) !important;
     }
 }
 
 
 /* =========================================================
-   SMALL IPHONE
+   VERY SMALL PHONES
 ========================================================= */
 
 @media (max-width: 389px) {
 
-    .day-button {
+    .schedule-board {
+
+        padding-left:
+            var(
+                --pointer-gutter,
+                52px
+            );
+
+        padding-right:
+            6px;
+    }
+
+
+    .schedule-row {
+
+        min-height:
+            48px;
+
+        column-gap:
+            6px;
+    }
+
+
+    .schedule-time {
+
         font-size:
+            min(
+                var(
+                    --time-size,
+                    9px
+                ),
+                11px
+            ) !important;
+    }
+
+
+    .schedule-task {
+
+        font-size:
+            min(
+                var(
+                    --task-size,
+                    13px
+                ),
+                14px
+            ) !important;
+    }
+
+
+    .schedule-board.grid-grid
+    .schedule-task {
+
+        padding-left:
             7px;
     }
 }
@@ -1452,6 +1491,7 @@ span {
 @media (min-width: 768px) {
 
     .menu-button {
+
         top:
             25px;
 
@@ -1459,12 +1499,16 @@ span {
             25px;
     }
 
+
     .day-navigation {
+
         top:
             25px;
     }
 
+
     .schedule {
+
         padding-top:
             78px;
 
@@ -1472,32 +1516,46 @@ span {
             80px;
     }
 
+
     .schedule-board {
+
         width:
             720px;
 
-        padding:
-            30px
-            24px
-            100px
+        padding-top:
+            30px;
+
+        padding-right:
+            24px;
+
+        padding-bottom:
+            100px;
+
+        padding-left:
             var(
                 --pointer-gutter,
                 62px
             );
     }
 
+
     .schedule-row {
+
         min-height:
             66px;
 
         column-gap:
             16px;
+
+        padding:
+            9px 0;
     }
 
+
     .schedule-task {
+
         padding:
-            9px
-            11px;
+            9px 11px;
     }
 }
 
